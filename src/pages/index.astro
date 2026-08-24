@@ -1,0 +1,81 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { site } from '../site.config.mjs';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const areas = await getCollection('areas');
+
+const trustPoints = [
+  'Fully insured and accredited',
+  'Free, no-obligation quotes',
+  'Local team, no subcontracting',
+];
+---
+<Base title={`${site.brand} | ${site.tagline}`} description={site.tagline}>
+  <section class="border-b border-[--color-line] bg-[--color-surface]">
+    <div class="mx-auto max-w-5xl px-4 py-20 text-center">
+      <h1 class="text-4xl md:text-5xl">{site.tagline}</h1>
+      <p class="mt-4 text-lg text-[--color-muted]">
+        Serving {site.nap.locality} and {site.nap.region}.
+      </p>
+      <a href={`tel:${site.nap.phone}`} class="mt-8 inline-block rounded bg-[--color-accent] px-6 py-3 text-white">
+        Call {site.nap.phoneDisplay}
+      </a>
+    </div>
+  </section>
+
+  {services.length > 0 && (
+    <section class="mx-auto max-w-5xl px-4 py-16">
+      <h2 class="text-2xl">Our services</h2>
+      <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {services.map((s) => (
+          <a
+            href={`/services/${s.id}/`}
+            class="block rounded border border-[--color-line] p-6 transition hover:border-[--color-accent]"
+          >
+            <h3 class="text-lg font-semibold">{s.data.h1}</h3>
+            <p class="mt-2 text-sm text-[--color-muted]">{s.data.summary}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="border-y border-[--color-line] bg-[--color-surface]">
+    <div class="mx-auto max-w-5xl px-4 py-16">
+      <h2 class="text-2xl">Why choose {site.brand}</h2>
+      <ul class="mt-8 grid gap-4 sm:grid-cols-3">
+        {trustPoints.map((point) => (
+          <li class="rounded border border-[--color-line] bg-[--color-paper] p-4 text-sm">{point}</li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-4 py-16">
+    <h2 class="text-2xl">Areas we cover</h2>
+    {areas.length > 0 ? (
+      <ul class="mt-6 flex flex-wrap gap-3">
+        {areas.map((a) => (
+          <li>
+            <a href={`/areas/${a.id}/`} class="rounded border border-[--color-line] px-4 py-2 text-sm hover:border-[--color-accent]">
+              {a.data.areaName}
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="mt-4 text-[--color-muted]">Proudly serving {site.nap.region}.</p>
+    )}
+  </section>
+
+  <section class="border-t border-[--color-line] bg-[--color-surface]">
+    <div class="mx-auto max-w-5xl px-4 py-16 text-center">
+      <h2 class="text-2xl">Ready to get started?</h2>
+      <a href={`tel:${site.nap.phone}`} class="mt-6 inline-block rounded bg-[--color-accent] px-6 py-3 text-white">
+        Call {site.nap.phoneDisplay}
+      </a>
+    </div>
+  </section>
+</Base>
