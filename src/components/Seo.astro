@@ -1,0 +1,20 @@
+---
+import { site } from '../site.config.mjs';
+
+const { title, description, noindex = false, ogImage = '/og-default.jpg', type = 'website' } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const og = new URL(ogImage, Astro.site).href;
+---
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={og} />
+<meta property="og:site_name" content={site.brand} />
+<meta name="twitter:card" content="summary_large_image" />

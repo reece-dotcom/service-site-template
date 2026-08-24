@@ -1,0 +1,60 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { site } from '../../site.config.mjs';
+
+export async function getStaticPaths() {
+  const items = await getCollection('services');
+  return items.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+
+const graph = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: d.h1,
+    description: d.summary,
+    provider: { '@id': `${site.url}/#business` },
+    areaServed: site.nap.region,
+  },
+];
+
+if (d.faqs.length) {
+  graph.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: d.faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  });
+}
+---
+<Base title={d.title} description={d.description} noindex={d.noindex} schema={graph}>
+  <article class="mx-auto max-w-3xl px-4 py-12">
+    <h1 class="text-4xl">{d.h1}</h1>
+    <p class="mt-4 text-lg text-[--color-muted]">{d.summary}</p>
+    <div class="prose mt-8"><Content /></div>
+
+    {d.faqs.length > 0 && (
+      <section class="mt-12">
+        <h2 class="text-2xl">Common questions</h2>
+        {d.faqs.map((f) => (
+          <div class="mt-6">
+            <h3 class="text-lg font-semibold">{f.q}</h3>
+            <p class="mt-2 text-[--color-muted]">{f.a}</p>
+          </div>
+        ))}
+      </section>
+    )}
+
+    <a href={`tel:${site.nap.phone}`} class="mt-12 inline-block rounded bg-[--color-accent] px-6 py-3 text-white">
+      Call {site.nap.phoneDisplay}
+    </a>
+  </article>
+</Base>

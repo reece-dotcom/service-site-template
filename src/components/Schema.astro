@@ -1,0 +1,35 @@
+---
+import { site } from '../site.config.mjs';
+const { extra = null } = Astro.props;
+
+const business = {
+  '@context': 'https://schema.org',
+  '@type': site.schemaType,
+  '@id': `${site.url}/#business`,
+  name: site.nap.name,
+  url: site.url,
+  telephone: site.nap.phone,
+  email: site.nap.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.nap.street,
+    addressLocality: site.nap.locality,
+    addressRegion: site.nap.region,
+    postalCode: site.nap.postcode,
+    addressCountry: site.nap.country,
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: site.geo.lat, longitude: site.geo.lng },
+  openingHoursSpecification: site.hours.map((h) => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: h.days,
+    opens: h.open,
+    closes: h.close,
+  })),
+  ...(site.social.length ? { sameAs: site.social } : {}),
+  ...(site.rating
+    ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: site.rating.value, reviewCount: site.rating.count } }
+    : {}),
+};
+---
+<script type="application/ld+json" set:html={JSON.stringify(business)} />
+{extra && <script type="application/ld+json" set:html={JSON.stringify(extra)} />}
