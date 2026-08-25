@@ -9,6 +9,7 @@ Two rules that govern everything below:
    map pack is the prize, and the map pack is won by the Google Business Profile, reviews and
    proximity — not by the site. The site's job is to *support* the profile, then win the
    organic results underneath it.
+
 2. **Never publish a page a human wouldn't want to read.** Spun town pages are the single
    fastest way to get a small installer site filtered out. Every rule about "unique content"
    below exists to enforce this.
@@ -57,6 +58,7 @@ areas dilute relevance. A service-area business (no customer-facing premises, co
 installers working out of a unit) should hide the street address; a showroom should show it.
 
 **Completeness checklist**
+
 - Services list populated, each with a real description (not the default stub)
 - Products for headline items (uPVC casement, composite door, warm roof)
 - Opening hours, including Saturday if genuinely open — plus special hours at Christmas
@@ -66,6 +68,7 @@ installers working out of a unit) should hide the street address; a showroom sho
 
 **Photos.** The most-neglected ranking and conversion lever. Target ~20 to start, then a
 steady trickle:
+
 - Exterior of installed jobs, **before and after** pairs
 - Team and vans (vans carry the branding and phone number)
 - Showroom if there is one
@@ -87,15 +90,19 @@ This is where GHL earns its keep.
 GBP review link → if no review after 3 days, one follow-up → then stop. Never a third chase.
 
 **What makes it work**
+
 - **SMS, not email.** Roughly triple the response rate in this trade.
 - **Ask at peak delight** — the day the installation is finished and the house looks
   transformed, not a fortnight later.
+
 - **The fitter asks in person first**, then the SMS lands as a reminder. Vastly outperforms a
   cold automated text.
+
 - Use the **short review link** from the GBP dashboard; every extra tap loses people.
 - **Reply to every review**, positive and negative, within 48 hours. Replies are visible to
   prospects and Google, and a calm reply under a bad review converts better than no bad
   reviews at all.
+
 - Never gate reviews (filtering happy customers to Google and unhappy ones to a private form)
   — against Google's policy and grounds for losing the review set.
 
@@ -124,13 +131,16 @@ The rule we follow:
 
 - **Area pages only for towns with real evidence of trading there** — completed jobs, reviews
   from residents, a genuine catchment. Start with 5–10, never 40.
+
 - Each area page must carry the **`localProof` field: 120+ characters, specific to that town**
   — named streets or estates, a housing-stock observation (1930s bay fronts in Heaton Moor,
   new-build estates off the bypass), conservation-area rules, the actual number of jobs done
   there. The build **fails** if it's shorter than 120 characters. That guardrail exists
   specifically to make the lazy version impossible.
+
 - Combined service+town pages (`/areas/stockport/composite-doors/`) **only** where the volume
   genuinely justifies it — the top 1–2 towns, top 1–2 services. Earn them, don't generate them.
+
 - If you can swap the town name and the page still reads correctly, **it should not be
   published.**
 
@@ -150,11 +160,14 @@ zero client JS · 100/100 Lighthouse baseline.
 "Composite Doors Stockport | Cheap Composite Doors Stockport Manchester".
 
 **Every service page**
+
 - What it is, in plain English — assume the reader is replacing windows for the first time
   in 25 years
+
 - Materials and options actually offered (don't list aluminium if they don't fit aluminium)
 - **Price guidance.** The most-searched, least-answered question in this trade. A range with
   honest caveats beats "prices from £X" and massively beats silence.
+
 - Energy ratings explained (A++ to C, U-values in human terms)
 - Guarantee and FENSA/CERTASS registration
 - 3–6 FAQs — these feed the FAQPage schema and win People Also Ask placements
@@ -162,6 +175,7 @@ zero client JS · 100/100 Lighthouse baseline.
 - CTA at top and bottom
 
 **Internal linking**
+
 - Service pages ↔ the area pages where that service is sold
 - Blog posts → the service page they support
 - Every page → `/contact/`
@@ -201,9 +215,11 @@ The blog is not for keyword volume. Three angles that work in this trade:
 
 1. **Cost content.** "How much do new windows cost in [region] in 2026" — highest-intent
    search there is, and almost every competitor dodges it.
+
 2. **Regulatory/explainer.** FENSA certificates, Building Regs Part L, what a conservation
    area means for your windows, trickle vents. Genuine confusion, genuine search volume,
    positions the installer as the expert.
+
 3. **Local project write-ups.** "Sash-style uPVC on a 1930s semi in Heaton Moor" — photos,
    the problem, the solution, the cost bracket. These support the area pages with real
    evidence and are the natural home for the local specificity the template demands.
@@ -220,9 +236,11 @@ Run in order. Nothing gets skipped.
 1. `CLIENT=<slug> npm run build` — passes (SEO guardrails are build-blocking)
 2. `CLIENT=<slug> npm run qa` — passes (duplicate meta, H1 count, alt text, JSON-LD, broken
    links, orphan pages, cross-client duplicate content)
+
 3. **Turn off Netlify site SSO** — `sso_login: false`. New sites are created behind a login
    wall by default and the team-level default can't be changed below Enterprise.
    **A site left locked returns 401 to Googlebot and will never index.** Blocking step.
+
 4. Custom domain + SSL, `www` vs apex chosen and the other redirected
 5. Live check: `/robots.txt`, `/sitemap-index.xml`, canonicals, `/thank-you/` noindex
 6. Google Search Console — verify, submit sitemap, set the target country
@@ -242,6 +260,7 @@ Run in order. Nothing gets skipped.
 - Search Console: impressions, clicks, average position, new queries
 - GBP Insights: calls, direction requests, searches — the numbers the client actually cares
   about
+
 - Review count and rating trend
 - One blog post
 - Two GBP posts
