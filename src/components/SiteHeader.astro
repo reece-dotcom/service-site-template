@@ -1,0 +1,39 @@
+---
+import { site } from '../lib/client.mjs';
+const path = Astro.url.pathname;
+const nav = [
+  { href: '/', label: 'Home' },
+  { href: '/services/', label: 'Services' },
+  { href: '/areas/', label: 'Areas we cover' },
+  { href: '/blog/', label: 'Advice' },
+  { href: '/contact/', label: 'Contact' },
+];
+const isCurrent = (href) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+<header class="hdr">
+  <div class="container hdr__inner">
+    <a class="hdr__brand" href="/">{site.business.name}</a>
+    <nav class="hdr__nav" aria-label="Main">
+      <ul>
+        {nav.map((i) => (
+          <li>
+            <a href={i.href} aria-current={isCurrent(i.href) ? 'page' : undefined}>{i.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <a class="btn btn--accent hdr__cta" href={`tel:${site.contact.phoneHref}`}>
+      Call {site.contact.phone}
+    </a>
+  </div>
+</header>
+<style>
+  .hdr { border-bottom: 1px solid color-mix(in srgb, var(--muted) 20%, transparent); background: #fff; position: sticky; top: 0; z-index: 20; }
+  .hdr__inner { display: flex; align-items: center; gap: var(--space-6); padding-block: var(--space-4); flex-wrap: wrap; }
+  .hdr__brand { font-family: var(--font-heading); font-weight: 700; font-size: 1.2rem; color: var(--ink); text-decoration: none; margin-right: auto; }
+  .hdr__nav ul { display: flex; gap: var(--space-6); list-style: none; padding: 0; margin: 0; flex-wrap: wrap; }
+  .hdr__nav a { color: var(--ink); text-decoration: none; font-weight: 550; font-size: 0.98rem; }
+  .hdr__nav a[aria-current='page'] { color: var(--brand); text-decoration: underline; }
+  .hdr__cta { padding: 0.6rem 1.1rem; font-size: 0.98rem; }
+  @media (max-width: 46rem) { .hdr__nav { order: 3; width: 100%; } .hdr__nav ul { gap: var(--space-4); } }
+</style>

@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../lib/client.mjs';
+import { canonical, contactPageSchema } from '../../lib/seo.mjs';
+
+const a = site.contact.address;
+const useGhl = site.forms.provider === 'ghl';
+/**
+ * Form posts server-side (no client JS). GHL is the default so leads land in
+ * the CRM and trigger follow-up + review-request workflows; Netlify Forms is
+ * the fallback only.
+ */
+const action = useGhl ? site.forms.ghlEndpoint : '/thank-you/';
+const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.contact.mapEmbedQuery)}&output=embed`;
+---
+<BaseLayout
+  title={`Contact ${site.business.name} | Free Quote`.slice(0, 60)}
+  description={`Call ${site.contact.phone} or send a message for a free, no-pressure survey and a fixed written quote for your windows or doors.`.slice(0, 160)}
+  schemas={[contactPageSchema(canonical('/contact/'))]}
+>
+  <section class="section">
+    <div class="container grid grid--2">
+      <div>
+        <p class="eyebrow">Get in touch</p>
+        <h1>Book a free survey</h1>
+        <p class="lede">Tell us roughly what you need. We&rsquo;ll come and measure, then put a fixed price in writing.</p>
+
+        <div class="nap">
+          <h2 class="nap__h">{site.business.name}</h2>
+          <address class="nap__addr">
+            {a.street}<br />{a.locality}<br />{a.region} {a.postcode}
+          </address>
+          <p>
+            <a href={`tel:${site.contact.phoneHref}`}>{site.contact.phone}</a><br />
+            <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
+          </p>
+          <h3 class="nap__h3">Opening hours</h3>
+          <ul class="hours">
+            {site.hours.map((h) => (
+              <li><span>{h.days.length > 1 ? `${h.days[0].slice(0,3)}–${h.days[h.days.length-1].slice(0,3)}` : h.days[0]}</span><span>{h.opens}–{h.closes}</span></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="form__h">Request a callback</h2>
+        <form
+          class="form"
+          method="POST"
+          action={action}
+          name={useGhl ? undefined : 'quote'}
+          data-netlify={useGhl ? undefined : 'true'}
+        >
+          {!useGhl && <input type="hidden" name="form-name" value="quote" />}
+          {useGhl && site.forms.ghlLocationId && (
+            <input type="hidden" name="location_id" value={site.forms.ghlLocationId} />
+          )}
+          <p class="visually-hidden">
+            <label>Leave this blank if you are human: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+          </p>
+          <label class="field">
+            <span>Your name</span>
+            <input type="text" name="full_name" autocomplete="name" required />
+          </label>
+          <label class="field">
+            <span>Phone</span>
+            <input type="tel" name="phone" autocomplete="tel" required />
+          </label>
+          <label class="field">
+            <span>Email</span>
+            <input type="email" name="email" autocomplete="email" required />
+          </label>
+          <label class="field">
+            <span>Postcode</span>
+            <input type="text" name="postal_code" autocomplete="postal-code" required />
+          </label>
+          <label class="field">
+            <span>What do you need?</span>
+            <textarea name="message" rows="4" required></textarea>
+          </label>
+          <button class="btn btn--primary form__btn" type="submit">Request my quote</button>
+          <p class="form__note muted">We&rsquo;ll only use your details to arrange your quote.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--surface">
+    <div class="container">
+      <h2>Find us</h2>
+      <iframe
+        class="map"
+        src={mapSrc}
+        title={`Map showing ${site.business.name} in ${a.locality}`}
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .nap { margin-top: var(--space-8); }
+  .nap__h { font-size: 1.15rem; }
+  .nap__h3 { margin-top: var(--space-6); font-size: 1rem; }
+  .nap__addr { font-style: normal; margin-block: var(--space-3); color: var(--muted); }
+  .hours { list-style: none; padding: 0; margin-top: var(--space-3); max-width: 20rem; }
+  .hours li { display: flex; justify-content: space-between; gap: var(--space-4); padding-block: var(--space-1); color: var(--muted); }
+  .form { display: grid; gap: var(--space-4); margin-top: var(--space-6); }
+  .form__h { font-size: 1.2rem; }
+  .field { display: grid; gap: var(--space-2); font-weight: 600; font-size: 0.95rem; }
+  .field input, .field textarea {
+    font: inherit; font-weight: 400; padding: 0.7rem 0.85rem; border-radius: var(--radius);
+    border: 1.5px solid color-mix(in srgb, var(--muted) 42%, transparent); background: #fff; width: 100%;
+  }
+  .form__btn { justify-content: center; margin-top: var(--space-2); }
+  .form__note { font-size: 0.85rem; }
+  .map { width: 100%; height: 26rem; border: 0; border-radius: var(--radius-lg); margin-top: var(--space-6); }
+</style>

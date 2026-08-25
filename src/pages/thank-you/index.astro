@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../lib/client.mjs';
+---
+<BaseLayout
+  title="Thanks — we've got your request"
+  description={`Your quote request has reached the ${site.business.name} team. We'll be in touch shortly to arrange your free survey.`.slice(0, 160)}
+  noindex={true}
+>
+  <section class="section ty">
+    <div class="container">
+      <h1>Thanks — that&rsquo;s come through</h1>
+      <p class="lede">
+        We&rsquo;ll call you back to arrange a survey. If it&rsquo;s urgent, ring us on
+        <a href={`tel:${site.contact.phoneHref}`}>{site.contact.phone}</a>.
+      </p>
+      <p><a class="btn btn--primary ty__btn" href="/">Back to the homepage</a></p>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .ty { min-height: 46vh; }
+  .ty__btn { margin-top: var(--space-8); }
+</style>

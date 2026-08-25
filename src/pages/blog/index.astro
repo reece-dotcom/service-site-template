@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { site } from '../../lib/client.mjs';
+
+const posts = (await getCollection('blog')).filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.publishedAt - a.data.publishedAt);
+const categories = [...new Set(posts.map((p) => p.data.category))].sort();
+const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<BaseLayout
+  title={`Windows & Doors Advice | ${site.business.name}`.slice(0, 60)}
+  description={`Practical guides on choosing, costing and caring for windows and doors, written by the ${site.business.name} team.`.slice(0, 160)}
+>
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Advice</p>
+      <h1>Guides worth reading before you buy</h1>
+      <p class="lede">No jargon, no sales pitch — the things we get asked on every survey.</p>
+      {categories.map((cat) => (
+        <div class="cat">
+          <h2 id={cat.toLowerCase().replace(/\W+/g, '-')}>{cat}</h2>
+          <div class="grid grid--2 cat__grid">
+            {posts.filter((p) => p.data.category === cat).map((p) => (
+              <article class="card">
+                <h3 class="post__h"><a href={`/blog/${p.id}/`}>{p.data.heading}</a></h3>
+                <p class="muted">{p.data.description}</p>
+                <p class="post__meta">
+                  <time datetime={p.data.publishedAt.toISOString()}>{fmt(p.data.publishedAt)}</time>
+                  <span aria-hidden="true"> · </span>{p.data.author}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>
+<style>
+  .cat { margin-top: var(--space-12); }
+  .cat__grid { margin-top: var(--space-6); }
+  .post__h { font-size: 1.2rem; margin-bottom: var(--space-2); }
+  .post__h a { text-decoration: none; color: var(--ink); }
+  .post__h a:hover { color: var(--brand); }
+  .post__meta { margin-top: var(--space-4); font-size: 0.875rem; color: var(--muted); }
+</style>

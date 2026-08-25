@@ -1,0 +1,61 @@
+---
+import '../styles/global.css';
+import { site } from '../lib/client.mjs';
+import { assertSeo, canonical, localBusinessSchema } from '../lib/seo.mjs';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+const { title, description, schemas = [], noindex = false, image } = Astro.props;
+
+assertSeo(title, description, Astro.url.pathname);
+
+const url = canonical(Astro.url.pathname);
+const t = site.theme;
+const jsonld = [localBusinessSchema(), ...schemas.filter(Boolean)];
+const ogImage = image ? new URL(image, site.url).href : undefined;
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={url} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.business.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    <meta property="og:locale" content="en_GB" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content={t.brand} />
+
+    <style is:inline set:html={`:root{
+      --brand:${t.brand};--brand-dark:${t.brandDark};--accent:${t.accent};
+      --ink:${t.ink};--muted:${t.muted};--surface:${t.surface};
+      --font-heading:${t.fontHeading};--font-body:${t.fontBody};}`}></style>
+
+    {site.analytics.plausibleDomain && (
+      <script
+        defer
+        data-domain={site.analytics.plausibleDomain}
+        src="https://plausible.io/js/script.js"
+      ></script>
+    )}
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonld)} is:inline />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <SiteHeader />
+    <main id="main"><slot /></main>
+    <SiteFooter />
+  </body>
+</html>

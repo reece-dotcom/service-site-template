@@ -1,0 +1,91 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import FaqList from '../../components/FaqList.astro';
+import { site } from '../../lib/client.mjs';
+import { canonical, serviceSchema, faqSchema } from '../../lib/seo.mjs';
+
+export async function getStaticPaths() {
+  const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
+  return areas.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const allServices = (await getCollection('services')).filter((s) => !s.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+const services = entry.data.servicesOffered.length
+  ? allServices.filter((s) => entry.data.servicesOffered.includes(s.id))
+  : allServices;
+
+const url = canonical(`/areas/${entry.id}/`);
+const schemas = [
+  ...services.map((s) =>
+    serviceSchema({
+      name: `${s.data.name} in ${entry.data.name}`,
+      description: s.data.summary,
+      url,
+      areaServed: entry.data.name,
+    })
+  ),
+  faqSchema(entry.data.faqs),
+];
+---
+<BaseLayout title={entry.data.title} description={entry.data.description} schemas={schemas}>
+  <section class="section">
+    <div class="container">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/areas/">Areas we cover</a>
+      </nav>
+      <h1>{entry.data.heading}</h1>
+      <p class="lede">{entry.data.summary}</p>
+    </div>
+  </section>
+
+  <!--
+    localProof sits directly under the H1 by design. This content is the reason
+    this page is allowed to exist rather than being a doorway page — it must
+    never be buried at the bottom.
+  -->
+  <section class="proof">
+    <div class="container proof__inner">
+      <p class="eyebrow">Our work in {entry.data.name}</p>
+      <p class="proof__text">{entry.data.localProof}</p>
+      {entry.data.postcodes.length > 0 && (
+        <p class="proof__pc">Covering {entry.data.postcodes.join(', ')}</p>
+      )}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container prose"><Content /></div>
+  </section>
+
+  <section class="section section--surface">
+    <div class="container">
+      <h2>What we install in {entry.data.name}</h2>
+      <div class="grid grid--3 svc">
+        {services.map((s) => (
+          <article class="card">
+            <h3><a href={`/services/${s.id}/`}>{s.data.name}</a></h3>
+            <p class="muted">{s.data.summary}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <FaqList faqs={entry.data.faqs} />
+  <CtaBand heading={`Getting windows or doors done in ${entry.data.name}?`} />
+</BaseLayout>
+<style>
+  .crumb { font-size: 0.9rem; color: var(--muted); margin-bottom: var(--space-6); }
+  .crumb a { color: var(--muted); }
+  .proof { background: var(--surface); border-left: 6px solid var(--accent); }
+  .proof__inner { padding-block: var(--space-12); }
+  .proof__text { font-size: 1.2rem; max-width: 62ch; margin-top: var(--space-4); }
+  .proof__pc { margin-top: var(--space-6); color: var(--muted); font-size: 0.95rem; }
+  .svc { margin-top: var(--space-8); }
+  .svc h3 a { text-decoration: none; color: var(--ink); }
+</style>

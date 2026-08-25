@@ -1,0 +1,35 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { site } from '../../lib/client.mjs';
+const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
+---
+<BaseLayout
+  title={`Areas We Cover | ${site.contact.address.region}`.slice(0, 60)}
+  description={`Where ${site.business.name} works — towns and postcodes across ${site.contact.address.region}, with local installers and a local number.`.slice(0, 160)}
+>
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Coverage</p>
+      <h1>Areas we cover</h1>
+      <p class="lede">Based in {site.contact.address.locality} and working across {site.contact.address.region}.</p>
+      <div class="grid grid--3 list">
+        {areas.map((a) => (
+          <article class="card">
+            <h2 class="list__h"><a href={`/areas/${a.id}/`}>{a.data.name}</a></h2>
+            <p class="muted">{a.data.summary}</p>
+            {a.data.postcodes.length > 0 && <p class="pc">{a.data.postcodes.join(' · ')}</p>}
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>
+<style>
+  .list { margin-top: var(--space-8); }
+  .list__h { font-size: 1.25rem; margin-bottom: var(--space-2); }
+  .list__h a { text-decoration: none; color: var(--ink); }
+  .pc { margin-top: var(--space-4); font-size: 0.85rem; color: var(--muted); letter-spacing: 0.04em; }
+</style>

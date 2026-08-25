@@ -1,0 +1,62 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import FaqList from '../../components/FaqList.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
+import { site } from '../../lib/client.mjs';
+import { canonical, serviceSchema, faqSchema } from '../../lib/seo.mjs';
+
+export async function getStaticPaths() {
+  const services = (await getCollection('services')).filter((s) => !s.data.draft);
+  return services.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
+const url = canonical(`/services/${entry.id}/`);
+const schemas = [
+  serviceSchema({ name: entry.data.name, description: entry.data.summary, url }),
+  faqSchema(entry.data.faqs),
+];
+---
+<BaseLayout title={entry.data.title} description={entry.data.description} schemas={schemas}>
+  <section class="section">
+    <div class="container">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/services/">Services</a>
+      </nav>
+      <p class="eyebrow">{site.contact.address.region}</p>
+      <h1>{entry.data.heading}</h1>
+      <p class="lede">{entry.data.summary}</p>
+      {entry.data.benefits.length > 0 && (
+        <ul class="checklist benefits">
+          {entry.data.benefits.map((b) => <li>{b}</li>)}
+        </ul>
+      )}
+    </div>
+  </section>
+  <TrustStrip />
+  <section class="section">
+    <div class="container prose"><Content /></div>
+  </section>
+  <FaqList faqs={entry.data.faqs} />
+  <section class="section">
+    <div class="container">
+      <h2>{entry.data.name} near you</h2>
+      <ul class="areas">
+        {areas.map((a) => (
+          <li><a href={`/areas/${a.id}/`}>{entry.data.name} in {a.data.name}</a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+  <CtaBand heading={`Thinking about ${entry.data.name.toLowerCase()}?`} />
+</BaseLayout>
+<style>
+  .crumb { font-size: 0.9rem; color: var(--muted); margin-bottom: var(--space-6); }
+  .crumb a { color: var(--muted); }
+  .benefits { margin-top: var(--space-8); max-width: 60ch; }
+  .areas { list-style: none; padding: 0; display: grid; gap: var(--space-3); margin-top: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); }
+</style>

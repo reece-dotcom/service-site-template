@@ -1,0 +1,28 @@
+# Each client's Netlify site builds from this same repo with its own
+# CLIENT environment variable (Site settings → Environment variables).
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# 301s for migrated URLs go here, per client. Getting these wrong on a
+# rebuild is the single most common way to lose existing rankings.
+# [[redirects]]
+#   from = "/old-page"
+#   to = "/services/new-page/"
+#   status = 301
+#   force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

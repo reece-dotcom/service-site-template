@@ -1,0 +1,19 @@
+---
+import { site } from '../lib/client.mjs';
+const years = new Date().getFullYear() - site.business.yearFounded;
+const rating = site.reviews?.aggregate ?? null;
+---
+<section class="trust">
+  <div class="container trust__inner">
+    <p><strong>{years}+ years</strong> installing locally</p>
+    {site.business.accreditations.map((a) => <p><strong>{a}</strong></p>)}
+    {rating && (
+      <p><strong>{rating.ratingValue}/5</strong> from {rating.reviewCount} {rating.source} reviews</p>
+    )}
+  </div>
+</section>
+<style>
+  .trust { border-block: 1px solid color-mix(in srgb, var(--muted) 20%, transparent); background: var(--surface); }
+  .trust__inner { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-8); justify-content: space-between; padding-block: var(--space-4); font-size: 0.95rem; color: var(--muted); }
+  .trust strong { color: var(--ink); }
+</style>
