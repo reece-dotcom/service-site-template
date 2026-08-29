@@ -7,6 +7,15 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# Apex domain is canonical. Without this, www and non-www are two sites and
+# the authority splits between them. Set the apex as the primary domain in
+# Netlify too; this redirect is the belt to that braces.
+[[redirects]]
+  from = "https://www.:domain.:tld/*"
+  to = "https://:domain.:tld/:splat"
+  status = 301
+  force = true
+
 # 301s for migrated URLs go here, per client. Getting these wrong on a
 # rebuild is the single most common way to lose existing rankings.
 # [[redirects]]

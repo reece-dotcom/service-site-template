@@ -120,7 +120,9 @@ to established competitors regardless of how good the site is.
 /areas/                    hub
 /areas/<town>/             one per genuinely served town
 /blog/                     the trust and long-tail layer
+/about/                    the E-E-A-T page — the named human who does the work
 /contact/                  the conversion page
+/404                       noindex, but keeps a mistyped URL alive
 ```
 
 **The service × town matrix rule.** The temptation is a page for every service in every town
@@ -145,9 +147,20 @@ The rule we follow:
   published.**
 
 **Handled automatically by the template** — no per-client work:
-canonicals · sitemap · robots · `noindex` on `/thank-you/` · LocalBusiness/Service/FAQPage/
-BlogPosting/ContactPage JSON-LD · Open Graph · title ≤60 and meta ≤160 enforced at build ·
+canonicals · sitemap **with real priorities** (home 1.0, services/areas 0.9, blog 0.6) · robots ·
+`noindex` on `/thank-you/` and `/404` · LocalBusiness/Service/FAQPage/BlogPosting/ContactPage/
+AboutPage/BreadcrumbList JSON-LD · `hasOfferCatalog` + `areaServed` · Open Graph ·
+title ≤60 and meta ≤160 enforced at build · sibling-service cross-links on every service page ·
+footer linking every service and area · WebP + lazy loading via `<Image>` · apex-domain 301 ·
 zero client JS · 100/100 Lighthouse baseline.
+
+**E-E-A-T (Stage 4b).** `/about/` is where a real named person appears: `business.owner`
+(name, role, since) plus `business.about` (heading, lede, story, photo, FAQs) and
+`business.accreditations` in object form — `{ name, id, url }` so each badge links to the
+issuing body's own register. That drives `founder`, `employee` and `hasCredential` in the
+business schema. **Every field is optional and must be left out rather than guessed**; a
+fabricated owner or membership number is worse than a thin page. Ask for the owner's name in
+intake — it is the single strongest trust signal on a small installer site.
 
 ---
 
@@ -248,7 +261,8 @@ Run in order. Nothing gets skipped.
 8. Plausible confirmed recording
 9. GHL form tested end to end — submission → CRM → notification → thank-you page
 10. Phone number tested from a mobile (click-to-call)
-11. Rich Results Test on home, a service page and an area page
+11. Rich Results Test on home, a service page, an area page and `/about/`
+11b. `/about/` names a real person and every accreditation resolves on the issuer's register
 12. GBP website link updated to the new domain
 13. If replacing an old site: 301 map for every old URL with traffic — **check before
     switching DNS, not after**

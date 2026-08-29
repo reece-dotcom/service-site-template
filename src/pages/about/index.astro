@@ -1,0 +1,188 @@
+---
+/**
+ * ABOUT — the E-E-A-T page.
+ *
+ * Every optimisation guide obsesses over schema and word counts, but the thing
+ * a homeowner comparing three quotes actually wants is "who is turning up at my
+ * house?". Google's quality raters want the same, and AI answer engines use it
+ * to tell a real trader from a lead-generation shell.
+ *
+ * Everything here is config-driven and every block degrades to nothing when
+ * the client hasn't given us that detail. Never invent an owner, a year, or a
+ * credential to fill this page.
+ */
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
+import AnswerBlock from '../../components/AnswerBlock.astro';
+import { site } from '../../lib/client.mjs';
+import { clientImage } from '../../lib/images.mjs';
+import { canonical, aboutPageSchema, breadcrumbSchema, faqSchema } from '../../lib/seo.mjs';
+
+const about = site.business.about ?? {};
+const owner = site.business.owner ?? {};
+const url = canonical('/about/');
+const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
+const services = (await getCollection('services'))
+  .filter((s) => !s.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const ownerPhoto = clientImage(about.photo);
+const credentials = (site.business.accreditations ?? []).map((a) =>
+  typeof a === 'string' ? { name: a } : a
+);
+const years = site.business.yearFounded
+  ? new Date().getFullYear() - site.business.yearFounded
+  : null;
+
+const title = about.title ?? `About ${site.business.name}`;
+const description =
+  about.description ??
+  `Who we are, what we fix and where we work. ${site.business.name} covers ${site.contact.address.locality} and the surrounding area.`;
+
+const schemas = [
+  aboutPageSchema(url),
+  faqSchema(about.faqs),
+  breadcrumbSchema([{ name: 'About' }]),
+];
+---
+
+<BaseLayout title={title} description={description} schemas={schemas}>
+  <section class="section">
+    <div class="container">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">/</span> About
+      </nav>
+      <p class="eyebrow">About us</p>
+      <h1>{about.heading ?? `The people behind ${site.business.name}`}</h1>
+      {about.lede && <p class="lede">{about.lede}</p>}
+
+      {!owner.name && (about.story ?? []).length > 0 && (
+        <div class="story">
+          {(about.story ?? []).map((para) => <p>{para}</p>)}
+        </div>
+      )}
+
+      {about.answer && (
+        <div class="answer-wrap">
+          <AnswerBlock
+            question={about.answerQuestion ?? `Who is ${site.business.name}?`}
+            answer={about.answer}
+          />
+        </div>
+      )}
+    </div>
+  </section>
+
+  {(owner.name || ownerPhoto) && (
+    <section class="section section--tint">
+      <div class="container owner">
+        {ownerPhoto && (
+          <div class="owner__shot">
+            <Image
+              src={ownerPhoto}
+              alt={`${owner.name ?? 'The owner'}${owner.role ? `, ${owner.role}` : ''} at ${site.business.name}`}
+              widths={[420, 720]}
+              sizes="(max-width: 48rem) 92vw, 34vw"
+              loading="lazy"
+            />
+          </div>
+        )}
+        <div class="owner__body">
+          <p class="eyebrow">Who turns up</p>
+          <h2>{owner.name}{owner.role && <span class="owner__role"> — {owner.role}</span>}</h2>
+          {(about.story ?? []).map((para) => <p>{para}</p>)}
+          {years && years > 0 && (
+            <p class="owner__stat">
+              <strong>{years} years</strong> {site.business.yearsLabel ?? 'in the trade'}
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {credentials.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Checkable, not decorative</p>
+            <h2>Accreditations</h2>
+          </div>
+          <p class="lede">
+            Every badge here can be looked up on the issuing body's own register.
+          </p>
+        </div>
+        <ul class="creds">
+          {credentials.map((c) => (
+            <li class="creds__item">
+              <strong>{c.name}</strong>
+              {c.id && <span class="creds__id">Membership no. {c.id}</span>}
+              {c.url && (
+                <a href={c.url} rel="nofollow noopener" target="_blank">Verify on their register</a>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <TrustStrip />
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">What and where</p>
+          <h2>What we do, and who for</h2>
+        </div>
+      </div>
+      <div class="grid grid--2">
+        <div>
+          <h3 class="mini-h">Work we take on</h3>
+          <ul class="checklist">
+            {services.map((s) => (
+              <li><a href={`/services/${s.id}/`}>{s.data.name}</a></li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 class="mini-h">Where we work</h3>
+          <ul class="chips">
+            {areas.map((a) => (
+              <li><a class="chip" href={`/areas/${a.id}/`}>{a.data.name}</a></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand heading={`Want to talk it through with ${owner.name ? owner.name.split(' ')[0] : 'us'}?`} />
+</BaseLayout>
+
+<style>
+  .crumb { font-size: 0.9rem; color: var(--muted); margin-bottom: var(--space-6); }
+  .crumb a { color: var(--muted); }
+  .answer-wrap { margin-top: var(--space-8); }
+  .story { margin-top: var(--space-8); max-width: 62ch; }
+  .story p + p { margin-top: var(--space-4); }
+  .section--tint { background: var(--surface); }
+  .owner { display: grid; gap: var(--space-10); grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); align-items: center; }
+  .owner__shot :global(img) { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius); }
+  .owner__body p { max-width: 58ch; }
+  .owner__role { color: var(--muted); font-weight: 400; }
+  .owner__stat { margin-top: var(--space-6); font-size: 1.05rem; }
+  .owner__stat strong { color: var(--brand); }
+  .creds { list-style: none; padding: 0; display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); margin-top: var(--space-8); }
+  .creds__item { display: grid; gap: var(--space-2); padding: var(--space-6); border: 1px solid rgb(0 0 0 / 10%); border-radius: var(--radius); background: #fff; }
+  .creds__id { color: var(--muted); font-size: 0.95rem; }
+  .mini-h { font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: var(--space-4); }
+  @media (max-width: 52rem) {
+    .owner { grid-template-columns: 1fr; }
+  }
+</style>

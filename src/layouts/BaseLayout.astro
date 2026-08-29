@@ -19,7 +19,7 @@ const catalogServices = (await getCollection('services'))
   .map((s) => ({ slug: s.id, name: s.data.name, description: s.data.summary }));
 const catalogAreas = (await getCollection('areas'))
   .filter((a) => !a.data.draft)
-  .map((a) => ({ name: a.data.name }));
+  .map((a) => ({ name: a.data.name, wikidata: a.data.wikidata }));
 
 const jsonld = [
   localBusinessSchema({ services: catalogServices, areas: catalogAreas }),

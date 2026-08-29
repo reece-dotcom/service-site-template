@@ -30,6 +30,7 @@ const year = new Date().getFullYear();
       <h2 class="ftr__h">Areas we cover</h2>
       <ul class="ftr__list">
         {areas.map((x) => <li><a href={`/areas/${x.id}/`}>{x.data.name}</a></li>)}
+        <li><a href="/about/">About us</a></li>
         <li><a href="/blog/">Advice &amp; guides</a></li>
         <li><a href="/contact/">Get a quote</a></li>
       </ul>

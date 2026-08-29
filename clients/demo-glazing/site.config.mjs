@@ -19,7 +19,47 @@ export default {
     directAnswerQuestion: 'Who fits windows and doors in South Manchester?',
     directAnswer:
       'Demo Glazing is a FENSA-registered family installer fitting A-rated uPVC and aluminium windows, composite doors and conservatories across South Manchester. Every job is surveyed and priced in writing before any work starts, and the installation is done by our own fitters rather than subcontractors. Call 0161 000 0000 for a quote.',
-    accreditations: ['FENSA registered', 'Which? Trusted Trader', 'Checkatrade'],
+    // Strings are fine, but the object form is better: an ID and a link to the
+    // issuing body's own register turn a decorative badge into a checkable one.
+    accreditations: [
+      { name: 'FENSA registered', id: '00000', url: 'https://www.fensa.org.uk/fensa-approved-installer-search' },
+      { name: 'Which? Trusted Trader' },
+      { name: 'Checkatrade' },
+    ],
+
+    /**
+     * The named human who does the work. Drives the About page and the
+     * founder/employee schema. Leave the whole block out if the client has not
+     * told you — never invent a person.
+     */
+    owner: {
+      name: 'Sample Owner',
+      role: 'Owner and installer',
+      since: 2009,
+    },
+
+    /** About page content. Every field optional; omitted blocks disappear. */
+    about: {
+      title: 'About Demo Glazing — who turns up at your door',
+      description:
+        'Family-run window and door installer covering Demo Town since 2009. Meet the person who quotes the job and does the work.',
+      heading: 'A two-van firm, not a call centre',
+      lede: 'You will deal with the same person from the quote to the last bit of trim.',
+      photo: 'hero.webp',
+      answerQuestion: 'Who is Demo Glazing?',
+      answer:
+        'Demo Glazing is a family-run window and door installer based in Demo Town, working across the county since 2009. Windows, doors and conservatories are fitted by the owner and one employed installer, not subcontracted out. FENSA registered. Call 01234 567890 for a quote.',
+      story: [
+        'The business started in 2009 with one van and a reputation built entirely on word of mouth from the first dozen jobs in Demo Town.',
+        'It has deliberately stayed small. Two vans, no subcontractors, and the person who prices your job is the person who fits it.',
+      ],
+      faqs: [
+        {
+          question: 'Do you subcontract the work out?',
+          answer: 'No. Every installation is done by the owner and one employed installer.',
+        },
+      ],
+    },
   },
 
   contact: {

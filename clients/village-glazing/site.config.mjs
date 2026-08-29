@@ -17,6 +17,36 @@ export default {
     yearFounded: 2005,
     priceRange: '£',
     accreditations: [],
+
+    // TODO(owner): his name and role are not on his Facebook page. Ask him —
+    // a named person is the single strongest trust signal on the About page.
+    // Do NOT fill this in from guesswork.
+    // owner: { name: '', role: '', since: 2005 },
+
+    about: {
+      title: 'About Village Glazing Repairs — Wallasey',
+      description:
+        'A Wallasey repair service for windows and doors across the Wirral. What we fix, how we work, and why repairing beats replacing.',
+      heading: 'We repair windows and doors. We do not sell you new ones.',
+      lede:
+        'Most firms that look at a broken window want to replace the whole frame. That is where the money is for them. It is rarely what you need.',
+      story: [
+        'Nearly every fault we are called out to is a worn part inside a frame that is otherwise perfectly good — a multipoint mechanism, a hinge, a cylinder, or a sealed unit that has lost its seal and misted up.',
+        'Those parts can be changed in place, usually in one visit, for a fraction of the cost of a replacement window. The frame you already have stays where it is.',
+      ],
+      faqs: [
+        {
+          question: 'Do you replace whole windows and doors?',
+          answer:
+            'Only when a frame is genuinely beyond repair. If the fault is the lock, hinge, handle, mechanism or a misted sealed unit, we fix that instead.',
+        },
+        {
+          question: 'Can a misted double glazed unit be fixed without a new window?',
+          answer:
+            'Yes. The glass unit is replaced and the existing frame stays in place, so there is no disruption to plaster, sills or decoration.',
+        },
+      ],
+    },
     directAnswerQuestion: 'Who repairs windows and doors in Wallasey and the Wirral?',
     directAnswer:
       'Village Glazing Repairs is a Wallasey-based repair service for windows and doors across the Wirral. Locks, handles, multipoint mechanisms, misted double glazed units and lead lights are fixed in the frames you already have, rather than replaced. Rated 5.0 from 13 Google reviews. Call 07708 132985.',

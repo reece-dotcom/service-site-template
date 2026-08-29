@@ -16,6 +16,14 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
+// Sibling services, in order, wrapping round from this one. Distributes
+// authority sideways instead of dead-ending every service page.
+const allServices = (await getCollection('services'))
+  .filter((s) => !s.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+const idx = allServices.findIndex((s) => s.id === entry.id);
+const related = [...allServices.slice(idx + 1), ...allServices.slice(0, idx)].slice(0, 3);
+const reviewed = entry.data.updatedAt;
 const url = canonical(`/services/${entry.id}/`);
 const schemas = [
   serviceSchema({ name: entry.data.name, description: entry.data.summary, url }),
@@ -66,6 +74,38 @@ const schemas = [
       </ul>
     </div>
   </section>
+  {related.length > 0 && (
+    <section class="section section--tint">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">While we are there</p>
+            <h2>Other work we take on</h2>
+          </div>
+        </div>
+        <ul class="rel">
+          {related.map((r) => (
+            <li>
+              <a class="card card--link rel__card" href={`/services/${r.id}/`}>
+                <h3>{r.data.name}</h3>
+                <p>{r.data.summary}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+  {reviewed && (
+    <p class="container reviewed">
+      <small>
+        Last reviewed
+        <time datetime={reviewed.toISOString().slice(0, 10)}>
+          {reviewed.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+        </time>
+      </small>
+    </p>
+  )}
   <CtaBand heading={`Thinking about ${entry.data.name.toLowerCase()}?`} />
 </BaseLayout>
 <style>
@@ -73,5 +113,13 @@ const schemas = [
   .crumb a { color: var(--muted); }
   .answer-wrap { margin-top: var(--space-8); }
   .benefits { margin-top: var(--space-8); max-width: 60ch; }
+  .section--tint { background: var(--surface); }
+  .rel { list-style: none; padding: 0; display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); }
+  .rel__card { display: block; text-decoration: none; }
+  .rel__card h3, .rel__card p { text-decoration: none; }
+  .rel__card h3 { font-size: 1.15rem; }
+  .rel__card p { color: var(--muted); margin-top: var(--space-2); }
+  .reviewed { color: var(--muted); margin-top: var(--space-10); }
+  .reviewed time { margin-left: 0.35rem; }
   .areas { list-style: none; padding: 0; display: grid; gap: var(--space-3); margin-top: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); }
 </style>

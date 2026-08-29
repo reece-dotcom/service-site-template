@@ -89,7 +89,9 @@ for (const href of linked) {
   if (!routes.has(href)) fails.push(`broken internal link: ${href}`);
 }
 for (const route of routes) {
-  if (route === '/' || route === '/thank-you/') continue;
+  // '/404.html' is deliberately unlinked (Netlify serves it on a miss) and
+  // '/thank-you/' is reached by form redirect only.
+  if (route === '/' || route === '/thank-you/' || route === '/404.html') continue;
   if (!linked.has(route)) fails.push(`orphan page (nothing links to it): ${route}`);
 }
 
@@ -99,6 +101,28 @@ for (const [d, rs] of descs) if (rs.length > 1) fails.push(`duplicate meta descr
 // Sitemap + robots
 if (!fs.existsSync(path.join(dist, 'sitemap-index.xml'))) fails.push('sitemap-index.xml not generated');
 if (!fs.existsSync(path.join(dist, 'robots.txt'))) fails.push('robots.txt not generated');
+
+// Sitemap priorities: without serialize() every page ships weighted the same,
+// which wastes the one signal a small site has for saying what matters.
+{
+  const smFile = fs
+    .readdirSync(dist)
+    .find((f) => /^sitemap-\d+\.xml$/.test(f));
+  if (!smFile) fails.push('no sitemap-0.xml — sitemap integration produced no URL set');
+  else {
+    const sm = fs.readFileSync(path.join(dist, smFile), 'utf8');
+    if (!sm.includes('<priority>')) fails.push('sitemap has no <priority> values (serialize() missing from astro.config.mjs)');
+    if (!sm.includes('<priority>1.0</priority>')) fails.push('sitemap does not give the home page priority 1.0');
+    if (!sm.includes('<changefreq>')) fails.push('sitemap has no <changefreq> values');
+  }
+}
+
+// Pages every local service site must have. The 404 keeps mistyped and
+// migrated URLs alive; /about/ is the E-E-A-T page and the only place a real
+// named human appears.
+for (const required of ['/about/', '/404.html']) {
+  if (!routes.has(required)) fails.push(`required page missing: ${required}`);
+}
 
 /**
  * Cross-client duplicate content — the defining risk of a shared template.
@@ -174,6 +198,23 @@ for (const slug of fs.readdirSync(clientsDir)) {
     const depth = route.split('/').filter(Boolean).length;
     if (depth > 1 && !types.includes('BreadcrumbList')) {
       fails.push(`${route}: nested page with no BreadcrumbList schema`);
+    }
+    if (route === '/about/' && !types.includes('AboutPage')) {
+      fails.push('/about/: no AboutPage schema');
+    }
+    // A service page that links to no sibling service is a dead end for both
+    // crawlers and customers.
+    if (/^\/services\/.+\//.test(route)) {
+      // Footer links to every service on every page, so only count links in
+      // the body — that is what actually passes context between pages.
+      const body = html.split(/<footer\b/)[0];
+      const siblings = new Set(
+        [...body.matchAll(/href="(\/services\/[^"\/]+\/)"/g)].map((m) => m[1])
+      );
+      siblings.delete(route);
+      if (siblings.size < 2) {
+        fails.push(`${route}: links to only ${siblings.size} other service page(s) — internal link network too thin`);
+      }
     }
   }
 

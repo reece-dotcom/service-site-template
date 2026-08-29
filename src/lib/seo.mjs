@@ -59,6 +59,26 @@ export function localBusinessSchema({ services = [], areas = [] } = {}) {
     sameAs: Object.values(site.social).filter(Boolean),
   };
 
+  // E-E-A-T: a named human who does the work, and any real, checkable trade
+  // accreditation. Both are optional — never invent either.
+  if (site.business.owner?.name) {
+    schema.founder = {
+      '@type': 'Person',
+      name: site.business.owner.name,
+      ...(site.business.owner.role ? { jobTitle: site.business.owner.role } : {}),
+    };
+    schema.employee = { '@id': `${site.url}/#owner` };
+  }
+  if (site.business.accreditations?.length) {
+    schema.hasCredential = site.business.accreditations.map((a) => ({
+      '@type': 'EducationalOccupationalCredential',
+      name: typeof a === 'string' ? a : a.name,
+      ...(typeof a === 'object' && a.id ? { identifier: a.id } : {}),
+      ...(typeof a === 'object' && a.url ? { url: a.url } : {}),
+    }));
+  }
+  if (site.business.yearFounded) schema.foundingDate = String(site.business.yearFounded);
+
   if (services.length) {
     schema.hasOfferCatalog = {
       '@type': 'OfferCatalog',
@@ -79,7 +99,14 @@ export function localBusinessSchema({ services = [], areas = [] } = {}) {
   // alone makes Google guess, and for installers with no shopfront it guesses
   // badly.
   const served = areas.length
-    ? areas.map((a) => ({ '@type': 'Place', name: a.name }))
+    ? areas.map((a) => ({
+        '@type': 'Place',
+        name: a.name,
+        // A Wikidata @id removes all ambiguity about WHICH town this is —
+        // vital in the UK, where dozens of places share a name. Optional per
+        // area; omit rather than guess the wrong entity.
+        ...(a.wikidata ? { '@id': a.wikidata } : {}),
+      }))
     : [{ '@type': 'Place', name: site.contact.address.region }].filter(
         () => site.contact.address.region
       );
@@ -162,5 +189,30 @@ export function breadcrumbSchema(trail = []) {
       name: item.name,
       ...(item.path ? { item: canonical(item.path) } : {}),
     })),
+  };
+}
+
+/**
+ * AboutPage + the owner as a real Person. This is the page that answers
+ * "who actually turns up?" — the single biggest E-E-A-T gap on a small
+ * installer site, and the thing AI answer engines look for to decide whether
+ * a business is a real trader or a lead-generation shell.
+ */
+export function aboutPageSchema(url) {
+  const owner = site.business.owner ?? {};
+  const person = {
+    '@type': 'Person',
+    '@id': `${site.url}/#owner`,
+    name: owner.name,
+    ...(owner.role ? { jobTitle: owner.role } : {}),
+    ...(owner.since ? { description: `Working in the trade since ${owner.since}.` } : {}),
+    worksFor: { '@id': `${site.url}/#business` },
+  };
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    url,
+    mainEntity: { '@id': `${site.url}/#business` },
+    ...(owner.name ? { about: person } : {}),
   };
 }

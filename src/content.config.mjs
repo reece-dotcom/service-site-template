@@ -37,6 +37,8 @@ const services = defineCollection({
     answer: z.string().optional(),
     answerQuestion: z.string().optional(),
     faqs: faq,
+    /** Shown as "Last reviewed" — a real freshness signal, so only set it when the page was genuinely reviewed. */
+    updatedAt: z.coerce.date().optional(),
     draft: z.boolean().default(false),
   }),
 });
@@ -57,8 +59,11 @@ const areas = defineCollection({
       .string()
       .min(120, 'localProof must be 120+ characters of genuinely local content'),
     postcodes: z.array(z.string()).default([]),
+    /** Wikidata entity URL for this town, e.g. https://www.wikidata.org/wiki/Q1234. Disambiguates same-named UK towns in schema. */
+    wikidata: z.string().url().optional(),
     servicesOffered: z.array(z.string()).default([]),
     faqs: faq,
+    updatedAt: z.coerce.date().optional(),
     draft: z.boolean().default(false),
   }),
 });

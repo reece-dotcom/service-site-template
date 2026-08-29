@@ -1,0 +1,55 @@
+---
+/**
+ * 404 — noindex, but useful. A dead end loses a job; this keeps the phone
+ * number and the service links in front of someone who mistyped a URL, and
+ * catches any link we miss when migrating an old site.
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../lib/client.mjs';
+
+const services = (await getCollection('services'))
+  .filter((s) => !s.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
+---
+
+<BaseLayout
+  title="Page not found"
+  description={`That page has moved or never existed. Here are the ${site.business.name} services and areas you were probably looking for.`}
+  noindex={true}
+>
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">404</p>
+      <h1>That page has moved</h1>
+      <p class="lede">
+        Nothing lost — call {site.contact.phone} and we'll sort it, or pick up one of these.
+      </p>
+      <p class="actions">
+        <a class="btn btn--primary" href={`tel:${site.contact.phoneHref}`}>Call {site.contact.phone}</a>
+        <a class="btn btn--ghost" href="/">Back to the home page</a>
+      </p>
+      <div class="grid grid--2 four-oh-four">
+        <div>
+          <h2 class="mini-h">Services</h2>
+          <ul class="checklist">
+            {services.map((s) => <li><a href={`/services/${s.id}/`}>{s.data.name}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 class="mini-h">Areas</h2>
+          <ul class="chips">
+            {areas.map((a) => <li><a class="chip" href={`/areas/${a.id}/`}>{a.data.name}</a></li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .actions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-8); }
+  .four-oh-four { margin-top: var(--space-12); }
+  .mini-h { font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: var(--space-4); }
+</style>
