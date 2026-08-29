@@ -1,0 +1,33 @@
+---
+/**
+ * Recent-work gallery. Renders nothing when the client has no images, so a
+ * text-only build stays valid.
+ */
+import { Image } from 'astro:assets';
+import { clientImages } from '../lib/images.mjs';
+
+const { items = [], heading = 'Recent work', eyebrow = 'The results' } = Astro.props;
+const shots = clientImages(items);
+---
+{shots.length ? (
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">{eyebrow}</p>
+      <h2>{heading}</h2>
+      <div class="gal">
+        {shots.map((s) => (
+          <figure class="gal__item">
+            <Image src={s.asset} alt={s.alt} widths={[420, 760]} sizes="(max-width: 48rem) 92vw, 32vw" loading="lazy" />
+            {s.caption && <figcaption>{s.caption}</figcaption>}
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+) : null}
+<style>
+  .gal { margin-top: var(--space-8); display: grid; gap: var(--space-5); grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); }
+  .gal__item { margin: 0; }
+  .gal__item img { width: 100%; height: 15rem; object-fit: cover; border-radius: var(--radius-lg); display: block; }
+  .gal__item figcaption { margin-top: var(--space-3); color: var(--muted); font-size: 0.9rem; }
+</style>

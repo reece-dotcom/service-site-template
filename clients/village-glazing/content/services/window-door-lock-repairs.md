@@ -4,6 +4,7 @@ description: "Locks, handles and multipoint mechanisms repaired across Wallasey 
 name: "Lock, handle & mechanism repairs"
 heading: "Window and door locks repaired across Wallasey"
 summary: "Sticking door? Handle that lifts but won't lock? Nine times out of ten it's the mechanism, not the door — and that's a repair, not a replacement."
+image: "locks.webp"
 order: 1
 benefits:
   - "Multipoint door mechanisms, gearboxes, cylinders and handles replaced"

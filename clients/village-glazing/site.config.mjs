@@ -18,6 +18,11 @@ export default {
     priceRange: '£',
     accreditations: [],
     yearsLabel: 'repairing windows and doors on the Wirral',
+    process: [
+      { title: 'Tell us what it does', body: 'Sticking, dropped, misted, will not lock — describe it and we can usually price it on the phone.' },
+      { title: 'We diagnose the real fault', body: 'The handle is rarely the problem. We find what is actually worn so the repair holds.' },
+      { title: 'Repaired, not replaced', body: 'Parts fitted, door or window adjusted, and you keep the frames you already have.' },
+    ],
     usps: [
       'Repairs, not replacements — the frames you have, working properly again',
       'Locks, hinges, handles and multipoint mechanisms replaced in place',
@@ -69,6 +74,20 @@ export default {
   reviews: {
     aggregate: null,
     featured: [],
+  },
+
+  /**
+   * Images live in clients/<slug>/images/ and are referenced by filename.
+   * DEMO NOTE: these are AI-generated placeholders standing in for the owner's
+   * own job photos — swap them for his real work before this goes live.
+   */
+  media: {
+    hero: 'hero.webp',
+    gallery: [
+      { src: 'gallery1.webp', alt: 'Repaired uPVC front door with new handle and lock', caption: 'New multipoint mechanism, cylinder and handle — same door.' },
+      { src: 'gallery2.webp', alt: 'Traditional leaded light window panel being repaired', caption: 'Lead light repaired in place rather than replaced.' },
+      { src: 'units.webp', alt: 'Misted double glazed unit next to a clear one', caption: 'Blown unit swapped, frame untouched.' },
+    ],
   },
 
   theme: {

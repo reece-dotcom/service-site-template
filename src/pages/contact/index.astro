@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { site } from '../../lib/client.mjs';
+import QuoteForm from '../../components/QuoteForm.astro';
 import { canonical, contactPageSchema } from '../../lib/seo.mjs';
 
 const a = site.contact.address;
@@ -43,46 +44,7 @@ const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.contact.
         </div>
       </div>
 
-      <div class="card">
-        <h2 class="form__h">Request a callback</h2>
-        <form
-          class="form"
-          method="POST"
-          action={action}
-          name={useGhl ? undefined : 'quote'}
-          data-netlify={useGhl ? undefined : 'true'}
-        >
-          {!useGhl && <input type="hidden" name="form-name" value="quote" />}
-          {useGhl && site.forms.ghlLocationId && (
-            <input type="hidden" name="location_id" value={site.forms.ghlLocationId} />
-          )}
-          <p class="visually-hidden">
-            <label>Leave this blank if you are human: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
-          </p>
-          <label class="field">
-            <span>Your name</span>
-            <input type="text" name="full_name" autocomplete="name" required />
-          </label>
-          <label class="field">
-            <span>Phone</span>
-            <input type="tel" name="phone" autocomplete="tel" required />
-          </label>
-          <label class="field">
-            <span>Email</span>
-            <input type="email" name="email" autocomplete="email" required />
-          </label>
-          <label class="field">
-            <span>Postcode</span>
-            <input type="text" name="postal_code" autocomplete="postal-code" required />
-          </label>
-          <label class="field">
-            <span>What do you need?</span>
-            <textarea name="message" rows="4" required></textarea>
-          </label>
-          <button class="btn btn--primary form__btn" type="submit">Request my quote</button>
-          <p class="form__note muted">We&rsquo;ll only use your details to arrange your quote.</p>
-        </form>
-      </div>
+      <QuoteForm heading="Request a callback" />
     </div>
   </section>
 

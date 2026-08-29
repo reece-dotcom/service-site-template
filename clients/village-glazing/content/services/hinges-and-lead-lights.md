@@ -4,6 +4,7 @@ description: "Seized window hinges replaced and damaged lead lights repaired acr
 name: "Hinges & lead lights"
 heading: "Hinges, friction stays and lead light repairs"
 summary: "Windows that won't open, drop as they swing, or have a cracked lead light panel — all repairable without touching the frame."
+image: "hinges.webp"
 order: 3
 benefits:
   - "Friction stays and egress hinges replaced to the correct size and weight"

@@ -1,0 +1,45 @@
+---
+/**
+ * Google map band. Uses the keyless embed endpoint (no API key, no cost) with
+ * the client's mapEmbedQuery, or the Place ID when one is set — always prefer
+ * the Place ID once the Google Business Profile exists, so the pin is the
+ * business rather than the town centre.
+ */
+import { site } from '../lib/client.mjs';
+
+const { heading = 'Where we work' } = Astro.props;
+const q = site.contact.googlePlaceId
+  ? `place_id:${site.contact.googlePlaceId}`
+  : site.contact.mapEmbedQuery;
+const src = `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`;
+---
+{q ? (
+  <section class="section">
+    <div class="container map__grid">
+      <div>
+        <p class="eyebrow">Find us</p>
+        <h2>{heading}</h2>
+        <p class="lede">
+          Based in {site.contact.address.locality}, {site.contact.address.region}.
+        </p>
+        <p class="map__nap">
+          <a href={`tel:${site.contact.phoneHref}`}>{site.contact.phone}</a><br />
+          <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
+        </p>
+      </div>
+      <iframe
+        class="map"
+        src={src}
+        title={`Map showing ${site.business.name} in ${site.contact.address.locality}`}
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+  </section>
+) : null}
+<style>
+  .map__grid { display: grid; gap: var(--space-8); grid-template-columns: 1fr 1.4fr; align-items: center; }
+  .map { width: 100%; height: 22rem; border: 0; border-radius: var(--radius-lg); }
+  .map__nap { margin-top: var(--space-4); }
+  @media (max-width: 52rem) { .map__grid { grid-template-columns: 1fr; } }
+</style>

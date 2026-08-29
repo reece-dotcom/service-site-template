@@ -4,6 +4,7 @@ description: "Foggy or blown double glazed units replaced across Wallasey and th
 name: "Misted & blown units"
 heading: "Misted double glazing replaced — frames stay put"
 summary: "A blown unit is a failed seal, not a failed window. We measure the glass, order it and swap it into the frame you already have."
+image: "units.webp"
 order: 2
 benefits:
   - "Glass-only replacement — no frames ripped out, no making good"

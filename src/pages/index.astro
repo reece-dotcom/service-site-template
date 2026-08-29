@@ -3,6 +3,12 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CtaBand from '../components/CtaBand.astro';
 import TrustStrip from '../components/TrustStrip.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import Gallery from '../components/Gallery.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import MapBand from '../components/MapBand.astro';
+import { Image } from 'astro:assets';
+import { clientImage } from '../lib/images.mjs';
 import { site } from '../lib/client.mjs';
 import { canonical, serviceSchema } from '../lib/seo.mjs';
 
@@ -27,6 +33,7 @@ const schemas = services.map((s) =>
  * for repair-only businesses and produces broken copy when accreditations is
  * empty.
  */
+const heroImage = clientImage(site.media?.hero);
 const heroPoints = site.business.usps?.length
   ? site.business.usps
   : [
@@ -40,22 +47,25 @@ const heroPoints = site.business.usps?.length
 ---
 
 <BaseLayout title={title.slice(0, 60)} description={description} schemas={schemas}>
-  <section class="hero">
+  <section class:list={['hero', heroImage && 'hero--image']}>
+    {heroImage && (
+      <Image class="hero__bg" src={heroImage} alt={`${site.business.name} — window and door repairs in ${site.business.primaryArea ?? site.business.town ?? ""}`} widths={[900, 1600]} sizes="100vw" loading="eager" fetchpriority="high" />
+    )}
     <div class="container hero__inner">
-      <div>
+      <div class="hero__copy">
         <p class="eyebrow">{site.contact.address.region}</p>
         <h1>{site.business.tagline}</h1>
         <p class="lede hero__lede">{site.business.description}</p>
+        <ul class="checklist hero__points">
+          {heroPoints.map((point) => <li>{point}</li>)}
+        </ul>
         <div class="hero__actions">
           <a class="btn btn--accent" href={`tel:${site.contact.phoneHref}`}>
             Call {site.contact.phone}
           </a>
-          <a class="btn btn--ghost hero__ghost" href="/contact/">Book a free survey</a>
         </div>
       </div>
-      <ul class="checklist hero__points">
-        {heroPoints.map((point) => <li>{point}</li>)}
-      </ul>
+      <QuoteForm heading="Get a free quote" compact={true} />
     </div>
   </section>
 
@@ -67,9 +77,15 @@ const heroPoints = site.business.usps?.length
       <h2>Our services</h2>
       <div class="grid grid--3 svc">
         {services.map((s) => (
-          <article class="card">
+          <article class="card svc__card">
+            {clientImage(s.data.image) && (
+              <a href={`/services/${s.id}/`} class="svc__media">
+                <Image src={clientImage(s.data.image)} alt={s.data.name} widths={[400, 720]} sizes="(max-width: 48rem) 92vw, 30vw" loading="lazy" />
+              </a>
+            )}
             <h3><a href={`/services/${s.id}/`}>{s.data.name}</a></h3>
             <p class="muted">{s.data.summary}</p>
+            <a class="svc__more" href={`/services/${s.id}/`}>Read more &rarr;</a>
           </article>
         ))}
       </div>
@@ -91,15 +107,34 @@ const heroPoints = site.business.usps?.length
     </div>
   </section>
 
+  <Gallery items={site.media?.gallery ?? []} />
+
+  <ProcessSteps />
+
+  <MapBand />
+
   <CtaBand />
 </BaseLayout>
 
 <style>
-  .hero { padding-block: clamp(var(--space-12), 6vw, var(--space-24)); }
-  .hero__inner { display: grid; gap: var(--space-12); grid-template-columns: 1.15fr 0.85fr; align-items: center; }
-  .hero__lede { margin-top: var(--space-6); }
+  .hero { padding-block: clamp(var(--space-12), 6vw, var(--space-24)); position: relative; isolation: isolate; }
+  .hero--image { color: #fff; }
+  .hero__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+  .hero--image::after {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(100deg, color-mix(in srgb, var(--brand-dark) 92%, transparent) 0%, color-mix(in srgb, var(--brand-dark) 78%, transparent) 46%, color-mix(in srgb, var(--brand-dark) 42%, transparent) 100%);
+  }
+  .hero--image :global(h1), .hero--image .hero__lede, .hero--image .eyebrow { color: #fff; }
+  .hero--image .hero__points li { color: #fff; }
+  .hero__inner { display: grid; gap: var(--space-12); grid-template-columns: 1.05fr 0.95fr; align-items: center; }
+  .hero__lede { margin-top: var(--space-6); max-width: 34rem; }
   .hero__actions { display: flex; gap: var(--space-4); margin-top: var(--space-8); flex-wrap: wrap; }
-  .hero__points { background: var(--surface); padding: var(--space-8); border-radius: var(--radius-lg); }
+  .hero__points { margin-top: var(--space-8); }
+  .hero:not(.hero--image) .hero__points { background: var(--surface); padding: var(--space-6); border-radius: var(--radius-lg); }
+  .svc__card { display: flex; flex-direction: column; }
+  .svc__media { display: block; margin: calc(var(--space-6) * -1) calc(var(--space-6) * -1) var(--space-5); overflow: hidden; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .svc__media :global(img) { width: 100%; height: 11rem; object-fit: cover; display: block; }
+  .svc__more { margin-top: auto; padding-top: var(--space-4); font-weight: 650; font-size: 0.95rem; text-decoration: none; color: var(--brand); }
   .svc { margin-top: var(--space-8); }
   .svc h3 a { text-decoration: none; color: var(--ink); }
   .svc h3 a:hover { color: var(--brand); }

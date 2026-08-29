@@ -1,0 +1,72 @@
+---
+/**
+ * The single lead form used everywhere (hero, contact page). Server-side POST,
+ * no client JS. Keep one implementation — two diverging forms means one of
+ * them quietly stops posting to the CRM.
+ */
+import { site } from '../lib/client.mjs';
+
+const { compact = false, heading = 'Request a callback', id = 'quote-form' } = Astro.props;
+const useGhl = site.forms.provider === 'ghl';
+const action = useGhl ? site.forms.ghlEndpoint : '/thank-you/';
+---
+<div class:list={['qf', compact && 'qf--compact']} id={id}>
+  <h2 class="qf__h">{heading}</h2>
+  <p class="qf__sub muted">No pressure and no sales patter — just a straight answer.</p>
+  <form
+    class="form"
+    method="POST"
+    action={action}
+    name={useGhl ? undefined : 'quote'}
+    data-netlify={useGhl ? undefined : 'true'}
+  >
+    {!useGhl && <input type="hidden" name="form-name" value="quote" />}
+    {useGhl && site.forms.ghlLocationId && (
+      <input type="hidden" name="location_id" value={site.forms.ghlLocationId} />
+    )}
+    <p class="visually-hidden">
+      <label>Leave this blank if you are human: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+    </p>
+    <div class="form__row">
+      <label class="field">
+        <span>Your name</span>
+        <input type="text" name="full_name" autocomplete="name" required />
+      </label>
+      <label class="field">
+        <span>Phone</span>
+        <input type="tel" name="phone" autocomplete="tel" required />
+      </label>
+    </div>
+    <div class="form__row">
+      <label class="field">
+        <span>Email</span>
+        <input type="email" name="email" autocomplete="email" required />
+      </label>
+      <label class="field">
+        <span>Postcode</span>
+        <input type="text" name="postal_code" autocomplete="postal-code" required />
+      </label>
+    </div>
+    <label class="field">
+      <span>What needs doing?</span>
+      <textarea name="message" rows={compact ? 3 : 4} required></textarea>
+    </label>
+    <button class="btn btn--accent form__btn" type="submit">Get my quote</button>
+    <p class="form__note muted">We&rsquo;ll only use your details to arrange your quote.</p>
+  </form>
+</div>
+<style>
+  .qf { background: #fff; border-radius: var(--radius-lg); padding: var(--space-6); border: 1px solid color-mix(in srgb, var(--muted) 20%, transparent); box-shadow: 0 18px 40px -28px rgba(0,0,0,0.45); }
+  .qf__h { font-size: 1.25rem; }
+  .qf__sub { font-size: 0.9rem; margin-top: var(--space-2); }
+  .form { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+  .form__row { display: grid; gap: var(--space-4); grid-template-columns: 1fr 1fr; }
+  .field { display: grid; gap: var(--space-2); font-weight: 600; font-size: 0.9rem; }
+  .field input, .field textarea {
+    font: inherit; font-weight: 400; padding: 0.65rem 0.8rem; border-radius: var(--radius);
+    border: 1.5px solid color-mix(in srgb, var(--muted) 42%, transparent); background: #fff; width: 100%;
+  }
+  .form__btn { justify-content: center; width: 100%; }
+  .form__note { font-size: 0.8rem; }
+  @media (max-width: 40rem) { .form__row { grid-template-columns: 1fr; } }
+</style>

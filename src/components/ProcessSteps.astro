@@ -1,0 +1,37 @@
+---
+/**
+ * "How it works" strip. Steps come from business.process in site.config.mjs;
+ * the fallback suits any trade that surveys before quoting.
+ */
+import { site } from '../lib/client.mjs';
+
+const steps = site.business.process?.length
+  ? site.business.process
+  : [
+      { title: 'Call or message', body: 'Tell us what the problem is. Most jobs we can price sensibly over the phone.' },
+      { title: 'We look at it properly', body: 'We check the whole thing, not just the bit that failed, so it does not come back.' },
+      { title: 'Fixed price in writing', body: 'You get a price that does not move, and a date. No sales visit, no discount theatre.' },
+    ];
+---
+<section class="section section--surface">
+  <div class="container">
+    <p class="eyebrow">How it works</p>
+    <h2>Three steps, no sales visit</h2>
+    <ol class="steps">
+      {steps.map((s, i) => (
+        <li class="steps__item">
+          <span class="steps__num">{String(i + 1).padStart(2, '0')}</span>
+          <h3>{s.title}</h3>
+          <p>{s.body}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+<style>
+  .steps { list-style: none; padding: 0; margin-top: var(--space-8); display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); counter-reset: none; }
+  .steps__item { background: #fff; border-radius: var(--radius-lg); padding: var(--space-6); border: 1px solid color-mix(in srgb, var(--muted) 18%, transparent); }
+  .steps__num { font-family: var(--font-heading); font-weight: 700; color: var(--accent); font-size: 0.95rem; letter-spacing: 0.08em; }
+  .steps__item h3 { margin-top: var(--space-2); font-size: 1.1rem; }
+  .steps__item p { margin-top: var(--space-2); color: var(--muted); font-size: 0.95rem; }
+</style>

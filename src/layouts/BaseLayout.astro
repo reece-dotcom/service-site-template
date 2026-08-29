@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { site } from '../lib/client.mjs';
 import { assertSeo, canonical, localBusinessSchema } from '../lib/seo.mjs';
 import SiteHeader from '../components/SiteHeader.astro';
+import StickyCta from '../components/StickyCta.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 
 const { title, description, schemas = [], noindex = false, image } = Astro.props;
@@ -57,5 +58,6 @@ const ogImage = image ? new URL(image, site.url).href : undefined;
     <SiteHeader />
     <main id="main"><slot /></main>
     <SiteFooter />
+    <StickyCta />
   </body>
 </html>
