@@ -45,6 +45,7 @@ export default {
     geo: { lat: 53.4239, lng: -3.0686 },
     googlePlaceId: 'ChIJ9X6Y-eU9q24RIfyZJ3Gwc-0',
     mapEmbedQuery: 'Wallasey, Wirral',
+    mapZoom: 12,
   },
 
   hours: [

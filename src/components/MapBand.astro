@@ -11,7 +11,10 @@ const { heading = 'Where we work' } = Astro.props;
 const q = site.contact.googlePlaceId
   ? `place_id:${site.contact.googlePlaceId}`
   : site.contact.mapEmbedQuery;
-const src = `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`;
+// Service-area businesses have no street address, so a place_id embed defaults
+// to a uselessly wide view. Pin the zoom (config: contact.mapZoom).
+const z = site.contact.mapZoom ?? 12;
+const src = `https://www.google.com/maps?q=${encodeURIComponent(q)}&z=${z}&output=embed`;
 ---
 {q ? (
   <section class="section">
