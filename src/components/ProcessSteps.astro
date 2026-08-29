@@ -15,8 +15,13 @@ const steps = site.business.process?.length
 ---
 <section class="section section--surface">
   <div class="container">
-    <p class="eyebrow">How it works</p>
-    <h2>Three steps, no sales visit</h2>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">How it works</p>
+        <h2>Three steps, no sales visit</h2>
+      </div>
+      <p class="lede">Nobody sits in your front room for two hours. You get a price, a date, and the work done.</p>
+    </div>
     <ol class="steps">
       {steps.map((s, i) => (
         <li class="steps__item">
@@ -29,9 +34,9 @@ const steps = site.business.process?.length
   </div>
 </section>
 <style>
-  .steps { list-style: none; padding: 0; margin-top: var(--space-8); display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); counter-reset: none; }
-  .steps__item { background: #fff; border-radius: var(--radius-lg); padding: var(--space-6); border: 1px solid color-mix(in srgb, var(--muted) 18%, transparent); }
-  .steps__num { font-family: var(--font-heading); font-weight: 700; color: var(--accent); font-size: 0.95rem; letter-spacing: 0.08em; }
-  .steps__item h3 { margin-top: var(--space-2); font-size: 1.1rem; }
+  .steps { list-style: none; padding: 0; display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+  .steps__item { background: #fff; border-radius: var(--radius-lg); padding: var(--space-6); border: 1px solid var(--hairline); border-top: 3px solid var(--brand); position: relative; }
+  .steps__num { font-family: var(--font-heading); font-weight: 700; color: var(--brand); font-size: 2.4rem; opacity: 0.9; line-height: 1; letter-spacing: -0.03em; display: block; }
+  .steps__item h3 { margin-top: var(--space-3); font-size: 1.15rem; }
   .steps__item p { margin-top: var(--space-2); color: var(--muted); font-size: 0.95rem; }
 </style>

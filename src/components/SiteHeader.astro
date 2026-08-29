@@ -35,5 +35,22 @@ const isCurrent = (href) => (href === '/' ? path === '/' : path.startsWith(href)
   .hdr__nav a { color: var(--ink); text-decoration: none; font-weight: 550; font-size: 0.98rem; }
   .hdr__nav a[aria-current='page'] { color: var(--brand); text-decoration: underline; }
   .hdr__cta { padding: 0.6rem 1.1rem; font-size: 0.98rem; }
-  @media (max-width: 46rem) { .hdr__nav { order: 3; width: 100%; } .hdr__nav ul { gap: var(--space-4); } }
+  @media (max-width: 46rem) {
+    .hdr__inner { gap: var(--space-3); padding-block: var(--space-3); }
+    .hdr__brand { font-size: 1.05rem; }
+    .hdr__nav {
+      order: 3; width: 100%;
+      margin-inline: calc(var(--space-4) * -1);
+      padding-inline: var(--space-4);
+      overflow-x: auto; scrollbar-width: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: var(--space-3);
+    }
+    .hdr__nav::-webkit-scrollbar { display: none; }
+    .hdr__nav ul { gap: var(--space-5); flex-wrap: nowrap; }
+    .hdr__nav a { white-space: nowrap; font-size: 0.92rem; }
+    /* The sticky bottom bar already carries the number on mobile — a second
+       full-width call button in the header just pushes the hero down. */
+    .hdr__cta { display: none; }
+  }
 </style>

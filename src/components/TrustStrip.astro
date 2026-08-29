@@ -6,15 +6,37 @@ const yearsLabel = site.business.yearsLabel ?? 'installing locally';
 ---
 <section class="trust">
   <div class="container trust__inner">
-    <p><strong>{years}+ years</strong> {yearsLabel}</p>
-    {site.business.accreditations.map((a) => <p><strong>{a}</strong></p>)}
+    <div class="trust__item">
+      <strong class="trust__big">{years}+</strong>
+      <span>years {yearsLabel}</span>
+    </div>
     {rating && (
-      <p><strong>{rating.ratingValue}/5</strong> from {rating.reviewCount} {rating.source} reviews</p>
+      <div class="trust__item">
+        <strong class="trust__big">{rating.ratingValue}<span class="trust__of">/5</span></strong>
+        <span>{rating.reviewCount} {rating.source} reviews</span>
+      </div>
     )}
+    {site.business.accreditations.slice(0, 3).map((a) => (
+      <div class="trust__item trust__item--badge">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="trust__tick"><path fill="currentColor" d="M9.55 17.6 4.4 12.45l1.42-1.42 3.73 3.73 8.63-8.63 1.42 1.42z"/></svg>
+        <span>{a}</span>
+      </div>
+    ))}
   </div>
 </section>
 <style>
-  .trust { border-block: 1px solid color-mix(in srgb, var(--muted) 20%, transparent); background: var(--surface); }
-  .trust__inner { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-8); justify-content: space-between; padding-block: var(--space-4); font-size: 0.95rem; color: var(--muted); }
-  .trust strong { color: var(--ink); }
+  .trust { border-bottom: 1px solid var(--hairline); background: #fff; }
+  .trust__inner {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6);
+    padding-block: var(--space-6); color: var(--muted); font-size: 0.95rem;
+  }
+  .trust__item { display: flex; flex-direction: column; gap: 0.15rem; padding-inline: var(--space-6); border-left: 1px solid var(--hairline); flex: 0 1 auto; }
+  .trust__item:first-child { border-left: 0; padding-left: 0; }
+  .trust__big { font-family: var(--font-heading); font-size: 1.9rem; line-height: 1; color: var(--ink); letter-spacing: -0.02em; }
+  .trust__of { font-size: 1rem; color: var(--muted); }
+  .trust__item--badge { flex-direction: row; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--ink); }
+  .trust__tick { color: var(--brand); flex: none; }
+  @media (max-width: 46rem) {
+    .trust__item { border-left: 0; padding-inline: 0; padding-block: var(--space-2); }
+  }
 </style>
