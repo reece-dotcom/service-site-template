@@ -11,6 +11,8 @@ benefits:
   - "Windows that have dropped brought back square so they close properly"
   - "Cracked or bowed lead lights repaired and re-leaded"
   - "Traditional leaded and Georgian designs matched where units need replacing"
+answerQuestion: "Can stiff hinges and cracked lead lights be repaired?"
+answer: "Usually yes. Friction hinges corrode on coastal Wirral properties and are replaced like for like, including escape hinges in bedrooms. Damaged lead light panels are normally cut out and re-leaded in place rather than replaced, keeping the original pattern. Village Glazing Repairs, Wallasey — call 07708 132985."
 faqs:
   - question: "My window is stiff to open — is that the hinge?"
     answer: "Usually, yes. Friction stays corrode, especially on coastal Wirral properties, and the stiffness you're fighting is the hinge binding rather than the window. New stays are inexpensive and make an immediate difference."

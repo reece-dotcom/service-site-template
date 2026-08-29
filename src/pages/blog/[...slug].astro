@@ -2,7 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CtaBand from '../../components/CtaBand.astro';
-import { canonical, blogPostingSchema } from '../../lib/seo.mjs';
+import { canonical, blogPostingSchema, breadcrumbSchema } from '../../lib/seo.mjs';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
@@ -27,7 +27,7 @@ const schema = blogPostingSchema({
 });
 const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
-<BaseLayout title={entry.data.title} description={entry.data.description} schemas={[schema]}>
+<BaseLayout title={entry.data.title} description={entry.data.description} schemas={[schema, breadcrumbSchema([{ name: 'Advice', path: '/blog/' }, { name: entry.data.heading }])]}>
   <article>
     <header class="section head">
       <div class="container">

@@ -11,6 +11,8 @@ benefits:
   - "Anti-snap cylinders fitted where the old ones are a security risk"
   - "Doors realigned so they lock without lifting and shoving"
   - "21 years on Wirral windows and doors — most parts carried in the van"
+answerQuestion: "Which part of a door lock actually fails?"
+answer: "Nine times out of ten the fault is the multipoint mechanism inside the door, not the handle you can see or the door itself. The mechanism is replaced in place, the door is adjusted, and you keep the existing frame and glass. Village Glazing Repairs covers Wallasey and the Wirral on 07708 132985."
 faqs:
   - question: "My door only locks if I lift the handle hard. Is that serious?"
     answer: "It usually means the door has dropped slightly on its hinges and the mechanism is being forced. Left alone the gearbox eventually snaps — often with the door locked shut. Adjusting the hinges and easing the keeps is a quick job; a broken gearbox is a bigger one."

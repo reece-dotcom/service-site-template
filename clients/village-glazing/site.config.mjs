@@ -17,6 +17,9 @@ export default {
     yearFounded: 2005,
     priceRange: '£',
     accreditations: [],
+    directAnswerQuestion: 'Who repairs windows and doors in Wallasey and the Wirral?',
+    directAnswer:
+      'Village Glazing Repairs is a Wallasey-based window and door repair service covering the whole of the Wirral. We fix locks, hinges, handles, multipoint mechanisms, misted double glazed units and lead lights in the frames you already have, rather than replacing them. Twenty-one years in the trade. Call 07708 132985 for a price.',
     yearsLabel: 'repairing windows and doors on the Wirral',
     process: [
       { title: 'Tell us what it does', body: 'Sticking, dropped, misted, will not lock — describe it and we can usually price it on the phone.' },

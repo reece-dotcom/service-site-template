@@ -142,6 +142,56 @@ for (const slug of fs.readdirSync(clientsDir)) {
   }
 }
 
+// Structured-data + AEO checks. These are the things that are invisible in the
+// browser, so nothing else catches them if a page or component regresses.
+{
+  const schemaOf = (html) => {
+    const m = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+    if (!m) return null;
+    try {
+      return JSON.parse(m[1]);
+    } catch {
+      return 'invalid';
+    }
+  };
+  for (const { route, html } of pages) {
+    const j = schemaOf(html);
+    if (j === null) {
+      fails.push(`${route}: no JSON-LD block`);
+      continue;
+    }
+    if (j === 'invalid') {
+      fails.push(`${route}: JSON-LD does not parse`);
+      continue;
+    }
+    const types = j.map((x) => x['@type']);
+    const biz = j[0];
+    if (!biz?.areaServed) fails.push(`${route}: business schema has no areaServed`);
+    if (route === '/' && !biz?.hasOfferCatalog) {
+      fails.push('/: business schema has no hasOfferCatalog');
+    }
+    // Every page below the top level should say where it sits.
+    const depth = route.split('/').filter(Boolean).length;
+    if (depth > 1 && !types.includes('BreadcrumbList')) {
+      fails.push(`${route}: nested page with no BreadcrumbList schema`);
+    }
+  }
+
+  const robots = fs.existsSync(path.join(dist, 'robots.txt'))
+    ? fs.readFileSync(path.join(dist, 'robots.txt'), 'utf8')
+    : '';
+  for (const bot of ['GPTBot', 'ClaudeBot', 'Google-Extended']) {
+    if (!new RegExp(`User-agent: ${bot}\\nDisallow: /`).test(robots)) {
+      fails.push(`robots.txt: training crawler ${bot} is not blocked`);
+    }
+  }
+  for (const bot of ['OAI-SearchBot', 'Claude-SearchBot', 'PerplexityBot']) {
+    if (!new RegExp(`User-agent: ${bot}\\nAllow: /`).test(robots)) {
+      fails.push(`robots.txt: answer engine ${bot} is not explicitly allowed`);
+    }
+  }
+}
+
 console.log(`\nQA: ${pages.length} pages, client "${active}"\n`);
 for (const w of warns) console.log(`  ⚠  ${w}`);
 if (fails.length) {

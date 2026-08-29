@@ -25,7 +25,14 @@ const addr = () => ({
   addressCountry: site.contact.address.country,
 });
 
-export function localBusinessSchema() {
+/**
+ * Primary business entity. `services` and `areas` are the live content
+ * collections: passing them turns the entity into a full service catalogue
+ * with an explicit service area, which is what Google and the AI answer
+ * engines read to decide what this business does and where. Never hand-write
+ * these lists per client — they come from the client's own content.
+ */
+export function localBusinessSchema({ services = [], areas = [] } = {}) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': site.business.schemaType,
@@ -51,6 +58,32 @@ export function localBusinessSchema() {
     })),
     sameAs: Object.values(site.social).filter(Boolean),
   };
+
+  if (services.length) {
+    schema.hasOfferCatalog = {
+      '@type': 'OfferCatalog',
+      name: `${site.business.name} services`,
+      itemListElement: services.map((s) => ({
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: s.name,
+          description: s.description,
+          url: canonical(`/services/${s.slug}/`),
+        },
+      })),
+    };
+  }
+
+  // A service-area business must state its area explicitly; the postal address
+  // alone makes Google guess, and for installers with no shopfront it guesses
+  // badly.
+  const served = areas.length
+    ? areas.map((a) => ({ '@type': 'Place', name: a.name }))
+    : [{ '@type': 'Place', name: site.contact.address.region }].filter(
+        () => site.contact.address.region
+      );
+  if (served.length) schema.areaServed = served;
   // Only emit ratings that actually exist. Never fabricate.
   if (site.reviews?.aggregate) {
     schema.aggregateRating = {
@@ -110,5 +143,24 @@ export function contactPageSchema(url) {
     '@type': 'ContactPage',
     url,
     mainEntity: { '@id': `${site.url}/#business` },
+  };
+}
+
+/**
+ * BreadcrumbList for a page. `trail` is ordered, excluding the home entry,
+ * e.g. [{ name: 'Services', path: '/services/' }, { name: 'Lock repairs' }].
+ * The last item is the current page and needs no path.
+ */
+export function breadcrumbSchema(trail = []) {
+  const items = [{ name: 'Home', path: '/' }, ...trail];
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: item.name,
+      ...(item.path ? { item: canonical(item.path) } : {}),
+    })),
   };
 }

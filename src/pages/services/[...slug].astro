@@ -4,8 +4,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import FaqList from '../../components/FaqList.astro';
 import TrustStrip from '../../components/TrustStrip.astro';
+import AnswerBlock from '../../components/AnswerBlock.astro';
 import { site } from '../../lib/client.mjs';
-import { canonical, serviceSchema, faqSchema } from '../../lib/seo.mjs';
+import { canonical, serviceSchema, faqSchema, breadcrumbSchema } from '../../lib/seo.mjs';
 
 export async function getStaticPaths() {
   const services = (await getCollection('services')).filter((s) => !s.data.draft);
@@ -19,6 +20,10 @@ const url = canonical(`/services/${entry.id}/`);
 const schemas = [
   serviceSchema({ name: entry.data.name, description: entry.data.summary, url }),
   faqSchema(entry.data.faqs),
+  breadcrumbSchema([
+    { name: 'Services', path: '/services/' },
+    { name: entry.data.name },
+  ]),
 ];
 ---
 <BaseLayout title={entry.data.title} description={entry.data.description} schemas={schemas}>
@@ -34,6 +39,15 @@ const schemas = [
         <ul class="checklist benefits">
           {entry.data.benefits.map((b) => <li>{b}</li>)}
         </ul>
+      )}
+      {entry.data.answer && (
+        <div class="answer-wrap">
+          <AnswerBlock
+            question={entry.data.answerQuestion ??
+              `${entry.data.name} in ${site.contact.address.locality} — the short answer`}
+            answer={entry.data.answer}
+          />
+        </div>
       )}
     </div>
   </section>
@@ -57,6 +71,7 @@ const schemas = [
 <style>
   .crumb { font-size: 0.9rem; color: var(--muted); margin-bottom: var(--space-6); }
   .crumb a { color: var(--muted); }
+  .answer-wrap { margin-top: var(--space-8); }
   .benefits { margin-top: var(--space-8); max-width: 60ch; }
   .areas { list-style: none; padding: 0; display: grid; gap: var(--space-3); margin-top: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); }
 </style>

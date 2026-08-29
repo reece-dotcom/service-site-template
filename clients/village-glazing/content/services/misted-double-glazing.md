@@ -11,6 +11,8 @@ benefits:
   - "A-rated and Low-E units available on like-for-like replacement"
   - "Obscure, toughened and Georgian bar units matched to the original"
   - "Usually two visits: measure, then fit when the unit arrives"
+answerQuestion: "Does a misted window mean a new window?"
+answer: "No. Misting means the sealed unit between the two panes has failed, not the frame. The glass unit is measured, ordered and swapped into the frame you already have, so the window, hinges and handles stay put. Village Glazing Repairs does this across Wallasey and the Wirral on 07708 132985."
 faqs:
   - question: "Why has my window gone foggy?"
     answer: "The perimeter seal around the sealed unit has failed, so moist air gets between the two panes and condenses. Nothing you can spray or wipe will fix it — the unit itself has to be replaced."

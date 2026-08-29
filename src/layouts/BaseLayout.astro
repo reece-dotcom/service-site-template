@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import '../styles/global.css';
 import { site } from '../lib/client.mjs';
 import { assertSeo, canonical, localBusinessSchema } from '../lib/seo.mjs';
@@ -12,7 +13,18 @@ assertSeo(title, description, Astro.url.pathname);
 
 const url = canonical(Astro.url.pathname);
 const t = site.theme;
-const jsonld = [localBusinessSchema(), ...schemas.filter(Boolean)];
+const catalogServices = (await getCollection('services'))
+  .filter((s) => !s.data.draft)
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((s) => ({ slug: s.id, name: s.data.name, description: s.data.summary }));
+const catalogAreas = (await getCollection('areas'))
+  .filter((a) => !a.data.draft)
+  .map((a) => ({ name: a.data.name }));
+
+const jsonld = [
+  localBusinessSchema({ services: catalogServices, areas: catalogAreas }),
+  ...schemas.filter(Boolean),
+];
 const ogImage = image ? new URL(image, site.url).href : undefined;
 ---
 

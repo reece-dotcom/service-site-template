@@ -1,0 +1,44 @@
+---
+/**
+ * DIRECT-ANSWER BLOCK (AEO)
+ *
+ * One tight paragraph that answers the page's core question in plain language,
+ * placed high on the page. This is the passage an AI answer engine or a Google
+ * featured snippet lifts verbatim, so it must stand alone: who, what, where,
+ * and the phone number — no "as mentioned above".
+ *
+ * 40–60 words is the working range. Shorter reads as a slogan and gets ignored;
+ * longer gets truncated mid-sentence. The build FAILS outside that range rather
+ * than shipping a block that will not get quoted.
+ */
+const { question, answer } = Astro.props;
+
+if (!answer) throw new Error('[AnswerBlock] answer is required');
+
+const words = answer.trim().split(/\s+/).length;
+if (words < 40 || words > 60) {
+  throw new Error(
+    `[AEO] Direct answer must be 40-60 words, got ${words}. ` +
+      `Fix the copy in the client config or page frontmatter, do not relax this check.\n  "${answer}"`
+  );
+}
+---
+<div class="answer">
+  {question && <p class="answer__q">{question}</p>}
+  <p class="answer__a">{answer}</p>
+</div>
+<style>
+  .answer {
+    border-left: 3px solid var(--accent);
+    padding: var(--space-1) 0 var(--space-1) var(--space-6);
+    max-width: 62ch;
+  }
+  .answer__q {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--ink);
+  }
+  .answer__a { margin: 0; font-size: 1.08rem; line-height: 1.65; color: var(--ink); }
+</style>

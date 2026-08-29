@@ -30,6 +30,12 @@ const services = defineCollection({
     order: z.number().default(99),
     image: z.string().optional(),
     benefits: z.array(z.string()).default([]),
+    /**
+     * AEO direct answer (40-60 words, enforced in AnswerBlock). The passage an
+     * AI answer engine quotes for "who does X in <town>".
+     */
+    answer: z.string().optional(),
+    answerQuestion: z.string().optional(),
     faqs: faq,
     draft: z.boolean().default(false),
   }),

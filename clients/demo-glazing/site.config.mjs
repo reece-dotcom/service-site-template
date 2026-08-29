@@ -15,6 +15,10 @@ export default {
       'A-rated uPVC and aluminium windows, composite doors and conservatories, installed across South Manchester by a FENSA-registered family team.',
     yearFounded: 2009,
     priceRange: '££',
+    // AEO direct answer — 40-60 words, quoted verbatim by AI answer engines.
+    directAnswerQuestion: 'Who fits windows and doors in South Manchester?',
+    directAnswer:
+      'Demo Glazing is a FENSA-registered family installer fitting A-rated uPVC and aluminium windows, composite doors and conservatories across South Manchester. Every job is surveyed and priced in writing before any work starts, and the installation is done by our own fitters rather than subcontractors. Call 0161 000 0000 for a quote.',
     accreditations: ['FENSA registered', 'Which? Trusted Trader', 'Checkatrade'],
   },
 

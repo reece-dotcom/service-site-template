@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import FaqList from '../../components/FaqList.astro';
 import { site } from '../../lib/client.mjs';
-import { canonical, serviceSchema, faqSchema } from '../../lib/seo.mjs';
+import { canonical, serviceSchema, faqSchema, breadcrumbSchema } from '../../lib/seo.mjs';
 
 export async function getStaticPaths() {
   const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
@@ -30,6 +30,10 @@ const schemas = [
     })
   ),
   faqSchema(entry.data.faqs),
+  breadcrumbSchema([
+    { name: 'Areas we cover', path: '/areas/' },
+    { name: entry.data.name },
+  ]),
 ];
 ---
 <BaseLayout title={entry.data.title} description={entry.data.description} schemas={schemas}>
