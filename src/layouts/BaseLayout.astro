@@ -39,7 +39,7 @@ const ogImage = image ? new URL(image, site.url).href : undefined;
     <meta name="theme-color" content={t.brand} />
 
     <style is:inline set:html={`:root{
-      --brand:${t.brand};--brand-dark:${t.brandDark};--accent:${t.accent};
+      --brand:${t.brand};--brand-dark:${t.brandDark};--accent:${t.accent};--accent-ink:${t.accentInk ?? t.ink};
       --ink:${t.ink};--muted:${t.muted};--surface:${t.surface};
       --font-heading:${t.fontHeading};--font-body:${t.fontBody};}`}></style>
 

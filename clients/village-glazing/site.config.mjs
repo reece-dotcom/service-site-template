@@ -43,7 +43,7 @@ export default {
       country: 'GB',
     },
     geo: { lat: 53.4239, lng: -3.0686 },
-    googlePlaceId: '',
+    googlePlaceId: 'ChIJ9X6Y-eU9q24RIfyZJ3Gwc-0',
     mapEmbedQuery: 'Wallasey, Wirral',
   },
 
@@ -71,9 +71,32 @@ export default {
 
   // Real reviews only. Facebook shows "100% recommend (11 reviews)" but that is
   // a recommendation count, not a star rating — no aggregateRating schema.
+  // Real Google Business Profile data, read off his live listing 2026-08-27.
+  // 5.0 from 13 reviews. Facebook's "100% recommend (11)" is a recommendation
+  // count, not a rating — not used anywhere.
   reviews: {
-    aggregate: null,
-    featured: [],
+    profileUrl: 'https://www.google.com/maps/place/?q=place_id:ChIJ9X6Y-eU9q24RIfyZJ3Gwc-0',
+    aggregate: { ratingValue: '5.0', reviewCount: 13, source: 'Google' },
+    featured: [
+      {
+        author: 'Eve & Isaac',
+        when: '2 months ago',
+        rating: 5,
+        body: 'Excellent service, sent a message with what was needed. Came out first thing and fixed both windows within 10 minutes. Would definitely recommend.',
+      },
+      {
+        author: 'Lauren Clewes',
+        when: '5 months ago',
+        rating: 5,
+        body: 'Great experience! Same day service, was so helpful. Best around I\u2019d say. Would 100% recommend.',
+      },
+      {
+        author: 'Google review',
+        when: '',
+        rating: 5,
+        body: 'He came out to repair straight away so the property could be made secure.',
+      },
+    ],
   },
 
   /**
@@ -86,17 +109,22 @@ export default {
     gallery: [
       { src: 'gallery1.webp', alt: 'Repaired uPVC front door with new handle and lock', caption: 'New multipoint mechanism, cylinder and handle — same door.' },
       { src: 'gallery2.webp', alt: 'Traditional leaded light window panel being repaired', caption: 'Lead light repaired in place rather than replaced.' },
-      { src: 'units.webp', alt: 'Misted double glazed unit next to a clear one', caption: 'Blown unit swapped, frame untouched.' },
+      // REAL photo — his own Facebook profile picture, a cracked sealed unit
+      // lifted out at a Wallasey terrace. The other two are placeholders.
+      { src: 'real-blown-unit.webp', alt: 'Cracked double glazed unit removed from a bay window in Wallasey', caption: 'Cracked unit out, new sealed unit in — his own photo.' },
     ],
   },
 
   theme: {
-    brand: '#15616d',
-    brandDark: '#0d3b43',
-    accent: '#ff8a3d',
-    ink: '#14211f',
-    muted: '#5c6f6d',
-    surface: '#f4f8f7',
+    // Sampled from his own Google Business Profile logo banner (navy + blue
+    // + glass-blue highlight). Do not invent colours when the client has a logo.
+    brand: '#0b2d5c',
+    brandDark: '#061d3d',
+    accent: '#2f7fe0',
+    accentInk: '#ffffff',
+    ink: '#121a26',
+    muted: '#5a6675',
+    surface: '#f2f6fb',
     fontHeading: "'Bricolage Grotesque', system-ui, sans-serif",
     fontBody: "system-ui, -apple-system, 'Segoe UI', sans-serif",
   },
