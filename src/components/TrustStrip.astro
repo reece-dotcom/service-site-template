@@ -2,10 +2,11 @@
 import { site } from '../lib/client.mjs';
 const years = new Date().getFullYear() - site.business.yearFounded;
 const rating = site.reviews?.aggregate ?? null;
+const yearsLabel = site.business.yearsLabel ?? 'installing locally';
 ---
 <section class="trust">
   <div class="container trust__inner">
-    <p><strong>{years}+ years</strong> installing locally</p>
+    <p><strong>{years}+ years</strong> {yearsLabel}</p>
     {site.business.accreditations.map((a) => <p><strong>{a}</strong></p>)}
     {rating && (
       <p><strong>{rating.ratingValue}/5</strong> from {rating.reviewCount} {rating.source} reviews</p>

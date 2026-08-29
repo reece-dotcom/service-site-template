@@ -20,6 +20,23 @@ const schemas = services.map((s) =>
     url: canonical(`/services/${s.id}/`),
   })
 );
+
+/**
+ * Hero selling points. Set `business.usps` per client to override — the
+ * defaults assume a replacement installer with accreditations, which is wrong
+ * for repair-only businesses and produces broken copy when accreditations is
+ * empty.
+ */
+const heroPoints = site.business.usps?.length
+  ? site.business.usps
+  : [
+      'Fixed written quotes after a proper survey — no pressure selling',
+      'Fitted by our own installers, never subcontracted',
+      ...(site.business.accreditations[0]
+        ? [`${site.business.accreditations[0]} with insurance-backed guarantees`]
+        : []),
+      `Local team covering ${areas.map((a) => a.data.name).slice(0, 3).join(', ')} and nearby`,
+    ];
 ---
 
 <BaseLayout title={title.slice(0, 60)} description={description} schemas={schemas}>
@@ -37,10 +54,7 @@ const schemas = services.map((s) =>
         </div>
       </div>
       <ul class="checklist hero__points">
-        <li>Fixed written quotes after a proper survey — no pressure selling</li>
-        <li>Fitted by our own installers, never subcontracted</li>
-        <li>{site.business.accreditations[0]} with insurance-backed guarantees</li>
-        <li>Local team covering {areas.map((a) => a.data.name).slice(0, 3).join(', ')} and nearby</li>
+        {heroPoints.map((point) => <li>{point}</li>)}
       </ul>
     </div>
   </section>
