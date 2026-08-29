@@ -43,8 +43,10 @@ export default {
       country: 'GB',
     },
     geo: { lat: 53.4239, lng: -3.0686 },
-    googlePlaceId: 'ChIJ9X6Y-eU9q24RIfyZJ3Gwc-0',
-    mapEmbedQuery: 'Wallasey, Wirral',
+    // Deliberately NOT using the Place ID here: his GBP pin sits on his home
+    // address. Service-area businesses get a coverage-area map instead.
+    googlePlaceId: '',
+    mapEmbedQuery: 'Wallasey, Wirral, Merseyside',
     mapZoom: 12,
   },
 
