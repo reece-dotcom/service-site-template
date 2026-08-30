@@ -1,0 +1,64 @@
+---
+/**
+ * "Us vs the national chains" table. The single highest-intent block on a
+ * local installer home page: it is the argument the customer is already
+ * having in their head after the big-brand salesman left.
+ *
+ * Config: business.comparison = {
+ *   heading?, them?: 'National chains', rows: [{ label, us, them }]
+ * }
+ * Every row must be a claim the client can defend — never tick a box for
+ * something they do not actually do.
+ */
+import { site } from '../lib/client.mjs';
+
+const c = site.business.comparison;
+const rows = c?.rows ?? [];
+const themLabel = c?.them ?? 'National chains';
+const usLabel = site.business.name;
+---
+{rows.length > 0 && (
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Straight comparison</p>
+          <h2>{c.heading ?? `Why people pick us over the big firms`}</h2>
+        </div>
+        <p class="lede">No swipes at anyone by name — just how the two ways of buying actually differ.</p>
+      </div>
+      <div class="cmp">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">What matters to you</th>
+              <th scope="col" class="cmp__us">{usLabel}</th>
+              <th scope="col">{themLabel}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr>
+                <th scope="row">{r.label}</th>
+                <td class="cmp__us">{r.us}</td>
+                <td class="cmp__them">{r.them}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .cmp { margin-top: var(--space-8); overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; background: #fff; font-size: 0.97rem; }
+  th, td { text-align: left; padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--hairline); }
+  thead th { font-family: var(--font-heading); font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  tbody th { font-weight: 550; color: var(--ink); }
+  .cmp__us { background: color-mix(in srgb, var(--brand) 6%, #fff); font-weight: 650; color: var(--ink); }
+  thead .cmp__us { color: var(--brand); }
+  .cmp__them { color: var(--muted); }
+  tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+</style>

@@ -8,11 +8,24 @@ import { site } from '../lib/client.mjs';
 
 const { compact = false, heading = 'Request a callback', id = 'quote-form' } = Astro.props;
 const useGhl = site.forms.provider === 'ghl';
+/**
+ * Qualifying dropdown. Options come from business.enquiryOptions so the CRM
+ * gets a routed, categorised lead instead of free text. Omit the field
+ * entirely rather than shipping a generic list that does not match what the
+ * client sells.
+ */
+const enquiryOptions = site.business.enquiryOptions ?? [];
+/** "George will call you back" — a named human beats "we will be in touch". */
+const owner = site.business.owner?.name?.split(' ')[0];
 const action = useGhl ? site.forms.ghlEndpoint : '/thank-you/';
 ---
 <div class:list={['qf', compact && 'qf--compact']} id={id}>
   <h2 class="qf__h">{heading}</h2>
-  <p class="qf__sub muted">No pressure and no sales patter — just a straight answer.</p>
+  <p class="qf__sub muted">
+    {owner
+      ? `${owner} will call you back to arrange a free survey. No pressure and no sales patter.`
+      : 'No pressure and no sales patter — just a straight answer.'}
+  </p>
   <form
     class="form"
     method="POST"
@@ -47,6 +60,15 @@ const action = useGhl ? site.forms.ghlEndpoint : '/thank-you/';
         <input type="text" name="postal_code" autocomplete="postal-code" required />
       </label>
     </div>
+    {enquiryOptions.length > 0 && (
+      <label class="field">
+        <span>What do you need?</span>
+        <select name="enquiry_type" required>
+          <option value="">Choose one…</option>
+          {enquiryOptions.map((o) => <option value={o}>{o}</option>)}
+        </select>
+      </label>
+    )}
     <label class="field">
       <span>What needs doing?</span>
       <textarea name="message" rows={compact ? 3 : 4} required></textarea>
@@ -62,7 +84,7 @@ const action = useGhl ? site.forms.ghlEndpoint : '/thank-you/';
   .form { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
   .form__row { display: grid; gap: var(--space-4); grid-template-columns: 1fr 1fr; }
   .field { color: var(--ink); display: grid; gap: var(--space-2); font-weight: 600; font-size: 0.9rem; }
-  .field input, .field textarea {
+  .field input, .field textarea, .field select {
     font: inherit; font-weight: 400; padding: 0.65rem 0.8rem; border-radius: var(--radius);
     border: 1.5px solid color-mix(in srgb, var(--muted) 42%, transparent); background: #fff; width: 100%;
   }

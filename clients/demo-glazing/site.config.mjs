@@ -22,9 +22,90 @@ export default {
     // Strings are fine, but the object form is better: an ID and a link to the
     // issuing body's own register turn a decorative badge into a checkable one.
     accreditations: [
-      { name: 'FENSA registered', id: '00000', url: 'https://www.fensa.org.uk/fensa-approved-installer-search' },
-      { name: 'Which? Trusted Trader' },
+      {
+        name: 'FENSA registered',
+        id: '00000',
+        url: 'https://www.fensa.org.uk/fensa-approved-installer-search',
+        // One plain sentence: what the body is, and what the customer gets.
+        blurb:
+          'Every window and door we fit is registered with FENSA, so the work is certified against Building Regulations and you get the certificate for your file.',
+      },
+      { name: 'Which? Trusted Trader', blurb: 'Assessed on customer service and trading practice, and re-checked, not a badge bought once.' },
       { name: 'Checkatrade' },
+    ],
+
+    /**
+     * Insurance-backed guarantee paragraph. Only include it if the client
+     * genuinely holds one — check the policy, do not assume.
+     */
+    guarantee: {
+      heading: 'Your guarantee is insurance-backed',
+      body: 'The workmanship guarantee is underwritten by an independent insurer, so if this business ever stopped trading your cover would still be honoured. You get the certificate with the paperwork, at no extra cost.',
+    },
+
+    /** Dropdown on the quote form. Match what the client actually sells. */
+    enquiryOptions: [
+      'New windows',
+      'New doors or bi-folds',
+      'Double glazing repairs',
+      'Conservatory',
+      'Fascias, soffits and guttering',
+      'Not sure yet',
+    ],
+
+    /** Problem/outcome pair. Use their customers' words, not marketing words. */
+    problems: [
+      { title: 'Heat and money escaping', body: 'Failed units and worn seals let the heating you paid for straight back out.' },
+      { title: 'Draughts and condensation', body: 'Wet sills every morning and a cold edge to every room facing the weather.' },
+      { title: 'Traffic noise', body: 'Single glazing on a main road makes the front of the house unusable in the evening.' },
+      { title: 'Security worries', body: 'Old locks and tired frames are the easiest thing on the street to get through.' },
+      { title: 'Dread of the sales visit', body: 'Two hours in your front room, a discount that appears when you stand up, a price nobody can explain.' },
+    ],
+    outcomes: [
+      { title: 'A warmer house, lower bills', body: 'A-rated units and proper installation, so the heat stays where you put it.' },
+      { title: 'Quiet rooms', body: 'Acoustic glass on the road side where it earns its money, standard units elsewhere.' },
+      { title: 'Secure and better looking', body: 'Multi-point locking, and frames that suit the house rather than fighting it.' },
+    ],
+
+    /**
+     * Comparison table. Every row must be defensible — if the client does
+     * subcontract sometimes, do not tick that row.
+     */
+    comparison: {
+      heading: 'Buying from us vs buying from a national chain',
+      them: 'National chains',
+      rows: [
+        { label: 'Who quotes the job', us: 'The owner, on site', them: 'Commission salesperson' },
+        { label: 'Who fits the job', us: 'Our own installers', them: 'Often subcontracted' },
+        { label: 'Pricing', us: 'Fixed, in writing', them: 'Discount that drops if you hesitate' },
+        { label: 'Sales visit length', us: 'About 30 minutes', them: 'Two hours plus' },
+        { label: 'Who you ring if something goes wrong', us: 'The person who fitted it', them: 'Call centre' },
+      ],
+    },
+
+    /**
+     * Optional promotion. `expires` is required and enforced at build time —
+     * the block disappears once the date passes. Never run an evergreen
+     * "ends this month" banner: false urgency is illegal under the CPRs and
+     * the DMCC Act 2024, and it is the client who gets fined.
+     */
+    offer: {
+      name: 'The survey-and-quote package',
+      items: [
+        'Free, no-obligation survey — about 30 minutes',
+        'Fixed written price, itemised',
+        'Fitted by our own team, cleared up before we leave',
+      ],
+      expires: '2026-12-31',
+      terms: 'Terms confirmed in writing at the point of quote.',
+    },
+
+    /** Home-page FAQs. Falls back to about.faqs if omitted. */
+    homeFaqs: [
+      { question: 'Is the quote really free?', answer: 'Yes. We survey, measure and send a fixed written price. There is no charge and no obligation.' },
+      { question: 'What areas do you cover?', answer: 'Stockport and the surrounding parts of Greater Manchester. If you are on the edge of that, ring and ask.' },
+      { question: 'Do you subcontract the work?', answer: 'No. The people who fit your windows are the people who work here.' },
+      { question: 'How long does an installation take?', answer: 'A typical whole-house replacement is two to three days. We tell you the days before you commit.' },
     ],
 
     /**

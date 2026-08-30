@@ -82,6 +82,25 @@ for (const { route, html } of pages) {
   for (const m of html.matchAll(/href="(\/[^"#?]*)"/g)) linked.add(m[1]);
 }
 
+// Short-form config values rendered as objects. This shipped live once when
+// accreditations gained the { name, id, url } object form and the trust strip
+// was still printing the raw value.
+for (const { route, html } of pages) {
+  if (html.includes('[object Object]')) fails.push(`${route}: "[object Object]" in the HTML — a config object rendered directly`);
+}
+
+// A promotional offer must carry a real, future end date. An evergreen
+// countdown is a misleading commercial practice (CPRs / DMCC Act 2024) and
+// the client carries the liability, so it fails the build rather than warns.
+{
+  const offer = (await import('../clients/' + (process.env.CLIENT || 'demo-glazing') + '/site.config.mjs')).default.business.offer;
+  if (offer) {
+    if (!offer.expires) fails.push('business.offer has no `expires` date — offers must end on a real date');
+    else if (new Date(`${offer.expires}T23:59:59Z`) < new Date()) warns.push(`business.offer expired on ${offer.expires} — it is no longer rendered; update or remove it`);
+    if (!offer.items?.length) fails.push('business.offer has no items');
+  }
+}
+
 // Broken internal links + orphan pages
 const routes = new Set(pages.map((p) => p.route));
 for (const href of linked) {

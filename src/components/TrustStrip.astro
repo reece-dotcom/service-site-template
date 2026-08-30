@@ -1,5 +1,6 @@
 ---
 import { site } from '../lib/client.mjs';
+import { accreditationNames } from '../lib/business.mjs';
 const years = new Date().getFullYear() - site.business.yearFounded;
 const rating = site.reviews?.aggregate ?? null;
 const yearsLabel = site.business.yearsLabel ?? 'installing locally';
@@ -16,7 +17,7 @@ const yearsLabel = site.business.yearsLabel ?? 'installing locally';
         <span>{rating.reviewCount} {rating.source} reviews</span>
       </div>
     )}
-    {site.business.accreditations.slice(0, 3).map((a) => (
+    {accreditationNames().slice(0, 3).map((a) => (
       <div class="trust__item trust__item--badge">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="trust__tick"><path fill="currentColor" d="M9.55 17.6 4.4 12.45l1.42-1.42 3.73 3.73 8.63-8.63 1.42 1.42z"/></svg>
         <span>{a}</span>

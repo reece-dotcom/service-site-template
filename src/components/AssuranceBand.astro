@@ -1,0 +1,74 @@
+---
+/**
+ * Accreditations explained, not just badged.
+ *
+ * A row of logos means nothing to a homeowner who does not know what FENSA
+ * is. One sentence each — what the body is and what the customer actually
+ * gets — converts far better, and it is the natural home for the
+ * insurance-backed guarantee, which is the single most reassuring thing a
+ * small installer can say.
+ *
+ * Config: give accreditations the object form with an optional `blurb`:
+ *   { name, id, url, blurb }
+ * Optional business.guarantee = { heading, body } for the IBG paragraph.
+ * Never list a body the client is not a current member of — the `url` should
+ * point at that body's own public register so the claim is checkable.
+ */
+import { site } from '../lib/client.mjs';
+import { accreditationList } from '../lib/business.mjs';
+
+const items = accreditationList().filter((a) => a.blurb);
+const guarantee = site.business.guarantee;
+---
+{(items.length > 0 || guarantee) && (
+  <section class="section section--surface">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Accredited and governed</p>
+          <h2>{site.business.assuranceHeading ?? 'What the badges actually mean for you'}</h2>
+        </div>
+      </div>
+
+      {items.length > 0 && (
+        <ul class="assure">
+          {items.map((a) => (
+            <li class="assure__item">
+              <h3>
+                {a.url ? <a href={a.url} rel="nofollow noopener" target="_blank">{a.name}</a> : a.name}
+              </h3>
+              <p>{a.blurb}</p>
+              {a.id && <p class="assure__id">Registration {a.id}</p>}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {guarantee && (
+        <div class="assure__guarantee">
+          <h3>{guarantee.heading ?? 'Your guarantee, in writing'}</h3>
+          <p>{guarantee.body}</p>
+        </div>
+      )}
+    </div>
+  </section>
+)}
+
+<style>
+  .assure {
+    list-style: none; padding: 0; margin-top: var(--space-8);
+    display: grid; gap: var(--space-5);
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+  .assure__item { background: #fff; border: 1px solid var(--hairline); border-top: 3px solid var(--brand); border-radius: var(--radius-lg); padding: var(--space-6); }
+  .assure__item h3 { font-size: 1.05rem; }
+  .assure__item a { color: inherit; }
+  .assure__item p { margin-top: var(--space-2); color: var(--muted); font-size: 0.95rem; }
+  .assure__id { font-variant-numeric: tabular-nums; font-size: 0.85rem !important; }
+  .assure__guarantee {
+    margin-top: var(--space-6); padding: var(--space-6);
+    background: #fff; border: 1px dashed color-mix(in srgb, var(--brand) 40%, transparent);
+    border-radius: var(--radius-lg);
+  }
+  .assure__guarantee p { margin-top: var(--space-2); color: var(--muted); max-width: 62ch; }
+</style>

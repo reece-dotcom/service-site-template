@@ -1,0 +1,63 @@
+---
+/**
+ * "What you get" package, with an honest deadline.
+ *
+ * Config: business.offer = {
+ *   eyebrow?, name, items: [string], note?, expires: 'YYYY-MM-DD', terms?
+ * }
+ *
+ * `expires` is required and enforced in src/lib/business.mjs: no date or a
+ * past date means the block silently disappears at build time. That is the
+ * point — a countdown that resets forever is a misleading commercial
+ * practice, and the client, not us, carries that liability. Real deadline,
+ * real rebuild.
+ */
+import { activeOffer } from '../lib/business.mjs';
+import { site } from '../lib/client.mjs';
+
+const offer = activeOffer();
+const endsLabel = offer
+  ? offer.endsAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  : '';
+---
+{offer && (
+  <section class="section offer">
+    <div class="container offer__inner">
+      <div class="offer__copy">
+        <p class="eyebrow">{offer.eyebrow ?? 'Booking this month'}</p>
+        <h2>{offer.name}</h2>
+        <ul class="offer__list">
+          {offer.items.map((i) => <li>{i}</li>)}
+        </ul>
+        {offer.note && <p class="offer__note">{offer.note}</p>}
+      </div>
+      <div class="offer__aside">
+        <p class="offer__ends">
+          Available on surveys booked before <strong><time datetime={offer.expires}>{endsLabel}</time></strong>.
+        </p>
+        <a class="btn btn--accent" href="/contact/">Book a free survey</a>
+        <a class="offer__call" href={`tel:${site.contact.phoneHref}`}>or call {site.contact.phone}</a>
+        {offer.terms && <p class="offer__terms">{offer.terms}</p>}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .offer__inner {
+    display: grid; gap: var(--space-8);
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    align-items: start;
+    background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+    color: #fff; border-radius: var(--radius-lg); padding: var(--space-8);
+  }
+  .offer__inner .eyebrow, .offer__inner h2 { color: #fff; }
+  .offer__list { list-style: none; padding: 0; margin-top: var(--space-5); display: grid; gap: var(--space-3); }
+  .offer__list li { padding-left: 1.6rem; position: relative; }
+  .offer__list li::before { content: '✓'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+  .offer__note, .offer__terms { color: color-mix(in srgb, #fff 75%, transparent); font-size: 0.9rem; margin-top: var(--space-4); }
+  .offer__aside { background: color-mix(in srgb, #000 18%, transparent); border-radius: var(--radius); padding: var(--space-6); }
+  .offer__ends { margin-bottom: var(--space-4); }
+  .offer__call { display: block; margin-top: var(--space-3); color: #fff; font-weight: 600; }
+  @media (max-width: 52rem) { .offer__inner { grid-template-columns: 1fr; padding: var(--space-6); } }
+</style>

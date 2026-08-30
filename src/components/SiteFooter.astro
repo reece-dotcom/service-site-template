@@ -1,5 +1,6 @@
 ---
 import { site } from '../lib/client.mjs';
+import { accreditationNames } from '../lib/business.mjs';
 import { getCollection } from 'astro:content';
 const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
 const services = (await getCollection('services')).filter((s) => !s.data.draft)
@@ -37,7 +38,7 @@ const year = new Date().getFullYear();
     </div>
   </div>
   <div class="container ftr__base">
-    <p>&copy; {year} {site.business.legalName}. {site.business.accreditations.join(' · ')}</p>
+    <p>&copy; {year} {site.business.legalName}. {accreditationNames().join(' · ')}</p>
   </div>
 </footer>
 <style>

@@ -9,10 +9,16 @@ import QuoteForm from '../components/QuoteForm.astro';
 import Gallery from '../components/Gallery.astro';
 import ProcessSteps from '../components/ProcessSteps.astro';
 import MapBand from '../components/MapBand.astro';
+import ProblemOutcome from '../components/ProblemOutcome.astro';
+import ComparisonTable from '../components/ComparisonTable.astro';
+import AssuranceBand from '../components/AssuranceBand.astro';
+import OfferBand from '../components/OfferBand.astro';
+import FaqList from '../components/FaqList.astro';
 import { Image } from 'astro:assets';
 import { clientImage } from '../lib/images.mjs';
 import { site } from '../lib/client.mjs';
-import { canonical, serviceSchema } from '../lib/seo.mjs';
+import { accreditationNames, activeOffer } from '../lib/business.mjs';
+import { canonical, serviceSchema, faqSchema } from '../lib/seo.mjs';
 
 const services = (await getCollection('services'))
   .filter((s) => !s.data.draft)
@@ -21,6 +27,7 @@ const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
 
 const title = `${site.business.name} | Windows & Doors in ${site.contact.address.locality}`;
 const description = site.business.description.slice(0, 160);
+const homeFaqs = site.business.homeFaqs ?? site.business.about?.faqs ?? [];
 const schemas = services.map((s) =>
   serviceSchema({
     name: s.data.name,
@@ -28,6 +35,7 @@ const schemas = services.map((s) =>
     url: canonical(`/services/${s.id}/`),
   })
 );
+if (homeFaqs.length) schemas.push(faqSchema(homeFaqs));
 
 /**
  * Hero selling points. Set `business.usps` per client to override — the
@@ -41,8 +49,8 @@ const heroPoints = site.business.usps?.length
   : [
       'Fixed written quotes after a proper survey — no pressure selling',
       'Fitted by our own installers, never subcontracted',
-      ...(site.business.accreditations[0]
-        ? [`${site.business.accreditations[0]} with insurance-backed guarantees`]
+      ...(accreditationNames()[0]
+        ? [`${accreditationNames()[0]} with insurance-backed guarantees`]
         : []),
       `Local team covering ${areas.map((a) => a.data.name).slice(0, 3).join(', ')} and nearby`,
     ];
@@ -92,6 +100,8 @@ const heroPoints = site.business.usps?.length
   )}
   <ReviewsBand />
 
+  <ProblemOutcome />
+
   <section class="section">
     <div class="container">
       <div class="section-head">
@@ -139,7 +149,15 @@ const heroPoints = site.business.usps?.length
 
   <Gallery items={site.media?.gallery ?? []} />
 
+  <AssuranceBand />
+
+  <ComparisonTable />
+
   <ProcessSteps />
+
+  <OfferBand />
+
+  <FaqList faqs={homeFaqs} />
 
   <MapBand />
 

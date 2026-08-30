@@ -1,0 +1,74 @@
+---
+/**
+ * Problem → outcome pair. The classic direct-response middle of a home page:
+ * name what is wrong in the customer's own words, then show the after state.
+ *
+ * Config: business.problems[] and business.outcomes[] ({ title, body }).
+ * Both optional — with neither set the section does not render, because
+ * invented pain points read as generic filler and hurt more than they help.
+ */
+import { site } from '../lib/client.mjs';
+
+const problems = site.business.problems ?? [];
+const outcomes = site.business.outcomes ?? [];
+const problemHead = site.business.problemsHeading ?? 'Sound familiar?';
+const outcomeHead = site.business.outcomesHeading ?? 'How it looks afterwards';
+---
+{problems.length > 0 && (
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">The everyday reality</p>
+          <h2>{problemHead}</h2>
+        </div>
+        <p class="lede">These are the things people actually ring us about, in the order we hear them.</p>
+      </div>
+      <ul class="po-grid">
+        {problems.map((p) => (
+          <li class="po-card po-card--problem">
+            <h3>{p.title}</h3>
+            <p>{p.body}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+{outcomes.length > 0 && (
+  <section class="section section--surface">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">After the work</p>
+          <h2>{outcomeHead}</h2>
+        </div>
+      </div>
+      <ul class="po-grid">
+        {outcomes.map((o) => (
+          <li class="po-card po-card--outcome">
+            <h3>{o.title}</h3>
+            <p>{o.body}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .po-grid {
+    list-style: none; padding: 0; margin-top: var(--space-8);
+    display: grid; gap: var(--space-5);
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+  .po-card {
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg); padding: var(--space-6);
+  }
+  .po-card h3 { font-size: 1.05rem; }
+  .po-card p { margin-top: var(--space-2); color: var(--muted); font-size: 0.95rem; }
+  .po-card--problem { border-left: 3px solid color-mix(in srgb, var(--muted) 55%, transparent); }
+  .po-card--outcome { border-left: 3px solid var(--accent); }
+</style>
