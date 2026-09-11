@@ -7,6 +7,13 @@ const services = (await getCollection('services')).filter((s) => !s.data.draft)
   .sort((a, b) => a.data.order - b.data.order);
 const a = site.contact.address;
 const year = new Date().getFullYear();
+// Social profiles the client has confirmed exist. Rendered as real links so
+// visitors (and Google) can see the business is active somewhere off-site;
+// the same list feeds sameAs in the schema.
+const socialLabels = { facebook: 'Facebook', instagram: 'Instagram', x: 'X', linkedin: 'LinkedIn', youtube: 'YouTube' };
+const socials = Object.entries(site.social ?? {})
+  .filter(([, url]) => Boolean(url))
+  .map(([key, url]) => ({ url, label: socialLabels[key] ?? key }));
 ---
 <footer class="ftr">
   <div class="container grid grid--3">
@@ -20,6 +27,13 @@ const year = new Date().getFullYear();
         <a href={`tel:${site.contact.phoneHref}`}>{site.contact.phone}</a><br />
         <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
       </p>
+      {socials.length > 0 && (
+        <p class="ftr__p ftr__social">
+          {socials.map((s2) => (
+            <a href={s2.url} rel="me noopener" target="_blank">{s2.label}</a>
+          ))}
+        </p>
+      )}
     </div>
     <div>
       <h2 class="ftr__h">Services</h2>
@@ -48,5 +62,6 @@ const year = new Date().getFullYear();
   .ftr__p { opacity: 0.85; margin-bottom: var(--space-4); font-size: 0.98rem; }
   .ftr__addr { font-style: normal; }
   .ftr__list { list-style: none; padding: 0; display: grid; gap: var(--space-2); font-size: 0.98rem; }
+  .ftr__social { display: flex; gap: var(--space-4); }
   .ftr__base { margin-top: var(--space-12); padding-top: var(--space-6); border-top: 1px solid rgb(255 255 255 / 18%); font-size: 0.875rem; opacity: 0.7; }
 </style>

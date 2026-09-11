@@ -220,12 +220,12 @@ export default {
     servicesLede:
       'Mostly repair and made-to-measure glass: the unit that misted, the pane that went through, the mirror that has to fit an alcove.',
     servicesDescription:
-      'Glass repair and replacement across {region} — misted sealed units, broken window and door glass, mirrors, splashbacks and shower screens.',
+      'Glass repair and replacement across Anglesey and Bangor — misted sealed units, broken window and door glass, mirrors, splashbacks and shower screens.',
     areasDescription:
-      'Where {business} works — towns, villages and postcodes across {region}, from a base in {locality}. One number, answered locally.',
+      'Where {business} works — towns, villages and postcodes across Anglesey and over the bridge into Bangor, from a base in {locality}. One number, answered locally.',
     areaServicesHeading: 'What we do in {area}',
     areaCtaHeading: 'Glass to sort in {area}?',
-    serviceAreasHeading: '{service} across Anglesey',
+    serviceAreasHeading: '{service} across Anglesey and Bangor',
     nearbyHeading: 'Nearby places we cover',
   },
 
