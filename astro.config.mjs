@@ -11,7 +11,9 @@ export default defineConfig({
   build: { format: 'directory' },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/thank-you/'),
+      // /lp/ is a noindex paid-traffic page: it must never enter the sitemap,
+      // or it competes with the real home page for the same terms.
+      filter: (page) => !page.includes('/thank-you/') && !page.includes('/lp/'),
       // Priorities tell Google what matters on a small site where every page
       // is otherwise weighted the same. Money pages first, blog last.
       serialize(item) {

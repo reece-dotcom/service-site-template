@@ -101,6 +101,14 @@ for (const { route, html } of pages) {
   }
 }
 
+// A numeric claim rendered with no number. This shipped once as a bare "+"
+// above "years installing locally" on a client with no yearFounded set.
+for (const { route, html } of pages) {
+  if (/>\s*\+\s*<\/strong>/.test(html) || /NaN/.test(html)) {
+    fails.push(`${route}: a statistic rendered with no value (empty "+" or NaN)`);
+  }
+}
+
 // Broken internal links + orphan pages
 const routes = new Set(pages.map((p) => p.route));
 for (const href of linked) {
@@ -110,7 +118,8 @@ for (const href of linked) {
 for (const route of routes) {
   // '/404.html' is deliberately unlinked (Netlify serves it on a miss) and
   // '/thank-you/' is reached by form redirect only.
-  if (route === '/' || route === '/thank-you/' || route === '/404.html') continue;
+  // '/lp/' is reached from paid ads only and is deliberately unlinked.
+  if (route === '/' || route === '/thank-you/' || route === '/404.html' || route === '/lp/') continue;
   if (!linked.has(route)) fails.push(`orphan page (nothing links to it): ${route}`);
 }
 
@@ -198,6 +207,10 @@ for (const slug of fs.readdirSync(clientsDir)) {
     }
   };
   for (const { route, html } of pages) {
+    // The landing page carries no business schema on purpose: it is noindex,
+    // so emitting a second LocalBusiness graph would only give Google a
+    // competing entity for the same NAP.
+    if (route === '/lp/') continue;
     const j = schemaOf(html);
     if (j === null) {
       fails.push(`${route}: no JSON-LD block`);
@@ -248,6 +261,50 @@ for (const slug of fs.readdirSync(clientsDir)) {
   for (const bot of ['OAI-SearchBot', 'Claude-SearchBot', 'PerplexityBot']) {
     if (!new RegExp(`User-agent: ${bot}\\nAllow: /`).test(robots)) {
       fails.push(`robots.txt: answer engine ${bot} is not explicitly allowed`);
+    }
+  }
+}
+
+
+/**
+ * /lp/ advertising landing page.
+ *
+ * It only exists to convert paid clicks, so the failure modes are different
+ * from the rest of the site: it must stay out of the index and the sitemap
+ * (or it cannibalises the home page), and it must not quietly ship the
+ * high-pressure claims the design ships with unless the client's config
+ * supplied the evidence. The evidence guards throw at build time in
+ * src/lib/lp.mjs; these are the checks on the built HTML.
+ */
+{
+  const lpPage = pages.find((p) => p.route === '/lp/');
+  if (lpPage) {
+    const { html } = lpPage;
+    if (!/name="robots"[^>]*noindex/.test(html)) {
+      fails.push('/lp/: landing page is not noindex — it will compete with the home page');
+    }
+    const smFile = fs.readdirSync(dist).find((f) => /^sitemap-\d+\.xml$/.test(f));
+    if (smFile && fs.readFileSync(path.join(dist, smFile), 'utf8').includes('/lp/')) {
+      fails.push('/lp/: noindex landing page is listed in the sitemap');
+    }
+    const robotsTxt = fs.existsSync(path.join(dist, 'robots.txt'))
+      ? fs.readFileSync(path.join(dist, 'robots.txt'), 'utf8')
+      : '';
+    if (!/Disallow: \/lp\//.test(robotsTxt)) {
+      fails.push('/lp/: not disallowed in robots.txt');
+    }
+    // A star rating or a quotation mark with no named platform next to it is
+    // the fabricated-testimonial pattern we refuse to ship.
+    if (/★/.test(html) && !/(Google|Checkatrade|Which\?|Trustpilot|Facebook)/.test(html)) {
+      fails.push('/lp/: star rating with no named review platform — unsourced rating');
+    }
+    // Escape hatches: the landing page should offer the phone, the form and
+    // nothing else. Links back into the site dilute the one job it has.
+    const leaks = [...html.matchAll(/href="(\/[^"#?]*)"/g)]
+      .map((m) => m[1])
+      .filter((h) => h !== '/lp/' && !h.startsWith('/_astro/') && !/\.[a-z0-9]+$/i.test(h));
+    if (leaks.length) {
+      warns.push(`/lp/: links off the landing page to ${[...new Set(leaks)].join(', ')} — intentional?`);
     }
   }
 }

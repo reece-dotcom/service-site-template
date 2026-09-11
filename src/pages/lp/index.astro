@@ -1,0 +1,312 @@
+---
+/**
+ * /lp/ — noindex ad landing page.
+ *
+ * Structure ported from the front-end design Reece supplied (Claude artifact
+ * "Glazing Master Template", 2026-09-11): rotating hero, job picker, headline
+ * stat, five-step process, guarantee grid, recent work, owner, coverage,
+ * finance, FAQ, form.
+ *
+ * Two deliberate departures from that design:
+ *  1. Every claim block is opt-in per client and guarded in src/lib/lp.mjs.
+ *     The design's placeholder stats, five-star testimonials, DBS/employment
+ *     claims and 0% finance are true of some installers and not others.
+ *  2. No client-side JS. The original used ~35KB of scroll/reveal script;
+ *     the same effects are CSS here.
+ */
+import { getCollection } from 'astro:content';
+import LpLayout from '../../layouts/LpLayout.astro';
+import QuoteForm from '../../components/QuoteForm.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import { Image } from 'astro:assets';
+import { clientImage } from '../../lib/images.mjs';
+import { site } from '../../lib/client.mjs';
+import {
+  lpEnabled,
+  lpConfig,
+  lpHero,
+  lpStat,
+  lpJobs,
+  lpFinance,
+  lpPromises,
+  lpJobTypes,
+} from '../../lib/lp.mjs';
+
+/**
+ * Astro has no "skip this route" primitive, so a client without an `lp`
+ * block gets a tiny noindex stub instead of a half-populated landing page.
+ */
+const enabled = lpEnabled();
+const lp = lpConfig();
+const hero = enabled ? lpHero() : null;
+const stat = enabled ? lpStat() : null;
+const jobs = enabled ? lpJobs() : [];
+const finance = enabled ? lpFinance() : null;
+const promises = enabled ? lpPromises() : [];
+const jobTypes = enabled ? lpJobTypes() : [];
+
+const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
+const steps = lp.steps ?? site.business.process ?? [];
+const faqs = lp.faqs ?? site.business.homeFaqs ?? site.business.about?.faqs ?? [];
+const ownerPhoto = clientImage(lp.owner?.photo ?? site.business.about?.photo);
+
+const title = (lp.title ?? `${site.business.name} | Free quote`).slice(0, 60);
+const description = (
+  lp.description ??
+  `${site.business.description}`
+).slice(0, 160);
+---
+
+{enabled ? (
+  <LpLayout title={title} description={description}>
+    <!-- hero -->
+    <section class="lp-hero">
+      <div class="lp-wrap lp-hero__grid">
+        <div>
+          <p class="lp-eyebrow">{hero.eyebrow ?? site.contact.address.locality}</p>
+          <h1>
+            {hero.headline}
+            {hero.rotate?.length ? (
+              <>
+                {' '}
+                <span class="lp-rot">
+                  {hero.rotate.map((word, i) => (
+                    <span
+                      class="lp-rot__w"
+                      style={`animation-delay:${(i * 12) / hero.rotate.length}s`}
+                    >
+                      {word}
+                    </span>
+                  ))}
+                  {/* invisible sizer: keeps the line width stable, no layout shift */}
+                  <span class="lp-rot__w" style="visibility:hidden;animation:none;opacity:1">
+                    {hero.rotate.reduce((a, b) => (b.length > a.length ? b : a))}
+                  </span>
+                </span>
+              </>
+            ) : null}
+          </h1>
+          {hero.sub && <p class="lp-lede">{hero.sub}</p>}
+          {hero.points?.length ? (
+            <ul class="lp-hero__points">
+              {hero.points.map((p) => <li>{p}</li>)}
+            </ul>
+          ) : null}
+          <div class="lp-hero__actions">
+            <a class="btn btn--accent btn--lg" href={`tel:${site.contact.phoneHref}`}>
+              Call {site.contact.phone}
+            </a>
+            <a class="btn" href="#quote">Get a price</a>
+          </div>
+        </div>
+        <QuoteForm heading={lp.formHeading ?? 'Tell us what the job is'} compact={true} id="quote-top" />
+      </div>
+    </section>
+
+    <!-- job picker -->
+    {jobTypes.length ? (
+      <section class="lp-sec lp-sec--alt">
+        <div class="lp-wrap">
+          <p class="lp-eyebrow">Start here</p>
+          <h2 class="lp-h2">{lp.jobTypesHeading ?? "Tell us what the job is and we'll price that job."}</h2>
+          <ul class="lp-jobs">
+            {jobTypes.map((job) => (
+              <li>
+                <a class="lp-job" href="#quote">
+                  {typeof job === 'string' ? job : job.label}
+                  {typeof job === 'object' && job.note && <span>{job.note}</span>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ) : null}
+
+    <!-- headline stat: only renders with a stated basis -->
+    {stat ? (
+      <section class="lp-sec">
+        <div class="lp-wrap lp-stat">
+          <p class="lp-stat__n">{stat.value}</p>
+          <div>
+            <h2 class="lp-h2">{stat.label}</h2>
+            <p class="lp-stat__basis">Measured from {stat.basis}.</p>
+          </div>
+        </div>
+      </section>
+    ) : null}
+
+    <!-- process -->
+    {steps.length ? (
+      <section class="lp-sec lp-sec--alt">
+        <div class="lp-wrap">
+          <p class="lp-eyebrow">How it works</p>
+          <h2 class="lp-h2">{lp.stepsHeading ?? 'The things that happen, in order.'}</h2>
+          <ol class="lp-steps">
+            {steps.map((s) => (
+              <li class="lp-step">
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    ) : null}
+
+    <!-- promises -->
+    {promises.length ? (
+      <section class="lp-sec lp-sec--ink">
+        <div class="lp-wrap">
+          <p class="lp-eyebrow">What you get, every job</p>
+          <h2 class="lp-h2">{lp.promisesHeading ?? `Our ${promises.length}-point promise`}</h2>
+          <ul class="lp-promises">
+            {promises.map((p) => (
+              <li class="lp-promise">
+                <h3>{p.title}</h3>
+                <p>{p.body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ) : null}
+
+    <!-- recent work: quotes require a named, checkable source -->
+    {jobs.length ? (
+      <section class="lp-sec">
+        <div class="lp-wrap">
+          <p class="lp-eyebrow">Recent work</p>
+          <h2 class="lp-h2">{lp.jobsHeading ?? 'Recent jobs, and what the customer said afterwards.'}</h2>
+          <ul class="lp-work">
+            {jobs.map((job) => (
+              <li class="lp-work__card">
+                {clientImage(job.image) && (
+                  <Image src={clientImage(job.image)} alt={job.alt ?? job.title} widths={[420, 760]} sizes="(max-width: 48rem) 92vw, 32vw" loading="lazy" />
+                )}
+                <div class="lp-work__body">
+                  <h3>{job.title}</h3>
+                  {job.meta && <p class="lp-work__meta">{job.meta}</p>}
+                  {job.quote && (
+                    <>
+                      <blockquote class="lp-work__quote">&ldquo;{job.quote}&rdquo;</blockquote>
+                      <p class="lp-work__src">{job.author ? `${job.author}, ` : ''}{job.source}</p>
+                    </>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ) : null}
+
+    <ComparisonTable />
+
+    <!-- owner -->
+    {site.business.owner?.name ? (
+      <section class="lp-sec lp-sec--alt">
+        <div class="lp-wrap lp-owner">
+          {ownerPhoto && (
+            <Image src={ownerPhoto} alt={`${site.business.owner.name}, ${site.business.owner.role ?? 'owner'}`} widths={[360, 640]} sizes="(max-width: 52rem) 92vw, 30vw" loading="lazy" />
+          )}
+          <div>
+            <p class="lp-eyebrow">Who turns up</p>
+            <h2 class="lp-h2">
+              {lp.ownerHeading ??
+                `You'll meet ${site.business.owner.name.split(' ')[0]} at the survey, and again on fit day.`}
+            </h2>
+            {(lp.ownerBody ?? site.business.about?.story ?? []).map((p) => (
+              <p class="lp-lede">{p}</p>
+            ))}
+          </div>
+        </div>
+      </section>
+    ) : null}
+
+    <!-- coverage -->
+    {areas.length ? (
+      <section class="lp-sec">
+        <div class="lp-wrap">
+          <p class="lp-eyebrow">Where we work</p>
+          <h2 class="lp-h2">{lp.coverageHeading ?? `Covering ${site.contact.address.locality} and nearby.`}</h2>
+          <ul class="lp-towns">
+            {areas.map((a) => <li class="lp-town">{a.data.name}</li>)}
+            {(lp.extraTowns ?? []).map((t) => <li class="lp-town">{t}</li>)}
+          </ul>
+        </div>
+      </section>
+    ) : null}
+
+    <!-- finance: requires an FCA firm reference + representative example -->
+    {finance ? (
+      <section class="lp-sec lp-sec--alt">
+        <div class="lp-wrap">
+          <p class="lp-eyebrow">Paying for it</p>
+          <h2 class="lp-h2">{finance.heading}</h2>
+          <p class="lp-lede">{finance.body}</p>
+          <p class="lp-fin__example">
+            {finance.representativeExample}
+            {' '}Credit provided by {finance.provider ?? 'our authorised finance partner'},
+            FCA firm reference {finance.fcaFirmRef}. Credit subject to status.
+          </p>
+        </div>
+      </section>
+    ) : null}
+
+    <!-- faqs -->
+    {faqs.length ? (
+      <section class="lp-sec">
+        <div class="lp-wrap">
+          <p class="lp-eyebrow">Before you ring</p>
+          <h2 class="lp-h2">{lp.faqHeading ?? 'The questions we get asked every week.'}</h2>
+          <div class="lp-faq">
+            {faqs.map((f) => (
+              <details>
+                <summary>{f.question}</summary>
+                <p>{f.answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    ) : null}
+
+    <!-- quote -->
+    <section class="lp-sec lp-sec--alt" id="quote">
+      <div class="lp-wrap lp-quote__grid">
+        <div>
+          <p class="lp-eyebrow">Get a price</p>
+          <h2 class="lp-h2">{lp.quoteHeading ?? "Start with the job you've got."}</h2>
+          <p class="lp-lede">
+            {lp.quoteBody ??
+              `Tell us what needs doing and ${
+                site.business.owner?.name?.split(' ')[0] ?? 'we'
+              } will come and look at it. Written price, no obligation.`}
+          </p>
+          <p class="lp-lede">
+            <a class="btn btn--accent btn--lg" href={`tel:${site.contact.phoneHref}`}>
+              Or call {site.contact.phone}
+            </a>
+          </p>
+        </div>
+        <QuoteForm heading={lp.formHeading ?? 'Tell us what the job is'} id="quote-form" />
+      </div>
+    </section>
+  </LpLayout>
+) : (
+  <LpLayout
+    title={`${site.business.name} | Landing page not configured`}
+    description={`No advertising landing page is configured for ${site.business.name}. Add an lp block to site.config.mjs to enable it.`}
+  >
+    <section class="lp-sec">
+      <div class="lp-wrap">
+        <h1 class="lp-h2">No landing page configured</h1>
+        <p class="lp-lede">
+          Set <code>lp.enabled</code> in this client&rsquo;s <code>site.config.mjs</code> to
+          switch the advertising landing page on.
+        </p>
+      </div>
+    </section>
+  </LpLayout>
+)}

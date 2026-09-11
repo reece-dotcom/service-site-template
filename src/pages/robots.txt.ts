@@ -31,6 +31,7 @@ export const GET: APIRoute = () => {
     'User-agent: *',
     'Allow: /',
     'Disallow: /thank-you/',
+    'Disallow: /lp/',
     '',
     '# Answer engines: allowed — these send referral traffic.',
     ...ANSWER_BOTS.flatMap((bot) => [`User-agent: ${bot}`, 'Allow: /', '']),

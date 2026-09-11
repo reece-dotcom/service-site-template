@@ -143,6 +143,55 @@ export default {
     },
   },
 
+  /**
+   * /lp/ — noindex advertising landing page (design ported 2026-09-11).
+   * Optional per client. Everything here is a claim someone could be asked
+   * to prove, so the risky blocks refuse to render without their evidence
+   * field: see src/lib/lp.mjs.
+   */
+  lp: {
+    enabled: true,
+    title: 'Demo Glazing | Free window and door quote',
+    description:
+      'Fixed written quotes for windows, doors and conservatories across South Manchester. Surveyed and fitted by our own team, never subcontracted.',
+    hero: {
+      eyebrow: 'South Manchester',
+      headline: 'New',
+      rotate: ['windows', 'doors', 'conservatories'],
+      sub: 'Surveyed properly, priced in writing, fitted by the people who quoted it.',
+      points: [
+        'Fixed written price after a 30-minute survey',
+        'Our own fitters, never subcontracted',
+        'FENSA registered — your certificate comes with the job',
+      ],
+    },
+    // A statistic needs a stated basis or the build fails. This is what makes
+    // the number persuasive as well as legal.
+    stat: {
+      value: '94%',
+      label: 'of jobs were fitted within six weeks of the survey.',
+      basis: 'the 108 installations completed between January and August 2026',
+    },
+    steps: [
+      { title: 'You ring or message', body: 'Tell us the job. Most things we can talk through in five minutes.' },
+      { title: 'Survey', body: 'About 30 minutes, at a time that suits you. We measure and check the reveals.' },
+      { title: 'Fixed price', body: 'An itemised written quote. It does not move, and it does not expire on the doorstep.' },
+      { title: 'Fitting day', body: 'Dust sheets down, old units away with us, everything cleaned before we leave.' },
+      { title: 'Paperwork', body: 'FENSA certificate and guarantee documents, sent to you the same week.' },
+    ],
+    promises: [
+      { title: 'Reliable', body: 'A confirmed fitting date the week before, and a call the morning we set off.' },
+      { title: 'Clean', body: 'Dust sheets before the first frame comes out. Offcuts and packaging leave with us the same day.' },
+      { title: 'Courteous', body: 'Shoe covers indoors, every opening secured while we are on site, nothing left unsealed overnight.' },
+      { title: 'Honest', body: 'If we find rotten timber or a failed lintel, we stop, show you, and price it before carrying on.' },
+    ],
+    faqs: [
+      { question: 'Is the survey really free?', answer: 'Yes, and there is no obligation. You get the written price whether you use us or not.' },
+      { question: 'How soon can you start?', answer: 'Survey usually within a week. Fitting depends on the frames — we tell you the lead time before you commit.' },
+    ],
+    quoteHeading: 'Start with the job you have got.',
+  },
+
   contact: {
     phone: '0161 000 0000',
     phoneHref: '+441610000000', // tel: format, no spaces

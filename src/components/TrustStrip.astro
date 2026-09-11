@@ -1,16 +1,25 @@
 ---
 import { site } from '../lib/client.mjs';
 import { accreditationNames } from '../lib/business.mjs';
-const years = new Date().getFullYear() - site.business.yearFounded;
+/**
+ * Years in trade, only when we actually know the founding year.
+ * Without this guard a client with no `yearFounded` shipped a bare "+" above
+ * the words "years installing locally" — a trust strip that undermines trust.
+ */
+const years = site.business.yearFounded
+  ? new Date().getFullYear() - site.business.yearFounded
+  : null;
 const rating = site.reviews?.aggregate ?? null;
 const yearsLabel = site.business.yearsLabel ?? 'installing locally';
 ---
 <section class="trust">
   <div class="container trust__inner">
-    <div class="trust__item">
-      <strong class="trust__big">{years}+</strong>
-      <span>years {yearsLabel}</span>
-    </div>
+    {years !== null && (
+      <div class="trust__item">
+        <strong class="trust__big">{years}+</strong>
+        <span>years {yearsLabel}</span>
+      </div>
+    )}
     {rating && (
       <div class="trust__item">
         <strong class="trust__big">{rating.ratingValue}<span class="trust__of">/5</span></strong>
