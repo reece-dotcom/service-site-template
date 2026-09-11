@@ -203,10 +203,11 @@ export function contactPageSchema(url) {
 /**
  * BreadcrumbList for a page. `trail` is ordered, excluding the home entry,
  * e.g. [{ name: 'Services', path: '/services/' }, { name: 'Lock repairs' }].
- * The last item is the current page and needs no path.
+ * The last item is the current page and needs no path. Translated pages pass
+ * their own home entry so the trail stays in one language.
  */
-export function breadcrumbSchema(trail = []) {
-  const items = [{ name: 'Home', path: '/' }, ...trail];
+export function breadcrumbSchema(trail = [], { homeName = 'Home', homePath = '/' } = {}) {
+  const items = [{ name: homeName, path: homePath }, ...trail];
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',

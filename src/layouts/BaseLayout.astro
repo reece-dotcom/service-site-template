@@ -3,15 +3,82 @@ import { getCollection } from 'astro:content';
 import '../styles/global.css';
 import { site } from '../lib/client.mjs';
 import { assertSeo, canonical, localBusinessSchema } from '../lib/seo.mjs';
+import { alternateLocales, defaultLocale, hreflangSet, normalisePath } from '../lib/i18n.mjs';
 import SiteHeader from '../components/SiteHeader.astro';
 import StickyCta from '../components/StickyCta.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 
-const { title, description, schemas = [], noindex = false, image } = Astro.props;
+const {
+  title,
+  description,
+  schemas = [],
+  noindex = false,
+  image,
+  /** Locale code of THIS page. English pages leave it unset. */
+  locale,
+} = Astro.props;
 
 assertSeo(title, description, Astro.url.pathname);
 
 const url = canonical(Astro.url.pathname);
+const here = normalisePath(Astro.url.pathname);
+
+/**
+ * hreflang, built from the translations collection so both sides stay in sync
+ * automatically. A translated page declares its English counterpart; the
+ * English page finds itself in that same map. No per-page wiring, which is
+ * what stops the pairs drifting apart as pages get added.
+ */
+const translated = (await getCollection('translations'))
+  .filter((t) => !t.data.draft)
+  .map((t) => ({
+    code: t.data.locale,
+    path: t.id === 'index' ? '/cy/' : `/cy/${t.id}/`,
+    enPath: normalisePath(t.data.enPath),
+  }));
+
+const thisLocale = locale ? alternateLocales().find((l) => l.code === locale) : undefined;
+const enPathOfThisPage = thisLocale
+  ? translated.find((t) => normalisePath(t.path) === here)?.enPath
+  : here;
+const siblings = enPathOfThisPage
+  ? translated.filter((t) => t.enPath === enPathOfThisPage)
+  : [];
+// Only emit hreflang when a real pair exists — a lone self-referencing tag is noise.
+const alternates = siblings.length ? hreflangSet(enPathOfThisPage, siblings) : [];
+
+// An unreviewed translation stays out of the index until a native speaker has
+// signed it off. See src/lib/i18n.mjs for why this is not optional.
+const localeNoindex = Boolean(thisLocale && !thisLocale.reviewed);
+const isNoindex = noindex || localeNoindex;
+
+// The other-language link for the header switcher.
+const switcher = thisLocale
+  ? { href: enPathOfThisPage, label: 'English', lang: defaultLocale() }
+  : siblings.length
+    ? (() => {
+        const l = alternateLocales().find((x) => x.code === siblings[0].code);
+        return l ? { href: siblings[0].path, label: l.label, lang: l.code } : undefined;
+      })()
+    : undefined;
+/**
+ * On a translated page the nav must stay inside that language — sending a
+ * Welsh reader to an English services index is the fastest way to make a
+ * bilingual site feel like a token gesture. Pages that only exist in English
+ * (contact, for now) are marked lang="en" so screen readers switch voice.
+ */
+const localeNav = thisLocale
+  ? [
+      ...(await getCollection('translations'))
+        .filter((t) => !t.data.draft && t.data.locale === thisLocale.code)
+        .sort((a, b) => a.data.order - b.data.order)
+        .map((t) => ({ href: t.id === 'index' ? '/cy/' : `/cy/${t.id}/`, label: t.data.navLabel ?? t.data.name })),
+      { href: '/contact/', label: 'Contact', lang: defaultLocale() },
+    ]
+  : undefined;
+
+const htmlLang = thisLocale?.htmlLang ?? defaultLocale();
+const ogLocale = htmlLang.replace('-', '_');
 const t = site.theme;
 const catalogServices = (await getCollection('services'))
   .filter((s) => !s.data.draft)
@@ -29,21 +96,24 @@ const ogImage = image ? new URL(image, site.url).href : undefined;
 ---
 
 <!doctype html>
-<html lang="en-GB">
+<html lang={htmlLang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={url} />
-    {noindex && <meta name="robots" content="noindex, follow" />}
+    {isNoindex && <meta name="robots" content="noindex, follow" />}
+    {alternates.map((a) => (
+      <link rel="alternate" hreflang={a.hreflang} href={canonical(a.path)} />
+    ))}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.business.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={url} />
-    <meta property="og:locale" content="en_GB" />
+    <meta property="og:locale" content={ogLocale} />
     {ogImage && <meta property="og:image" content={ogImage} />}
     <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
 
@@ -67,7 +137,11 @@ const ogImage = image ? new URL(image, site.url).href : undefined;
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
-    <SiteHeader />
+    <SiteHeader
+      switcher={switcher}
+      navOverride={localeNav}
+      callLabel={thisLocale?.code === 'cy' ? `Ffoniwch ${site.contact.phone}` : undefined}
+    />
     <main id="main"><slot /></main>
     <SiteFooter />
     <StickyCta />

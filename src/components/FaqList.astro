@@ -1,11 +1,13 @@
 ---
-const { faqs } = Astro.props;
+// Headings are overridable so translated pages are not stuck with English
+// furniture around Welsh content.
+const { faqs, eyebrow = 'Common questions', heading = 'Answered honestly' } = Astro.props;
 ---
 {faqs?.length ? (
   <section class="section section--surface">
     <div class="container">
-      <p class="eyebrow">Common questions</p>
-      <h2>Answered honestly</h2>
+      <p class="eyebrow">{eyebrow}</p>
+      <h2>{heading}</h2>
       <div class="faq">
         {faqs.map((f) => (
           <details class="faq__item">

@@ -2,8 +2,13 @@
 title: "Emergency Glass Repair & Boarding Up | Anglesey"
 description: "Broken window or door glass on Anglesey? We board up to make the property secure, then reglaze properly once the made-to-measure glass arrives."
 name: "Emergency glass repair"
+targets:
+  - "emergency glass repair"
+  - "broken window"
+  - "boarding up"
+  - "Anglesey"
 heading: "Broken glass made safe, then put right"
-summary: "A broken pane stops being a glazing job and becomes a security job. We make the opening safe first, then glaze it properly when the glass lands."
+summary: "A broken window stops being a glazing job and becomes a security job. We make the opening safe first, then glaze it properly when the glass lands."
 order: 2
 benefits:
   - "Boarded up so the property is secure and weathertight overnight"

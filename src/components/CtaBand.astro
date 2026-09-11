@@ -1,6 +1,13 @@
 ---
 import { site } from '../lib/client.mjs';
-const { heading = 'Ready for a straight-talking quote?', text = 'No pressure, no sales patter — a proper survey and a fixed price in writing.' } = Astro.props;
+const {
+  heading = 'Ready for a straight-talking quote?',
+  text = 'No pressure, no sales patter — a proper survey and a fixed price in writing.',
+  callLabel,
+  ghostLabel = 'Request a callback',
+  ghostHref = '/contact/',
+  ghostLang,
+} = Astro.props;
 ---
 <section class="cta section">
   <div class="container cta__inner">
@@ -9,8 +16,10 @@ const { heading = 'Ready for a straight-talking quote?', text = 'No pressure, no
       <p class="cta__p">{text}</p>
     </div>
     <div class="cta__actions">
-      <a class="btn btn--accent" href={`tel:${site.contact.phoneHref}`}>Call {site.contact.phone}</a>
-      <a class="btn btn--ghost cta__ghost" href="/contact/">Request a callback</a>
+      <a class="btn btn--accent" href={`tel:${site.contact.phoneHref}`}>
+        {callLabel ?? `Call ${site.contact.phone}`}
+      </a>
+      <a class="btn btn--ghost cta__ghost" href={ghostHref} lang={ghostLang}>{ghostLabel}</a>
     </div>
   </div>
 </section>

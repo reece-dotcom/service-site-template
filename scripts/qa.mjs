@@ -124,6 +124,110 @@ for (const { route, html } of pages) {
   }
 }
 
+/**
+ * KEYWORD COVERAGE.
+ *
+ * "Is the term we are targeting actually on the page?" is the one on-page
+ * question that is worth automating, because it is the one that silently goes
+ * wrong: copy gets rewritten, a heading gets tightened, and the phrase the
+ * page was built to rank for quietly disappears. It matters twice as much on
+ * translated pages, where nobody editing the English side can read the Welsh.
+ *
+ * Declare terms in the page's `targets:` frontmatter. The first is primary and
+ * should appear in the title or the H1. Matching ignores case and accents so
+ * "Ynys Mon" matches "Ynys Môn".
+ */
+{
+  const fold = (t) =>
+    t
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[\u2018\u2019]/g, "'")
+      .toLowerCase()
+      .replace(/\s+/g, ' ');
+  const textOf = (html) =>
+    fold(
+      html
+        .replace(/<script[\s\S]*?<\/script>/g, ' ')
+        .replace(/<style[\s\S]*?<\/style>/g, ' ')
+        .replace(/<[^>]+>/g, ' ')
+    );
+
+  const clientsRoot = path.resolve(process.cwd(), 'clients');
+  const activeSlug = process.env.CLIENT || 'demo-glazing';
+  const contentRoot = path.join(clientsRoot, activeSlug, 'content');
+  const routeFor = (rel) => {
+    const noExt = rel.replace(/\.md$/, '');
+    const [dir, ...rest] = noExt.split(path.sep);
+    const tail = rest.join('/');
+    if (dir === 'services') return `/services/${tail}/`;
+    if (dir === 'areas') return `/areas/${tail}/`;
+    if (dir === 'cy') return tail === 'index' ? '/cy/' : `/cy/${tail}/`;
+    return null;
+  };
+  const mdFiles = [];
+  if (fs.existsSync(contentRoot))
+    (function walk(dir) {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const p2 = path.join(dir, e.name);
+        if (e.isDirectory()) walk(p2);
+        else if (e.name.endsWith('.md')) mdFiles.push(path.relative(contentRoot, p2));
+      }
+    })(contentRoot);
+
+  const byRoute = new Map(pages.map((p2) => [p2.route, p2.html]));
+  for (const rel of mdFiles) {
+    const route = routeFor(rel);
+    if (!route) continue;
+    const raw = fs.readFileSync(path.join(contentRoot, rel), 'utf8');
+    const fm = raw.match(/^---\n([\s\S]*?)\n---/)?.[1];
+    if (!fm) continue;
+    const block = fm.match(/^targets:\n((?:\s+-\s+.*\n?)+)/m)?.[1];
+    if (!block) continue;
+    const terms = [...block.matchAll(/-\s+"?([^"\n]+?)"?\s*$/gm)].map((m) => m[1]);
+    const html = byRoute.get(route);
+    if (!html) {
+      warns.push(`${rel}: declares targets but no page was built at ${route}`);
+      continue;
+    }
+    const body = textOf(html);
+    for (const term of terms) {
+      if (!body.includes(fold(term))) {
+        fails.push(`${route}: target term "${term}" is not on the page (declared in ${rel})`);
+      }
+    }
+    // Primary term belongs in the title or the H1, not just buried in body copy.
+    const head = fold(
+      (html.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? '') +
+        ' ' +
+        (html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? '').replace(/<[^>]+>/g, ' ')
+    );
+    if (terms[0] && !head.includes(fold(terms[0]))) {
+      warns.push(`${route}: primary target "${terms[0]}" is in neither the title nor the H1`);
+    }
+  }
+}
+
+/**
+ * A language the business cannot actually speak must not be promised.
+ * Dawelen's owner does not speak Welsh — the site is translated, the phone is
+ * answered in English — so "Welsh spoken" anywhere on it would be a claim that
+ * fails on the first call. Only allowed when the client states the capability
+ * in business.languages.
+ */
+{
+  const cfg = (await import('../clients/' + (process.env.CLIENT || 'demo-glazing') + '/site.config.mjs')).default;
+  const speaks = (cfg.business?.languages ?? []).map((l) => l.toLowerCase());
+  if (!speaks.includes('cy') && !speaks.includes('welsh')) {
+    const claims = /(welsh spoken|siarad cymraeg|croeso i chi siarad cymraeg|yn gymraeg ar y ff[oô]n|we speak welsh)/i;
+    for (const { route, html } of pages) {
+      const body = html.replace(/<script[\s\S]*?<\/script>/g, '');
+      const hit = body.match(claims);
+      if (hit) fails.push(`${route}: claims Welsh-speaking service ("${hit[0]}") but business.languages does not include it`);
+    }
+  }
+}
+
 const areaRoutes = pages.filter((p) => /^\/areas\/[^/]+\/$/.test(p.route)).length;
 // Area pages must link sideways. An area page that links only to services is a
 // dead end for a crawler and for the visitor in the next village along.
@@ -148,6 +252,30 @@ for (const { route, html } of pages) {
 
 // Broken internal links + orphan pages
 const routes = new Set(pages.map((p) => p.route));
+
+/**
+ * hreflang must be reciprocal, or Google ignores it entirely. The build pairs
+ * the pages; this confirms the pairing survived into the HTML on both sides.
+ */
+for (const { route, html } of pages) {
+  const tags = [...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)];
+  if (!tags.length) continue;
+  if (!tags.some(([, lang]) => lang === 'x-default')) {
+    fails.push(`${route}: hreflang set with no x-default`);
+  }
+  for (const [, , href] of tags) {
+    const p2 = new URL(href).pathname;
+    if (!routes.has(p2)) {
+      fails.push(`${route}: hreflang points at ${p2}, which is not a page on this site`);
+      continue;
+    }
+    const other = pages.find((x) => x.route === p2);
+    if (other && other.route !== route && !other.html.includes(`href="${new URL(href).origin}${route}"`)) {
+      fails.push(`${route}: hreflang to ${p2} is not reciprocated — Google ignores one-way hreflang`);
+    }
+  }
+}
+
 for (const href of linked) {
   if (href.startsWith('/_astro/') || /\.[a-z0-9]+$/i.test(href)) continue;
   if (!routes.has(href)) fails.push(`broken internal link: ${href}`);

@@ -2,6 +2,10 @@
 title: "Glass Repair in Holyhead | Dawelen Glass"
 description: "Misted sealed units, broken window and door glass and boarding up in Holyhead, Holy Island and Trearddur Bay. Exposed, weather-beaten glazing a speciality."
 name: "Holyhead"
+targets:
+  - "glass repair in Holyhead"
+  - "misted double glazing"
+  - "Holy Island"
 heading: "Glass and glazing in Holyhead"
 summary: "The island's biggest town, its most exposed housing and its busiest run of shopfronts — three different kinds of glass problem in one place."
 localProof: "Holyhead sits on Holy Island with water on three sides, so the west and north-west elevations take salt-laden wind straight off the Irish Sea all winter. Sealed units on those walls fail years before the sheltered side of the same house, and whole runs of terracing above the harbour mist up together."

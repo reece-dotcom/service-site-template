@@ -10,21 +10,29 @@ const nav = [
   { href: '/contact/', label: 'Contact' },
 ];
 const isCurrent = (href) => (href === '/' ? path === '/' : path.startsWith(href));
+/** Link to this page's other-language twin, supplied by BaseLayout. */
+const { switcher, navOverride, callLabel } = Astro.props;
+const items = navOverride ?? nav;
 ---
 <header class="hdr">
   <div class="container hdr__inner">
     <a class="hdr__brand" href="/">{site.business.name}</a>
     <nav class="hdr__nav" aria-label="Main">
       <ul>
-        {nav.map((i) => (
+        {items.map((i) => (
           <li>
-            <a href={i.href} aria-current={isCurrent(i.href) ? 'page' : undefined}>{i.label}</a>
+            <a href={i.href} lang={i.lang} aria-current={(navOverride ? i.href === path : isCurrent(i.href)) ? 'page' : undefined}>{i.label}</a>
           </li>
         ))}
       </ul>
     </nav>
+    {switcher && (
+      <a class="hdr__lang" href={switcher.href} lang={switcher.lang} hreflang={switcher.lang} rel="alternate">
+        {switcher.label}
+      </a>
+    )}
     <a class="btn btn--accent hdr__cta" href={`tel:${site.contact.phoneHref}`}>
-      Call {site.contact.phone}
+      {callLabel ?? `Call ${site.contact.phone}`}
     </a>
   </div>
 </header>
@@ -35,6 +43,7 @@ const isCurrent = (href) => (href === '/' ? path === '/' : path.startsWith(href)
   .hdr__nav ul { display: flex; gap: var(--space-6); list-style: none; padding: 0; margin: 0; flex-wrap: wrap; }
   .hdr__nav a { color: var(--ink); text-decoration: none; font-weight: 550; font-size: 0.98rem; }
   .hdr__nav a[aria-current='page'] { color: var(--brand); text-decoration: underline; }
+  .hdr__lang { color: var(--brand); font-weight: 600; font-size: 0.95rem; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
   .hdr__cta { padding: 0.6rem 1.1rem; font-size: 0.98rem; }
   @media (max-width: 46rem) {
     .hdr__inner { gap: var(--space-3); padding-block: var(--space-3); }
@@ -52,6 +61,7 @@ const isCurrent = (href) => (href === '/' ? path === '/' : path.startsWith(href)
     .hdr__nav a { white-space: nowrap; font-size: 0.92rem; }
     /* The sticky bottom bar already carries the number on mobile — a second
        full-width call button in the header just pushes the hero down. */
-    .hdr__cta { display: none; }
+    .hdr__lang { color: var(--brand); font-weight: 600; font-size: 0.95rem; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+  .hdr__cta { display: none; }
   }
 </style>

@@ -30,6 +30,8 @@ const services = defineCollection({
     order: z.number().default(99),
     image: z.string().optional(),
     benefits: z.array(z.string()).default([]),
+    /** Search terms this page must contain; QA fails the build if they are missing. */
+    targets: z.array(z.string()).default([]),
     /**
      * AEO direct answer (40-60 words, enforced in AnswerBlock). The passage an
      * AI answer engine quotes for "who does X in <town>".
@@ -59,6 +61,8 @@ const areas = defineCollection({
       .string()
       .min(120, 'localProof must be 120+ characters of genuinely local content'),
     postcodes: z.array(z.string()).default([]),
+    /** Search terms this page must contain; QA fails the build if they are missing. */
+    targets: z.array(z.string()).default([]),
     /** Town coordinates. Used to order the nearby-areas links and nothing else. */
     geo: z.object({ lat: z.number(), lng: z.number() }).optional(),
     /** Wikidata entity URL for this town, e.g. https://www.wikidata.org/wiki/Q1234. Disambiguates same-named UK towns in schema. */
@@ -106,4 +110,36 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { services, areas, blog };
+/**
+ * Translated pages (currently Welsh). One file per page, authored as plain
+ * markdown so a native-speaker reviewer can edit it without touching code.
+ *
+ * `enPath` is the English page this one is the translation of — it drives the
+ * reciprocal hreflang pair and is validated against real routes at build time.
+ * `targets` are the search terms this page must actually contain; QA fails the
+ * build if the rendered page does not include them, in either language.
+ */
+const translations = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: contentPath('cy') }),
+  schema: z.object({
+    ...seo,
+    locale: z.string().default('cy'),
+    name: z.string(),
+    heading: z.string(),
+    summary: z.string(),
+    /** Overrides the closing CTA heading on this page. */
+    ctaHeading: z.string().optional(),
+    /** Shorter label for the nav, if the page name is long. */
+    navLabel: z.string().optional(),
+    /** English counterpart, e.g. /services/misted-double-glazing/ */
+    enPath: z.string().startsWith('/'),
+    /** Search terms that must appear on this page (checked by QA). First one is primary. */
+    targets: z.array(z.string()).default([]),
+    faqs: faq,
+    order: z.number().default(99),
+    updatedAt: z.coerce.date().optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { services, areas, blog, translations };

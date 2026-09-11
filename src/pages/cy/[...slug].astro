@@ -1,0 +1,111 @@
+---
+/**
+ * Translated pages (Welsh). One route for the whole second language.
+ *
+ * These are authored as markdown in clients/<slug>/content/cy/, so the native
+ * speaker reviewing them edits prose, not components. Slugs are Welsh
+ * (/cy/gwasanaethau/gwydr-dwbl-niwlog/) because a URL in the language of the
+ * page is a small ranking signal and an obvious trust signal to a Welsh reader.
+ *
+ * Pairing with the English page is validated in getStaticPaths: a translated
+ * page whose enPath does not exist would emit a one-way hreflang, which Google
+ * ignores — so it fails the build instead of shipping broken.
+ */
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import FaqList from '../../components/FaqList.astro';
+import { site } from '../../lib/client.mjs';
+import { assertPairing, normalisePath } from '../../lib/i18n.mjs';
+import { serviceSchema, faqSchema, breadcrumbSchema } from '../../lib/seo.mjs';
+
+export async function getStaticPaths() {
+  const pages = (await getCollection('translations')).filter((p) => !p.data.draft);
+  const services = (await getCollection('services')).filter((s) => !s.data.draft);
+  const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
+
+  // Every English route this template produces, for the pairing guard.
+  const englishRoutes = new Set([
+    '/',
+    '/services/',
+    '/areas/',
+    '/about/',
+    '/blog/',
+    '/contact/',
+    ...services.map((s) => `/services/${s.id}/`),
+    ...areas.map((a) => `/areas/${a.id}/`),
+  ]);
+
+  return pages.map((page) => {
+    // content/cy/index.md is the translated home page and lives at /cy/.
+    const slug = page.id === 'index' ? undefined : page.id;
+    assertPairing(`/cy/${slug ? slug + '/' : ''}`, page.data.enPath, englishRoutes);
+    return { params: { slug }, props: { page } };
+  });
+}
+
+const { page } = Astro.props;
+const { Content } = await render(page);
+const d = page.data;
+const enPath = normalisePath(d.enPath);
+
+// Breadcrumbs in the language of the page. The trail is derived from the file
+// path, so /cy/gwasanaethau/x/ sits under a Welsh "Gwasanaethau" crumb.
+const segs = page.id === 'index' ? [] : page.id.split('/');
+const sectionLabels = { gwasanaethau: 'Gwasanaethau', ardaloedd: 'Ardaloedd' };
+const section = segs.length > 1 ? segs[0] : undefined;
+const crumbs = [
+  { name: 'Hafan', path: '/cy/' },
+  ...(section ? [{ name: sectionLabels[section] ?? section }] : []),
+  { name: d.name },
+];
+---
+
+<BaseLayout
+  title={d.title}
+  description={d.description}
+  locale={d.locale}
+  schemas={[
+    serviceSchema({ name: d.name, description: d.summary }),
+    faqSchema(d.faqs),
+    page.id === 'index' ? null : breadcrumbSchema(crumbs.slice(1), { homeName: 'Hafan', homePath: '/cy/' }),
+  ]}
+>
+  <section class="section">
+    <div class="container">
+      {page.id !== 'index' && (
+        <nav class="crumb" aria-label="Briwsion bara">
+          <a href="/cy/">Hafan</a>
+          {section && <span aria-hidden="true">/</span>}
+          {section && <span>{sectionLabels[section] ?? section}</span>}
+        </nav>
+      )}
+      <p class="eyebrow">{site.business.name}</p>
+      <h1>{d.heading}</h1>
+      <p class="lede cy__lede">{d.summary}</p>
+      <div class="prose cy__prose"><Content /></div>
+      <p class="cy__en">
+        <a href={enPath} hreflang="en-GB" lang="en-GB" rel="alternate">
+          Read this page in English
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <FaqList faqs={d.faqs} eyebrow="Holi ac ateb" heading="Atebion gonest" />
+
+  <CtaBand
+    heading={d.ctaHeading ?? "Gwydr i'w drwsio?"}
+    text="Dim pwysau a dim jargon — pris clir, yn ysgrifenedig."
+    callLabel={`Ffoniwch ${site.contact.phone}`}
+    ghostLabel="Gofyn am alwad"
+    ghostLang="cy"
+  />
+</BaseLayout>
+
+<style>
+  .cy__lede { max-width: 58rem; }
+  .cy__prose { max-width: 58rem; }
+  .cy__prose h2 { margin-top: var(--space-10); }
+  .cy__en { margin-top: var(--space-10); font-size: 0.95rem; }
+</style>

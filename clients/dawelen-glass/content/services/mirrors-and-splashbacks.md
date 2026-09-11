@@ -2,8 +2,13 @@
 title: "Mirrors, Splashbacks & Shower Screens | Anglesey"
 description: "Made-to-measure mirrors, glass splashbacks, shelves and shower screens cut and fitted across Anglesey. Measured on site, polished edges."
 name: "Mirrors and splashbacks"
-heading: "Mirrors, splashbacks and shower glass, cut to your sizes"
-summary: "Bespoke glass for the awkward spaces: alcove mirrors, splashbacks behind a hob, shelves, shower screens and table tops."
+targets:
+  - "made-to-measure mirrors"
+  - "glass splashback"
+  - "shower screens"
+  - "Anglesey"
+heading: "Made-to-measure mirrors, splashbacks and shower glass"
+summary: "Made-to-measure mirrors and glass for the awkward spaces: alcove mirrors, a glass splashback behind a hob, shelves, shower screens and table tops."
 order: 4
 benefits:
   - "Measured on site — alcoves and chimney breasts are rarely square"

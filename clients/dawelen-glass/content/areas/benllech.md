@@ -2,6 +2,10 @@
 title: "Glass Repair in Benllech | Dawelen Glass"
 description: "Misted units, broken glass and made-to-measure mirrors in Benllech and Red Wharf Bay. We are based here, so it is a short drive rather than a journey."
 name: "Benllech"
+targets:
+  - "glass repair in Benllech"
+  - "misted double glazing"
+  - "Red Wharf Bay"
 heading: "Glass and glazing in Benllech"
 summary: "Our base. Benllech, Red Wharf Bay and the villages along this stretch of coast are a few minutes away rather than a trip across the island."
 localProof: "We are based in Benllech, so this is home ground: the bungalows and 1970s coastal builds above the bay, the holiday lets around Beach Road, and the properties facing Red Wharf Bay where salt air and onshore wind take the perimeter seals out of the seaward units years before the sheltered side of the same house needs anything."

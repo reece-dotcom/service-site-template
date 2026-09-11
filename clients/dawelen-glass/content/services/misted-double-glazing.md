@@ -2,8 +2,13 @@
 title: "Misted Double Glazing Repair | Anglesey"
 description: "Failed and misted double glazed units replaced across Anglesey. The sealed unit is swapped into your existing frame — no new window needed."
 name: "Misted double glazing"
+targets:
+  - "misted double glazing"
+  - "misted units"
+  - "condensation between glass"
+  - "Anglesey"
 heading: "Misted double glazing, replaced without a new window"
-summary: "Condensation between the panes means the sealed unit has failed, not the window. We measure it, order the glass and swap it into the frame you already have."
+summary: "Condensation between glass panes means the sealed unit has failed, not the window. We measure it, order the glass and swap it into the frame you already have."
 order: 1
 benefits:
   - "The existing frame, hinges and handles stay where they are"
@@ -34,6 +39,9 @@ That is a glass problem. The frame, the hinges, the handles and the
 weatherseals are usually all perfectly serviceable, which is why the honest
 answer to a misted window is nearly always a new unit rather than a new
 window.
+
+Misted units are the single most common job we are called out to on the
+island, and in most houses only some of the windows are affected.
 
 ## On a coast, units fail sooner
 

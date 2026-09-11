@@ -2,6 +2,10 @@
 title: "Glass Repair in Bangor | Dawelen Glass"
 description: "Misted sealed units, broken window and door glass and made-to-measure mirrors in Bangor, Gwynedd. Over the bridge from our Anglesey base."
 name: "Bangor"
+targets:
+  - "glass repair in Bangor"
+  - "broken window"
+  - "landlords"
 heading: "Glass and glazing in Bangor"
 summary: "Over the Menai Strait in Gwynedd — the nearest city to our base, and a short run over either bridge."
 localProof: "Bangor is a university city with a large private rented sector, so a lot of the glass work here is landlord and letting-agent work on Victorian and Edwardian terraces: door glass that never met current safety standards, sash and casement panes, and sealed units retro-fitted into older frames during earlier upgrades."

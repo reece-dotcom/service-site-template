@@ -263,6 +263,20 @@ export default {
     { days: ['Saturday'], opens: '09:00', closes: '13:00' },
   ],
 
+  /**
+   * Welsh alongside English. reviewed:false keeps every /cy/ page out of the
+   * index and out of the sitemap until a native speaker has signed the copy
+   * off — the pages are live and readable for that review, they just cannot
+   * rank yet. Flip to true only after the sign-off.
+   * ONS 2021: 55.8% of Anglesey residents speak Welsh.
+   */
+  locales: {
+    default: 'en-GB',
+    alternates: [
+      { code: 'cy', prefix: '/cy', label: 'Cymraeg', reviewed: false },
+    ],
+  },
+
   social: {
     facebook: 'https://www.facebook.com/dawelenglass',
   },

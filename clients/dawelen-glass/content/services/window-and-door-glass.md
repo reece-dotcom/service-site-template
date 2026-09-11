@@ -2,11 +2,16 @@
 title: "Window & Door Glass Replacement | Anglesey"
 description: "Replacement glass for windows, patio doors and conservatories across Anglesey — cut to measure, toughened or obscure as the opening requires."
 name: "Window and door glass"
+targets:
+  - "replacement glass"
+  - "toughened glass"
+  - "cut to measure"
+  - "patio door glass"
 heading: "Replacement glass for windows, doors and conservatories"
-summary: "Cracked, blown or the wrong glass in the wrong place — measured on site and cut to that measurement, in the specification the opening actually needs."
+summary: "Cracked, blown or the wrong glass in the wrong place — measured on site and cut to measure, in the specification the opening actually needs."
 order: 3
 benefits:
-  - "Patio and French door panes, including toughened units"
+  - "Patio door glass and French door panes, in toughened glass"
   - "Obscure glass for bathrooms, in the common privacy patterns"
   - "Conservatory roof and side panels"
   - "Georgian bar and leaded effect matched where it exists elsewhere in the house"
