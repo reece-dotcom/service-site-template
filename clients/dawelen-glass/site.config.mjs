@@ -207,6 +207,28 @@ export default {
     formHeading: 'Tell us about the glass',
   },
 
+  /**
+   * Template copy overrides. This business repairs and cuts glass; it does not
+   * install replacement windows, so the installer-flavoured template defaults
+   * ("What we install", "fitted by our own installers") would be untrue here.
+   * `installs: false` also turns on the QA check that catches installer
+   * wording creeping back in.
+   */
+  copy: {
+    installs: false,
+    servicesHeading: 'What we do',
+    servicesLede:
+      'Mostly repair and made-to-measure glass: the unit that misted, the pane that went through, the mirror that has to fit an alcove.',
+    servicesDescription:
+      'Glass repair and replacement across {region} — misted sealed units, broken window and door glass, mirrors, splashbacks and shower screens.',
+    areasDescription:
+      'Where {business} works — towns, villages and postcodes across {region}, from a base in {locality}. One number, answered locally.',
+    areaServicesHeading: 'What we do in {area}',
+    areaCtaHeading: 'Glass to sort in {area}?',
+    serviceAreasHeading: '{service} across Anglesey',
+    nearbyHeading: 'Nearby places we cover',
+  },
+
   contact: {
     phone: '07921 252768',
     phoneHref: '+447921252768',
@@ -219,6 +241,13 @@ export default {
       country: 'GB',
     },
     geo: { lat: 53.3167, lng: -4.2333 },
+    /**
+     * Service radius in km, emitted as a GeoCircle in the LocalBusiness
+     * schema. 30km from Benllech covers the whole island including Holyhead
+     * and Rhosneigr, and stops just short of Bangor — which is honest, and
+     * keeps the entity anchored to Anglesey rather than the mainland.
+     */
+    serviceRadiusKm: 30,
     /**
      * No googlePlaceId: there is no Google Business Profile yet, and pinning
      * a home or guest-house address is the wrong answer for a service-area

@@ -111,6 +111,33 @@ export function localBusinessSchema({ services = [], areas = [] } = {}) {
         () => site.contact.address.region
       );
   if (served.length) schema.areaServed = served;
+
+  /**
+   * A service-area business with no shopfront should also state its radius.
+   * Named places tell Google WHERE it works; a GeoCircle tells it how far,
+   * which is what decides whether the business is eligible for a query from a
+   * village that has no page of its own.
+   */
+  if (site.contact.serviceRadiusKm) {
+    schema.serviceArea = {
+      '@type': 'GeoCircle',
+      geoMidpoint: {
+        '@type': 'GeoCoordinates',
+        latitude: site.contact.geo.lat,
+        longitude: site.contact.geo.lng,
+      },
+      geoRadius: String(site.contact.serviceRadiusKm * 1000),
+    };
+  }
+  /**
+   * Languages the business actually trades in. In Welsh-speaking counties this
+   * is a real differentiator and an honest one — so it only ships when the
+   * client has told us, never inferred from the postcode.
+   */
+  if (site.business.languages?.length) schema.knowsLanguage = site.business.languages;
+  if (site.contact.googlePlaceId) {
+    schema.hasMap = `https://www.google.com/maps/place/?q=place_id:${site.contact.googlePlaceId}`;
+  }
   // Only emit ratings that actually exist. Never fabricate.
   if (site.reviews?.aggregate) {
     schema.aggregateRating = {

@@ -109,6 +109,43 @@ for (const { route, html } of pages) {
   }
 }
 
+// Installer-specific template copy leaking onto a client who does not install
+// anything. The copy layer (src/lib/copy.mjs) exists to prevent this; this
+// check catches the next hardcoded string someone adds.
+{
+  const cfg = (await import('../clients/' + (process.env.CLIENT || 'demo-glazing') + '/site.config.mjs')).default;
+  const installs = cfg.copy?.installs !== false;
+  if (!installs) {
+    for (const { route, html } of pages) {
+      const body = html.replace(/<script[\s\S]*?<\/script>/g, '');
+      const hit = body.match(/\b(we install|installers|installed by|what we install)\b/i);
+      if (hit) fails.push(`${route}: installer wording "${hit[0]}" on a client with copy.installs === false`);
+    }
+  }
+}
+
+const areaRoutes = pages.filter((p) => /^\/areas\/[^/]+\/$/.test(p.route)).length;
+// Area pages must link sideways. An area page that links only to services is a
+// dead end for a crawler and for the visitor in the next village along.
+for (const { route, html } of pages) {
+  if (!/^\/areas\/[^/]+\/$/.test(route)) continue;
+  const others = new Set(
+    [...html.matchAll(/href="\/areas\/([^"/]+)\/"/g)].map((m) => m[1])
+  );
+  others.delete(route.split('/')[2]);
+  // A client with only two towns cannot link to two others.
+  if (others.size < Math.min(2, areaRoutes - 1)) warns.push(`${route}: links to only ${others.size} other area page(s) — nearby-area links missing?`);
+}
+
+// Service x area pages: each one must be reachable and must not be a near-copy
+// of its own parents (the build guards the intro; this guards the rendered page).
+for (const { route, html } of pages) {
+  if (!/^\/services\/[^/]+\/in\/[^/]+\/$/.test(route)) continue;
+  const [, , svc, , area] = route.split('/');
+  if (!html.includes(`href="/services/${svc}/"`)) fails.push(`${route}: no link back to the parent service page`);
+  if (!html.includes(`href="/areas/${area}/"`)) fails.push(`${route}: no link back to the area page`);
+}
+
 // Broken internal links + orphan pages
 const routes = new Set(pages.map((p) => p.route));
 for (const href of linked) {

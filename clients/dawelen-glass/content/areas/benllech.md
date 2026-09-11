@@ -5,6 +5,22 @@ name: "Benllech"
 heading: "Glass and glazing in Benllech"
 summary: "Our base. Benllech, Red Wharf Bay and the villages along this stretch of coast are a few minutes away rather than a trip across the island."
 localProof: "We are based in Benllech, so this is home ground: the bungalows and 1970s coastal builds above the bay, the holiday lets around Beach Road, and the properties facing Red Wharf Bay where salt air and onshore wind take the perimeter seals out of the seaward units years before the sheltered side of the same house needs anything."
+wikidata: "https://www.wikidata.org/wiki/Q402177"
+geo: { lat: 53.3167, lng: -4.2333 }
+serviceDetail:
+  - service: "misted-double-glazing"
+    title: "Misted Double Glazing in Benllech | Dawelen Glass"
+    description: "Failed and misted sealed units replaced in Benllech and Red Wharf Bay, into your existing frames. We are based in the village."
+    heading: "Misted double glazing in Benllech"
+    intro: "Because we are based in the village, misted units in Benllech are the job we do more of than any other. The pattern is very consistent along this coast: the windows looking out over the bay go first, the ones sheltered behind the house are often fine, and the owner has usually been told the whole house needs replacement windows. In most of those cases the frames are sound and the fix is the sealed unit on one elevation."
+    points:
+      - "Short measuring visits, because we are already in the village"
+      - "Seaward elevation prioritised — the sheltered side often needs nothing"
+      - "Frames, hardware and sightlines left exactly as they are"
+      - "Holiday lets fitted around changeover days"
+    faqs:
+      - question: "Can you look at it this week?"
+        answer: "Usually, yes. Benllech is home ground, so a measuring visit here does not need to wait for a run of work on that side of the island."
 postcodes: ["LL74"]
 faqs:
   - question: "How quickly can you get to a job in Benllech?"

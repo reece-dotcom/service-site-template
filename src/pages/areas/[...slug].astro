@@ -5,6 +5,8 @@ import CtaBand from '../../components/CtaBand.astro';
 import FaqList from '../../components/FaqList.astro';
 import { site } from '../../lib/client.mjs';
 import { canonical, serviceSchema, faqSchema, breadcrumbSchema } from '../../lib/seo.mjs';
+import { copy } from '../../lib/copy.mjs';
+import { nearbyAreas } from '../../lib/places.mjs';
 
 export async function getStaticPaths() {
   const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
@@ -19,6 +21,11 @@ const services = entry.data.servicesOffered.length
   ? allServices.filter((s) => entry.data.servicesOffered.includes(s.id))
   : allServices;
 
+const allAreas = (await getCollection('areas')).filter((a) => !a.data.draft);
+const nearby = nearbyAreas(entry, allAreas, 3);
+/** Service x area pages that exist for this town, linked from the service list. */
+const detailFor = (id) => entry.data.serviceDetail.find((d) => d.service === id);
+const reviewed = entry.data.updatedAt;
 const url = canonical(`/areas/${entry.id}/`);
 const schemas = [
   ...services.map((s) =>
@@ -68,20 +75,53 @@ const schemas = [
 
   <section class="section section--surface">
     <div class="container">
-      <h2>What we install in {entry.data.name}</h2>
+      <h2>{copy('areaServicesHeading', { area: entry.data.name })}</h2>
       <div class="grid grid--3 svc">
-        {services.map((s) => (
-          <article class="card">
-            <h3><a href={`/services/${s.id}/`}>{s.data.name}</a></h3>
-            <p class="muted">{s.data.summary}</p>
-          </article>
-        ))}
+        {services.map((s) => {
+          const detail = detailFor(s.id);
+          return (
+            <article class="card">
+              <h3>
+                <a href={detail ? `/services/${s.id}/in/${entry.id}/` : `/services/${s.id}/`}>
+                  {detail ? `${s.data.name} in ${entry.data.name}` : s.data.name}
+                </a>
+              </h3>
+              <p class="muted">{s.data.summary}</p>
+            </article>
+          );
+        })}
       </div>
     </div>
   </section>
 
   <FaqList faqs={entry.data.faqs} />
-  <CtaBand heading={`Getting windows or doors done in ${entry.data.name}?`} />
+
+  <!--
+    Nearby towns. Turns a set of dead-end area pages into a crawlable cluster,
+    and answers the visitor from the next village along who has no page.
+  -->
+  {nearby.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <h2>{copy('nearbyHeading')}</h2>
+        <ul class="nearby">
+          {nearby.map(({ entry: a, km }) => (
+            <li>
+              <a href={`/areas/${a.id}/`}>{a.data.name}</a>
+              {km !== null && <span class="muted"> · about {km} km away</span>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  {reviewed && (
+    <p class="container reviewed">
+      Last reviewed {reviewed.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
+    </p>
+  )}
+  <CtaBand heading={copy('areaCtaHeading', { area: entry.data.name })} />
 </BaseLayout>
 <style>
   .crumb { font-size: 0.9rem; color: var(--muted); margin-bottom: var(--space-6); }
@@ -92,4 +132,6 @@ const schemas = [
   .proof__pc { margin-top: var(--space-6); color: var(--muted); font-size: 0.95rem; }
   .svc { margin-top: var(--space-8); }
   .svc h3 a { text-decoration: none; color: var(--ink); }
+  .nearby { margin-top: var(--space-6); display: flex; flex-wrap: wrap; gap: var(--space-6); list-style: none; padding: 0; }
+  .reviewed { color: var(--muted); font-size: 0.9rem; padding-bottom: var(--space-8); }
 </style>

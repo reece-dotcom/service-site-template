@@ -1,0 +1,129 @@
+---
+/**
+ * Service × area page — /services/<service>/in/<area>/.
+ *
+ * Generated only from an area file's `serviceDetail` entries, each of which
+ * has to survive src/lib/intersect.mjs. There is deliberately no way to
+ * mass-generate these: a page per service per town would be a doorway
+ * network, and that risk sits with the client's domain.
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import CtaBand from '../../../../components/CtaBand.astro';
+import FaqList from '../../../../components/FaqList.astro';
+import QuoteForm from '../../../../components/QuoteForm.astro';
+import { site } from '../../../../lib/client.mjs';
+import { canonical, serviceSchema, faqSchema, breadcrumbSchema } from '../../../../lib/seo.mjs';
+import { assertIntersection, intersectionSeo } from '../../../../lib/intersect.mjs';
+
+export async function getStaticPaths() {
+  const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
+  const services = (await getCollection('services')).filter((s) => !s.data.draft);
+  const paths = [];
+  for (const area of areas) {
+    for (const detail of area.data.serviceDetail) {
+      const service = services.find((s) => s.id === detail.service);
+      assertIntersection({ detail, area, service, serviceBody: service?.body ?? '' });
+      // Sibling services, so this page is part of the network rather than a
+      // spur off it. Prefer the same town's other service pages, then the rest
+      // of the catalogue.
+      const siblings = [
+        ...area.data.serviceDetail
+          .filter((d) => d.service !== detail.service)
+          .map((d) => {
+            const svc = services.find((x) => x.id === d.service);
+            return svc ? { name: `${svc.data.name} in ${area.data.name}`, href: `/services/${svc.id}/in/${area.id}/` } : null;
+          }),
+        ...services
+          .filter((x) => x.id !== service.id && !area.data.serviceDetail.some((d) => d.service === x.id))
+          .map((x) => ({ name: x.data.name, href: `/services/${x.id}/` })),
+      ].filter(Boolean).slice(0, 4);
+      paths.push({
+        params: { service: service.id, area: area.id },
+        props: { detail, area, service, siblings },
+      });
+    }
+  }
+  return paths;
+}
+
+const { detail, area, service, siblings } = Astro.props;
+const url = canonical(`/services/${service.id}/in/${area.id}/`);
+const { title, description } = intersectionSeo({
+  detail,
+  area,
+  service,
+  business: site.business,
+});
+const faqs = detail.faqs ?? [];
+const schemas = [
+  serviceSchema({
+    name: `${service.data.name} in ${area.data.name}`,
+    description: detail.description ?? service.data.summary,
+    url,
+    areaServed: area.data.name,
+  }),
+  faqSchema(faqs),
+  breadcrumbSchema([
+    { name: 'Services', path: '/services/' },
+    { name: service.data.name, path: `/services/${service.id}/` },
+    { name: area.data.name },
+  ]),
+];
+---
+<BaseLayout title={title} description={description} schemas={schemas}>
+  <section class="section">
+    <div class="container">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">/</span>
+        <a href="/services/">Services</a> <span aria-hidden="true">/</span>
+        <a href={`/services/${service.id}/`}>{service.data.name}</a>
+      </nav>
+      <p class="eyebrow">{area.data.name}, {site.contact.address.region}</p>
+      <h1>{detail.heading ?? `${service.data.name} in ${area.data.name}`}</h1>
+      <div class="intro">
+        <p class="lede">{detail.intro}</p>
+        {detail.points.length > 0 && (
+          <ul class="checklist">{detail.points.map((p) => <li>{p}</li>)}</ul>
+        )}
+        <p class="cta-line">
+          <a class="btn btn--accent" href={`tel:${site.contact.phoneHref}`}>
+            Call {site.contact.phone}
+          </a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <FaqList faqs={faqs} />
+
+  <!--
+    Both parents get a link back. This page exists inside a cluster; a visitor
+    who wants the full service detail or the rest of the town's coverage should
+    not have to go via the nav.
+  -->
+  <section class="section section--surface">
+    <div class="container">
+      <h2>More on this</h2>
+      <ul class="links">
+        <li><a href={`/services/${service.id}/`}>{service.data.name} — the full detail</a></li>
+        <li><a href={`/areas/${area.id}/`}>Everything we do in {area.data.name}</a></li>
+        <li><a href="/contact/">Prices and how to get a quote</a></li>
+        {siblings.map((sib) => (
+          <li><a href={sib.href}>{sib.name}</a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <QuoteForm />
+  <CtaBand heading={`${service.data.name} in ${area.data.name}?`} />
+</BaseLayout>
+<style>
+  .crumb { font-size: 0.9rem; color: var(--muted); margin-bottom: var(--space-6); }
+  .crumb a { color: var(--muted); }
+  .intro { max-width: 68ch; }
+  .intro .checklist { margin-top: var(--space-6); }
+  .cta-line { margin-top: var(--space-8); }
+  .links { margin-top: var(--space-6); display: grid; gap: var(--space-4); list-style: none; padding: 0; }
+</style>

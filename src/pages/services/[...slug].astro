@@ -7,6 +7,7 @@ import TrustStrip from '../../components/TrustStrip.astro';
 import AnswerBlock from '../../components/AnswerBlock.astro';
 import { site } from '../../lib/client.mjs';
 import { canonical, serviceSchema, faqSchema, breadcrumbSchema } from '../../lib/seo.mjs';
+import { copy } from '../../lib/copy.mjs';
 
 export async function getStaticPaths() {
   const services = (await getCollection('services')).filter((s) => !s.data.draft);
@@ -66,11 +67,21 @@ const schemas = [
   <FaqList faqs={entry.data.faqs} />
   <section class="section">
     <div class="container">
-      <h2>{entry.data.name} near you</h2>
+      <h2>{copy('serviceAreasHeading', { service: entry.data.name })}</h2>
       <ul class="areas">
-        {areas.map((a) => (
-          <li><a href={`/areas/${a.id}/`}>{entry.data.name} in {a.data.name}</a></li>
-        ))}
+        {areas.map((a) => {
+          // Deep-link to the service x area page when that town has one: it is
+          // the page built to rank for "<service> <town>", so the anchor text
+          // and the destination should agree.
+          const hasDetail = a.data.serviceDetail.some((d) => d.service === entry.id);
+          return (
+            <li>
+              <a href={hasDetail ? `/services/${entry.id}/in/${a.id}/` : `/areas/${a.id}/`}>
+                {entry.data.name} in {a.data.name}
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </div>
   </section>

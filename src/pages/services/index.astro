@@ -3,19 +3,20 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import { site } from '../../lib/client.mjs';
+import { copy } from '../../lib/copy.mjs';
 const services = (await getCollection('services')).filter((s) => !s.data.draft)
   .sort((a, b) => a.data.order - b.data.order);
 const loc = site.contact.address.locality;
 ---
 <BaseLayout
   title={`Windows, Doors & Glazing Services | ${loc}`.slice(0, 60)}
-  description={`Everything ${site.business.name} installs across ${site.contact.address.region} — windows, doors and conservatories, surveyed and fitted by our own team.`.slice(0, 160)}
+  description={copy('servicesDescription').slice(0, 160)}
 >
   <section class="section">
     <div class="container">
       <p class="eyebrow">Services</p>
-      <h1>What we install</h1>
-      <p class="lede">Every job surveyed properly, quoted in writing and fitted by our own installers.</p>
+      <h1>{copy('servicesHeading')}</h1>
+      <p class="lede">{copy('servicesLede')}</p>
       <div class="grid grid--3 list">
         {services.map((s) => (
           <article class="card">

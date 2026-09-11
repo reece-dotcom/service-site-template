@@ -59,9 +59,33 @@ const areas = defineCollection({
       .string()
       .min(120, 'localProof must be 120+ characters of genuinely local content'),
     postcodes: z.array(z.string()).default([]),
+    /** Town coordinates. Used to order the nearby-areas links and nothing else. */
+    geo: z.object({ lat: z.number(), lng: z.number() }).optional(),
     /** Wikidata entity URL for this town, e.g. https://www.wikidata.org/wiki/Q1234. Disambiguates same-named UK towns in schema. */
     wikidata: z.string().url().optional(),
     servicesOffered: z.array(z.string()).default([]),
+    /**
+     * Opt-in service x area pages (/services/<service>/in/<this area>/).
+     * These rank for the real money queries, so they carry the strictest
+     * guards in the codebase — see src/lib/intersect.mjs. Only add an entry
+     * when there is something true and specific to say about that service in
+     * that town.
+     */
+    serviceDetail: z
+      .array(
+        z.object({
+          service: z.string(),
+          title: z.string().max(60).optional(),
+          description: z.string().max(160).optional(),
+          heading: z.string().optional(),
+          intro: z
+            .string()
+            .min(220, 'serviceDetail.intro needs 220+ characters specific to this service in this town'),
+          points: z.array(z.string()).default([]),
+          faqs: faq,
+        })
+      )
+      .default([]),
     faqs: faq,
     updatedAt: z.coerce.date().optional(),
     draft: z.boolean().default(false),

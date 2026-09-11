@@ -5,6 +5,8 @@ name: "Amlwch"
 heading: "Glass and glazing in Amlwch"
 summary: "The north coast takes the worst of the weather on this island, and the glazing shows it — exposed elevations, storm damage and early unit failure."
 localProof: "Amlwch, the port and Bull Bay sit on the most exposed coastline on Anglesey, taking wind straight off the Irish Sea with nothing in front of it. Sealed units on north-facing elevations here fail early and often in runs rather than one at a time, and after a winter gale a proportion of the work is storm damage: panes taken out by debris rather than by age."
+wikidata: "https://www.wikidata.org/wiki/Q472667"
+geo: { lat: 53.416, lng: -4.345 }
 postcodes: ["LL68"]
 faqs:
   - question: "Is it worth replacing units on an exposed elevation?"

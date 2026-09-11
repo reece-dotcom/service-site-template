@@ -5,6 +5,8 @@ name: "Menai Bridge"
 heading: "Glass and glazing in Menai Bridge"
 summary: "Victorian terraces, stone cottages and a lot of rented property along the Strait — where the frame is often older than the glass in it."
 localProof: "Menai Bridge and the properties along the Strait towards Beaumaris are noticeably older stock: Victorian terraces, stone cottages and converted buildings, plenty of it rented to people working or studying around Bangor. Older timber and early uPVC frames mean measurements that are rarely square, and a lot of obscure and patterned glass that has to be matched rather than simply reordered."
+wikidata: "https://www.wikidata.org/wiki/Q2655856"
+geo: { lat: 53.223, lng: -4.164 }
 postcodes: ["LL59", "LL58"]
 faqs:
   - question: "Can you match the glass in an older window?"

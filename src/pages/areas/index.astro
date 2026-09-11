@@ -3,11 +3,12 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import { site } from '../../lib/client.mjs';
+import { copy } from '../../lib/copy.mjs';
 const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
 ---
 <BaseLayout
   title={`Areas We Cover | ${site.contact.address.region}`.slice(0, 60)}
-  description={`Where ${site.business.name} works — towns and postcodes across ${site.contact.address.region}, with local installers and a local number.`.slice(0, 160)}
+  description={copy('areasDescription').slice(0, 160)}
 >
   <section class="section">
     <div class="container">
