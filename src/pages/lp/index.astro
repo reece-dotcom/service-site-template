@@ -206,7 +206,7 @@ const description = (
     <!-- owner -->
     {site.business.owner?.name ? (
       <section class="lp-sec lp-sec--alt">
-        <div class="lp-wrap lp-owner">
+        <div class={`lp-wrap lp-owner${ownerPhoto ? '' : ' lp-owner--nophoto'}`}>
           {ownerPhoto && (
             <Image src={ownerPhoto} alt={`${site.business.owner.name}, ${site.business.owner.role ?? 'owner'}`} widths={[360, 640]} sizes="(max-width: 52rem) 92vw, 30vw" loading="lazy" />
           )}

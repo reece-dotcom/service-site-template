@@ -222,6 +222,22 @@ export default {
         answer: 'Yes — clear, grey or bronze tint, reeded and satin glass are all options, and toughened as standard for doors.',
       },
     ],
+    /**
+     * Real work only: the six photos the client supplied. NO customer quotes,
+     * ratings or dates — he has none published anywhere yet, and the `lp.jobs`
+     * guard would (correctly) refuse an unsourced testimonial. Add quotes here
+     * the moment there are real Google or Checkatrade reviews to point at.
+     */
+    jobsHeading: 'Recent work, and what it actually looks like.',
+    jobs: [
+      { title: 'Four-leaf bifold, living room to kitchen', image: 'job-5.webp', alt: 'Black steel-look bifold doors, four leaves, between a living room and a kitchen with herringbone flooring', meta: 'Steel-look bifold · folds flat to the reveal' },
+      { title: 'Top-hung sliders, bronze-tinted glass', image: 'job-6.webp', alt: 'Top-hung sliding steel-look double doors with bronze-tinted glass', meta: 'Sliding pair · where a swing door would have eaten the room' },
+      { title: 'Single four-pane door off a hallway', image: 'job-1.webp', alt: 'Single steel-look internal door with four horizontal panes in a hallway', meta: 'Single door · bar heights lined through with the frame beyond' },
+      { title: 'French pair, hallway to living room', image: 'job-4.webp', alt: 'Pair of steel-look French doors open onto a living room', meta: 'French pair · clear toughened glass' },
+      { title: 'Glazed drinks cabinet and matching doors', image: 'job-3.webp', alt: 'Glazed steel-look display cabinet with lit oak interior and matching internal doors along the hall', meta: 'Cabinet · same frame section as the doors down the hall' },
+      { title: 'Full-height pivot door, commercial fit-out', image: 'job-2.webp', alt: 'Full-height steel-look pivot door with a single vertical bar in a commercial interior', meta: 'Pivot door · commercial interior' },
+    ],
+
     quoteHeading: 'Send us the opening.',
     quoteBody:
       'A photo, a rough width and height, and which rooms it sits between. We will come back with options and a straight answer on price.',
