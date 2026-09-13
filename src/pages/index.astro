@@ -6,6 +6,7 @@ import TrustStrip from '../components/TrustStrip.astro';
 import AnswerBlock from '../components/AnswerBlock.astro';
 import ReviewsBand from '../components/ReviewsBand.astro';
 import QuoteForm from '../components/QuoteForm.astro';
+import CenteredHero from '../components/CenteredHero.astro';
 import Gallery from '../components/Gallery.astro';
 import ProcessSteps from '../components/ProcessSteps.astro';
 import MapBand from '../components/MapBand.astro';
@@ -19,6 +20,7 @@ import { clientImage } from '../lib/images.mjs';
 import { site } from '../lib/client.mjs';
 import { accreditationNames, activeOffer } from '../lib/business.mjs';
 import { canonical, serviceSchema, faqSchema } from '../lib/seo.mjs';
+import { homeCentered, homeHero } from '../lib/home.mjs';
 
 const services = (await getCollection('services'))
   .filter((s) => !s.data.draft)
@@ -43,7 +45,13 @@ if (homeFaqs.length) schemas.push(faqSchema(homeFaqs));
  * for repair-only businesses and produces broken copy when accreditations is
  * empty.
  */
-const heroImage = clientImage(site.media?.hero);
+const centered = homeCentered();
+const hero = homeHero();
+const heroImage = clientImage(centered ? (site.home.hero.image ?? site.media?.hero) : site.media?.hero);
+/* Carousel photos resolved in the same order as the rotating words. */
+const heroSlides = centered
+  ? (site.home.hero.slides ?? []).map((slide) => ({ ...slide, src: clientImage(slide.image) }))
+  : [];
 const heroPoints = site.business.usps?.length
   ? site.business.usps
   : [
@@ -57,6 +65,23 @@ const heroPoints = site.business.usps?.length
 ---
 
 <BaseLayout title={title.slice(0, 60)} description={description} schemas={schemas}>
+  {centered ? (
+    <>
+      <CenteredHero
+        hero={hero}
+        slides={heroSlides}
+        fallbackImage={heroImage}
+        wrapClass="container"
+      />
+      {/* The centered hero has no room for the form, so it sits immediately
+          below and owns the #quote target the hero CTA points at. */}
+      <section class="section section--tight" id="quote">
+        <div class="container container--narrow">
+          <QuoteForm heading="Get a free quote" />
+        </div>
+      </section>
+    </>
+  ) : (
   <section class:list={['hero', heroImage && 'hero--image']}>
     {heroImage && (
       <Image class="hero__bg" src={heroImage} alt={site.media?.heroAlt ?? `${site.business.name} — ${site.business.tagline}`} widths={[900, 1600]} sizes="100vw" loading="eager" fetchpriority="high" />
@@ -85,6 +110,7 @@ const heroPoints = site.business.usps?.length
       <QuoteForm heading="Get a free quote" compact={true} />
     </div>
   </section>
+  )}
 
   <TrustStrip />
   {site.business.directAnswer && (

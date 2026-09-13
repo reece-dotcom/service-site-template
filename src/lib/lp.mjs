@@ -42,9 +42,18 @@ export function lpConfig() {
 export function lpHero() {
   const hero = lpConfig().hero;
   if (!hero) fail('lp.hero is required when lp.enabled is true');
-  if (!hero.headline) fail('lp.hero.headline is required');
+  return validateCenteredHero(hero, 'lp.hero');
+}
+
+/**
+ * Shared validation for the centered/rotating hero, used by /lp/ (lp.hero) and
+ * by the home page (home.hero). Kept in one place so the two heroes cannot
+ * drift apart: the carousel-to-word pairing is the part that breaks silently.
+ */
+export function validateCenteredHero(hero, key = 'hero') {
+  if (!hero.headline) fail(`${key}.headline is required`);
   if (hero.rotate && hero.rotate.length < 2) {
-    fail('lp.hero.rotate needs at least two words, or omit it');
+    fail(`${key}.rotate needs at least two words, or omit it`);
   }
   /**
    * Optional hero carousel: one photo per rotating word, in the same order,
@@ -54,23 +63,23 @@ export function lpHero() {
    */
   if (hero.slides) {
     if (!hero.rotate) {
-      fail('lp.hero.slides needs lp.hero.rotate — each slide pairs with one word');
+      fail(`${key}.slides needs ${key}.rotate — each slide pairs with one word`);
     }
     if (hero.slides.length !== hero.rotate.length) {
       fail(
-        `lp.hero.slides has ${hero.slides.length} photo(s) but lp.hero.rotate has ` +
+        `${key}.slides has ${hero.slides.length} photo(s) but ${key}.rotate has ` +
           `${hero.rotate.length} word(s) — the carousel is synced to the words, ` +
           'so the counts must match'
       );
     }
     if (hero.slides.length > 5) {
-      fail('lp.hero.slides supports at most 5 photos');
+      fail(`${key}.slides supports at most 5 photos`);
     }
     hero.slides.forEach((slide, i) => {
-      if (!slide.image) fail(`lp.hero.slides[${i}].image is required`);
+      if (!slide.image) fail(`${key}.slides[${i}].image is required`);
       if (!slide.alt) {
         fail(
-          `lp.hero.slides[${i}].alt is required — describe the work in the photo`
+          `${key}.slides[${i}].alt is required — describe the work in the photo`
         );
       }
     });

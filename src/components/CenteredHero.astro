@@ -1,0 +1,100 @@
+---
+/**
+ * Centered full-bleed hero with a rotating word and a photo carousel synced to
+ * it (the format Reece supplied as the "Glazing Master Template" artifact).
+ *
+ * One component, two callers: /lp/ (config `lp.hero`) and the home page
+ * (config `home.hero`). Sharing the markup is deliberate — the fragile part is
+ * the pairing of photo N with word N, and that logic should exist once.
+ *
+ * Styling lives in styles/lp.css under the `.lp-hero--center` class names; the
+ * caller is responsible for importing it. No client-side JS: the rotation and
+ * the crossfade are CSS animations on a shared 12s cycle, so the first photo
+ * paints with the HTML instead of after a script runs.
+ */
+import { Image } from 'astro:assets';
+import { site } from '../lib/client.mjs';
+/* Styles live with the /lp/ sheet; importing here means only pages that
+   actually render this hero pay for it. */
+import '../styles/lp.css';
+
+const {
+  hero,
+  slides = [],
+  fallbackImage = null,
+  wrapClass = 'lp-wrap',
+  ctaHref = '#quote',
+} = Astro.props;
+
+const cycle = 12;
+const rotate = hero.rotate ?? [];
+/* Widest word, rendered invisibly, holds the line width steady so the pill
+   does not jump between words (no layout shift, no CLS). */
+const widest = rotate.length
+  ? rotate.reduce((a, b) => (b.length > a.length ? b : a))
+  : '';
+---
+
+<section class="lp-hero lp-hero--center">
+  {slides.length ? (
+    <div class={`lp-hero__slides lp-hero__slides--n${slides.length}`}>
+      {slides.map((slide, i) => (
+        <Image
+          class="lp-hero__bg"
+          src={slide.src}
+          alt={slide.alt}
+          widths={[900, 1600]}
+          sizes="100vw"
+          loading={i === 0 ? 'eager' : 'lazy'}
+          style={`animation-delay:${(i * cycle) / slides.length}s`}
+        />
+      ))}
+    </div>
+  ) : fallbackImage ? (
+    <Image
+      class="lp-hero__bg"
+      src={fallbackImage}
+      alt={hero.imageAlt ?? `${site.business.name} work in ${site.contact.address.locality}`}
+      widths={[900, 1600]}
+      sizes="100vw"
+      loading="eager"
+    />
+  ) : null}
+  <div class={`${wrapClass} lp-hero__center`}>
+    <h1>
+      {hero.headline}
+      {rotate.length ? (
+        <>
+          {' '}
+          <span class="lp-rot lp-rot--pill">
+            {rotate.map((word, i) => (
+              <span class="lp-rot__w" style={`animation-delay:${(i * cycle) / rotate.length}s`}>
+                {word}
+              </span>
+            ))}
+            <span class="lp-rot__w" style="visibility:hidden;animation:none;opacity:1">
+              {widest}
+            </span>
+          </span>
+        </>
+      ) : null}
+    </h1>
+    {hero.sub && <p class="lp-lede lp-lede--center">{hero.sub}</p>}
+    <div class="lp-hero__actions lp-hero__actions--center">
+      <a class="btn btn--accent btn--lg" href={ctaHref}>{hero.cta ?? 'Book a free survey'}</a>
+    </div>
+    <p class="lp-hero__note">
+      {hero.note}
+      {hero.note && <br />}
+      or call <a href={`tel:${site.contact.phoneHref}`}>{site.contact.phone}</a>
+      {hero.hours ? ` — ${hero.hours}` : ''}
+    </p>
+    {rotate.length ? (
+      <ul class="lp-dots" aria-hidden="true">
+        {rotate.map((_, i) => (
+          <li class="lp-dots__d" style={`animation-delay:${(i * cycle) / rotate.length}s`}></li>
+        ))}
+      </ul>
+    ) : null}
+  </div>
+</section>

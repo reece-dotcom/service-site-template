@@ -17,6 +17,7 @@
 import { getCollection } from 'astro:content';
 import LpLayout from '../../layouts/LpLayout.astro';
 import QuoteForm from '../../components/QuoteForm.astro';
+import CenteredHero from '../../components/CenteredHero.astro';
 import ComparisonTable from '../../components/ComparisonTable.astro';
 import { Image } from 'astro:assets';
 import { clientImage } from '../../lib/images.mjs';
@@ -68,63 +69,7 @@ const description = (
   <LpLayout title={title} description={description}>
     <!-- hero -->
     {centered ? (
-      <section class="lp-hero lp-hero--center">
-        {heroSlides.length ? (
-          <div class={`lp-hero__slides lp-hero__slides--n${heroSlides.length}`}>
-            {heroSlides.map((slide, i) => (
-              <Image
-                class="lp-hero__bg"
-                src={slide.src}
-                alt={slide.alt}
-                widths={[900, 1600]}
-                sizes="100vw"
-                loading={i === 0 ? 'eager' : 'lazy'}
-                style={`animation-delay:${(i * 12) / heroSlides.length}s`}
-              />
-            ))}
-          </div>
-        ) : heroImage ? (
-          <Image class="lp-hero__bg" src={heroImage} alt={hero.imageAlt ?? `${site.business.name} work in ${site.contact.address.locality}`} widths={[900, 1600]} sizes="100vw" loading="eager" />
-        ) : null}
-        <div class="lp-wrap lp-hero__center">
-          <h1>
-            {hero.headline}
-            {hero.rotate?.length ? (
-              <>
-                {' '}
-                <span class="lp-rot lp-rot--pill">
-                  {hero.rotate.map((word, i) => (
-                    <span class="lp-rot__w" style={`animation-delay:${(i * 12) / hero.rotate.length}s`}>
-                      {word}
-                    </span>
-                  ))}
-                  {/* invisible sizer: keeps the line width stable, no layout shift */}
-                  <span class="lp-rot__w" style="visibility:hidden;animation:none;opacity:1">
-                    {hero.rotate.reduce((a, b) => (b.length > a.length ? b : a))}
-                  </span>
-                </span>
-              </>
-            ) : null}
-          </h1>
-          {hero.sub && <p class="lp-lede lp-lede--center">{hero.sub}</p>}
-          <div class="lp-hero__actions lp-hero__actions--center">
-            <a class="btn btn--accent btn--lg" href="#quote">{hero.cta ?? 'Book a free survey'}</a>
-          </div>
-          <p class="lp-hero__note">
-            {hero.note}
-            {hero.note && <br />}
-            or call <a href={`tel:${site.contact.phoneHref}`}>{site.contact.phone}</a>
-            {hero.hours ? ` — ${hero.hours}` : ''}
-          </p>
-          {hero.rotate?.length ? (
-            <ul class="lp-dots" aria-hidden="true">
-              {hero.rotate.map((_, i) => (
-                <li class="lp-dots__d" style={`animation-delay:${(i * 12) / hero.rotate.length}s`}></li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-      </section>
+      <CenteredHero hero={hero} slides={heroSlides} fallbackImage={heroImage} />
     ) : (
       <section class="lp-hero">
         <div class="lp-wrap lp-hero__grid">

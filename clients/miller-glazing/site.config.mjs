@@ -170,6 +170,26 @@ export default {
    * /lp/ — advertising landing page. Only the blocks we can stand behind:
    * no statistic, no testimonials, no finance.
    */
+  /* Home page uses the centered hero (same format as /lp/) so the site and the
+     ad landing page look like one business. The H1 keeps the location and the
+     service in it — the rotator is inside the headline, not instead of it. */
+  home: {
+    heroLayout: 'centered',
+    hero: {
+      headline: 'In east London we fit',
+      rotate: ['steel-look doors', 'internal bifolds', 'glass sliders', 'glazed screens'],
+      sub: 'Slim black frames, glass chosen for the room, measured and fitted by the two brothers who run the company. Dagenham, Romford, Barking, Ilford and across Essex.',
+      cta: 'Get a free quote',
+      note: 'One fixed price in writing before anything is ordered. No salesman, no pressure.',
+      slides: [
+        { image: 'job-1.webp', alt: 'Single steel-look internal door with four horizontal panes, fitted off a hallway' },
+        { image: 'job-5.webp', alt: 'Four-leaf steel-look bifold doors between a living room and a kitchen' },
+        { image: 'job-6.webp', alt: 'Top-hung sliding steel-look doors with bronze-tinted glass' },
+        { image: 'job-3.webp', alt: 'Glazed steel-look display cabinet with a lit oak interior and matching doors along the hall' },
+      ],
+    },
+  },
+
   lp: {
     enabled: true,
     title: 'Steel-Look Internal Doors, East London | Miller Glazing',
