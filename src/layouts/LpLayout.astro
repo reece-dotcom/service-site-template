@@ -10,6 +10,7 @@
 import '../styles/global.css';
 import '../styles/lp.css';
 import { site } from '../lib/client.mjs';
+import { derivedVars } from '../lib/theme.mjs';
 import { assertSeo, canonical } from '../lib/seo.mjs';
 
 const { title, description } = Astro.props;
@@ -18,6 +19,7 @@ assertSeo(title, description, Astro.url.pathname);
 
 const url = canonical(Astro.url.pathname);
 const t = site.theme;
+const dv = Object.entries(derivedVars(t)).map(([k, v]) => `${k}:${v};`).join('');
 ---
 
 <!doctype html>
@@ -40,7 +42,7 @@ const t = site.theme;
     <meta name="theme-color" content={t.brand} />
 
     <style is:inline set:html={`:root{
-      --brand:${t.brand};--brand-dark:${t.brandDark};--accent:${t.accent};--accent-ink:${t.accentInk ?? t.ink};
+      --brand:${t.brand};--brand-dark:${t.brandDark};--accent:${t.accent};--accent-ink:${t.accentInk ?? t.ink};${dv}
       --ink:${t.ink};--muted:${t.muted};--surface:${t.surface};
       --font-heading:${t.fontHeading};--font-body:${t.fontBody};}`}></style>
 

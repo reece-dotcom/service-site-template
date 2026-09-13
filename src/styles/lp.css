@@ -34,6 +34,11 @@
 .lp-sec--ink .lp-eyebrow {
   color: #fff;
 }
+.lp-sec--ink .lp-eyebrow::before {
+  background: var(--accent-on-dark);
+}
+.lp-sec--ink a { color: #fff; }
+.lp-sec--ink a:hover { color: var(--accent-on-dark); }
 
 .lp-eyebrow {
   font-size: 0.76rem;

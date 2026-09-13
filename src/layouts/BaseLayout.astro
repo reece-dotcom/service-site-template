@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import '../styles/global.css';
 import { site } from '../lib/client.mjs';
+import { derivedVars } from '../lib/theme.mjs';
 import { assertSeo, canonical, localBusinessSchema } from '../lib/seo.mjs';
 import { alternateLocales, defaultLocale, hreflangSet, normalisePath } from '../lib/i18n.mjs';
 import SiteHeader from '../components/SiteHeader.astro';
@@ -80,6 +81,7 @@ const localeNav = thisLocale
 const htmlLang = thisLocale?.htmlLang ?? defaultLocale();
 const ogLocale = htmlLang.replace('-', '_');
 const t = site.theme;
+const dv = Object.entries(derivedVars(t)).map(([k, v]) => `${k}:${v};`).join('');
 const catalogServices = (await getCollection('services'))
   .filter((s) => !s.data.draft)
   .sort((a, b) => a.data.order - b.data.order)
@@ -121,7 +123,7 @@ const ogImage = image ? new URL(image, site.url).href : undefined;
     <meta name="theme-color" content={t.brand} />
 
     <style is:inline set:html={`:root{
-      --brand:${t.brand};--brand-dark:${t.brandDark};--accent:${t.accent};--accent-ink:${t.accentInk ?? t.ink};
+      --brand:${t.brand};--brand-dark:${t.brandDark};--accent:${t.accent};--accent-ink:${t.accentInk ?? t.ink};${dv}
       --ink:${t.ink};--muted:${t.muted};--surface:${t.surface};
       --font-heading:${t.fontHeading};--font-body:${t.fontBody};}`}></style>
 

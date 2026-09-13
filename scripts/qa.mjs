@@ -11,6 +11,8 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { themeIssues } from '../src/lib/theme.mjs';
 
 const dist = path.resolve(process.cwd(), 'dist');
 const fails = [];
@@ -471,6 +473,16 @@ for (const slug of fs.readdirSync(clientsDir)) {
     if (leaks.length) {
       warns.push(`/lp/: links off the landing page to ${[...new Set(leaks)].join(', ')} — intentional?`);
     }
+  }
+}
+
+// Theme contrast: a black-on-black hover or an invisible footer heading is
+// something the owner spots in the first ten seconds.
+{
+  const cfgPath = path.resolve(process.cwd(), 'clients', active, 'site.config.mjs');
+  if (fs.existsSync(cfgPath)) {
+    const { default: cfg } = await import(pathToFileURL(cfgPath).href);
+    fails.push(...themeIssues(cfg.theme));
   }
 }
 

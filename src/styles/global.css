@@ -130,6 +130,10 @@ img { max-width: 100%; height: auto; display: block; }
 .btn--primary { background: var(--brand); color: #fff; }
 .btn--primary:hover { background: var(--brand-dark); color: #fff; }
 .btn--accent { background: var(--accent); color: var(--accent-ink, var(--ink)); }
+/* Filled buttons keep their own text colour on hover — the global a:hover
+   (brand) would vanish on a brand/accent-coloured button. */
+.btn--accent:hover { background: color-mix(in srgb, var(--accent) 85%, #fff); color: var(--accent-ink, var(--ink)); }
+.btn--ghost:hover { color: var(--brand-dark); }
 .btn--ghost { border-color: currentColor; color: var(--brand-dark); }
 .btn--lg { padding: 1rem 1.9rem; font-size: 1.1rem; }
 .btn--primary, .btn--accent { box-shadow: 0 10px 20px -14px rgb(0 0 0 / 55%); }
