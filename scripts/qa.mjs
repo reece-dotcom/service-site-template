@@ -33,6 +33,9 @@ const htmlFiles = [];
 })(dist);
 
 const routeOf = (f) => '/' + path.relative(dist, f).replace(/index\.html$/, '');
+// Google measures the decoded text: "&amp;" is one character, not five. A
+// business with "&" in its name was failing the title cap on every page.
+const decode = (s) => s?.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
 const pages = htmlFiles.map((f) => ({ route: routeOf(f), html: fs.readFileSync(f, 'utf8') }));
 
 const titles = new Map();
@@ -42,8 +45,8 @@ const linked = new Set(['/']);
 for (const { route, html } of pages) {
   const noindex = /name="robots"[^>]*noindex/.test(html);
 
-  const title = html.match(/<title>([\s\S]*?)<\/title>/)?.[1];
-  const desc = html.match(/<meta name="description" content="([^"]*)"/)?.[1];
+  const title = decode(html.match(/<title>([\s\S]*?)<\/title>/)?.[1]);
+  const desc = decode(html.match(/<meta name="description" content="([^"]*)"/)?.[1]);
   const canon = html.match(/<link rel="canonical" href="([^"]*)"/)?.[1];
   const h1s = html.match(/<h1[\s>]/g)?.length ?? 0;
 
@@ -348,6 +351,10 @@ const shingles = (t) => {
 const mine = bodies(active).map((b) => ({ ...b, s: shingles(b.text) }));
 for (const slug of fs.readdirSync(clientsDir)) {
   if (slug === active) continue;
+  // Prospect demos are never live, so they cannot duplicate anything on the
+  // web. They are still checked as the ACTIVE client, so a demo built by
+  // copying a real client's copy is caught before it is ever promoted.
+  if (slug.startsWith('prospect-')) continue;
   for (const other of bodies(slug)) {
     const os = shingles(other.text);
     for (const m of mine) {

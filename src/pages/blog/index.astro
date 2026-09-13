@@ -18,6 +18,9 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
       <p class="eyebrow">Advice</p>
       <h1>Guides worth reading before you buy</h1>
       <p class="lede">No jargon, no sales pitch — the things we get asked on every survey.</p>
+      {posts.length === 0 && (
+        <p class="empty">The first guides are being written. Ring us in the meantime — we answer the same questions on the phone every week.</p>
+      )}
       {categories.map((cat) => (
         <div class="cat">
           <h2 id={cat.toLowerCase().replace(/\W+/g, '-')}>{cat}</h2>
@@ -40,6 +43,7 @@ const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long'
   <CtaBand />
 </BaseLayout>
 <style>
+  .empty { margin-top: var(--space-8); padding: var(--space-6); background: var(--surface); border-radius: var(--radius-lg); max-width: 60ch; }
   .cat { margin-top: var(--space-12); }
   .cat__grid { margin-top: var(--space-6); }
   .post__h { font-size: 1.2rem; margin-bottom: var(--space-2); }

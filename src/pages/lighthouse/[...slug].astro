@@ -1,0 +1,251 @@
+---
+/**
+ * /lighthouse/ — the one-page Lighthouse Review that goes with a prospect demo.
+ *
+ * Only exists on prospect demos that have a clients/<slug>/lighthouse.mjs.
+ * getStaticPaths returns nothing otherwise, so live client sites never grow a
+ * stray review page. Content is the prospect's own numbers from the call and
+ * the checks in scripts/lighthouse/fetch.mjs — no invented figures, and a
+ * section with no data simply does not render.
+ *
+ * Reads in the prospect's own theme so it looks like part of their site, and
+ * prints to a clean one-pager (header, footer and demo strip hidden).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../lib/client.mjs';
+import { hasLighthouse, lighthouseReview, agency } from '../../lib/demo.mjs';
+
+export async function getStaticPaths() {
+  return hasLighthouse() ? [{ params: { slug: undefined } }] : [];
+}
+
+const r = await lighthouseReview();
+const who = agency();
+const biz = site.business.name;
+
+const title = `Lighthouse Review | ${biz}`.slice(0, 60);
+const description = `What a customer sees when they look for ${biz} online, and the three fixes that would bring in more work.`.slice(0, 160);
+
+const fmtDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+const gbp = (n) => '£' + Math.round(n).toLocaleString('en-GB');
+const ragLabel = { red: 'Needs fixing', amber: 'Could be better', green: 'Working' };
+
+// Review comparison: bars scaled to whoever has the most reviews.
+const you = r.reviews?.you;
+const rivals = (r.reviews?.rivals ?? []).filter((x) => x && x.name);
+const rows = you ? [{ ...you, you: true }, ...rivals] : rivals;
+const maxCount = Math.max(1, ...rows.map((x) => x.count ?? 0));
+
+// Money: only what the owner told us, and only the sums that follow from it.
+const m = r.money ?? {};
+const winRate = m.enquiriesMonth && m.jobsMonth ? Math.min(1, m.jobsMonth / m.enquiriesMonth) : null;
+const perEnquiry = winRate !== null && m.avgJob ? m.avgJob * winRate : null;
+const extra = m.extraEnquiries ?? 5;
+const extraYear = perEnquiry ? perEnquiry * extra * 12 : null;
+const showMoney = Boolean(m.avgJob || m.enquiriesMonth || m.jobsMonth);
+---
+
+<BaseLayout title={title} description={description} noindex={true}>
+  <section class="lh-hero">
+    <div class="container lh-hero__in">
+      <p class="eyebrow lh-hero__eyebrow">Lighthouse Review · {fmtDate(r.date)}</p>
+      <h1>What a customer sees when they look for {biz}</h1>
+      {r.headline && <p class="lede lh-hero__lede">{r.headline}</p>}
+      <p class="lh-hero__for">Prepared for {r.preparedFor ?? site.business.owner?.name ?? biz} by {who.person} at {who.name}.</p>
+    </div>
+  </section>
+
+  {r.areas?.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Right now</p>
+            <h2>The four places a customer checks before they ring</h2>
+          </div>
+          <p class="lede">We looked at each one the way a homeowner would, on a phone, on the day of the call.</p>
+        </div>
+        <div class="grid grid--2 rag">
+          {r.areas.map((a) => (
+            <article class:list={['card', 'rag__card', `rag__card--${a.rag}`]}>
+              <p class:list={['rag__pill', `rag__pill--${a.rag}`]}>{ragLabel[a.rag] ?? a.rag}</p>
+              <h3>{a.name}</h3>
+              <p class="rag__finding">{a.finding}</p>
+              {a.points?.length > 0 && (
+                <ul class="rag__points">
+                  {a.points.map((p) => <li>{p}</li>)}
+                </ul>
+              )}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {rows.length > 0 && (
+    <section class="section section--surface">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Reviews</p>
+            <h2>You against the installers you are losing jobs to</h2>
+          </div>
+          <p class="lede">Google reviews are the first thing a homeowner compares. Counts and ratings as shown on Google Maps on the day of the call.</p>
+        </div>
+        <ol class="bars">
+          {rows.map((x) => (
+            <li class:list={['bars__row', x.you && 'bars__row--you']}>
+              <span class="bars__name">{x.name}{x.you && <em> (you)</em>}</span>
+              <span class="bars__track"><span class="bars__fill" style={`width:${Math.max(2, Math.round(((x.count ?? 0) / maxCount) * 100))}%`}></span></span>
+              <span class="bars__num">{x.count ?? '—'} reviews{x.rating ? ` · ${x.rating}★` : ''}</span>
+            </li>
+          ))}
+        </ol>
+        {r.reviews?.note && <p class="bars__note">{r.reviews.note}</p>}
+      </div>
+    </section>
+  )}
+
+  {showMoney && (
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Your numbers</p>
+            <h2>What one extra enquiry is worth to you</h2>
+          </div>
+          <p class="lede">Worked out from the figures you gave us on the call — rough numbers, but yours.</p>
+        </div>
+        <div class="grid grid--3 money">
+          {m.avgJob && <div class="card money__tile"><strong>{gbp(m.avgJob)}</strong><span>average job</span></div>}
+          {m.enquiriesMonth && <div class="card money__tile"><strong>{m.enquiriesMonth}</strong><span>enquiries a month</span></div>}
+          {m.jobsMonth && <div class="card money__tile"><strong>{m.jobsMonth}</strong><span>jobs won a month</span></div>}
+        </div>
+        {perEnquiry && (
+          <p class="money__sum">
+            You win about <strong>{Math.round(winRate * 100)}%</strong> of enquiries, so each one is worth roughly <strong>{gbp(perEnquiry)}</strong> to you.
+            {extraYear && <> Just {extra} more a month would be <strong>{gbp(extraYear)}</strong> a year.</>}
+          </p>
+        )}
+        {m.note && <p class="money__note">{m.note}</p>}
+      </div>
+    </section>
+  )}
+
+  {r.fixes?.length > 0 && (
+    <section class="section section--surface">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">What to do</p>
+            <h2>The three fixes that matter most, in order</h2>
+          </div>
+          <p class="lede">Not everything we found. Just the three that would change what a customer sees first.</p>
+        </div>
+        <ol class="fixes">
+          {r.fixes.map((f, i) => (
+            <li class="card fixes__item">
+              <span class="fixes__n" aria-hidden="true">{i + 1}</span>
+              <div>
+                <h3>{f.title}</h3>
+                {f.why && <p class="fixes__why">{f.why}</p>}
+                {f.what && <p class="fixes__what"><strong>What we would do:</strong> {f.what}</p>}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )}
+
+  <section class="section lh-next">
+    <div class="container lh-next__in">
+      <div>
+        <p class="eyebrow">Next step</p>
+        <h2>{r.nextHeading ?? 'Twenty minutes on the phone, and you decide'}</h2>
+        <p class="lede lh-next__lede">{r.next ?? `Have a look around the demo site we built from your call. If you like the direction, ring ${who.person} and we will walk through the three fixes and what it costs to do them properly.`}</p>
+      </div>
+      <div class="lh-next__actions">
+        <a class="btn btn--accent btn--lg" href={`tel:${who.phoneHref}`}>Call {who.person} on {who.phone}</a>
+        <a class="btn btn--ghost btn--lg" href="/">See your demo site</a>
+        <a class="lh-next__mail" href={`mailto:${who.email}`}>{who.email}</a>
+      </div>
+    </div>
+  </section>
+
+  {r.sources?.length > 0 && (
+    <section class="section section--tight">
+      <div class="container">
+        <p class="lh-sources">Where the numbers come from: {r.sources.join(' · ')}</p>
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .lh-hero { background: var(--brand-dark); color: #fff; padding-block: clamp(var(--space-12), 6vw, var(--space-24)); }
+  .lh-hero__in { max-width: 62rem; }
+  .lh-hero__eyebrow { color: var(--accent-on-dark); }
+  .lh-hero :global(h1) { color: #fff; margin-top: var(--space-4); }
+  .lh-hero__lede { color: #fff; opacity: 0.92; margin-top: var(--space-6); max-width: 46rem; font-size: 1.3rem; }
+  .lh-hero__for { margin-top: var(--space-8); opacity: 0.7; font-size: 0.95rem; }
+
+  .rag__card { border-left: 6px solid var(--muted); }
+  .rag__card--red { border-left-color: var(--status-bad); }
+  .rag__card--amber { border-left-color: var(--status-warn); }
+  .rag__card--green { border-left-color: var(--status-good); }
+  .rag__pill { display: inline-block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.65rem; border-radius: 999px; color: #fff; margin-bottom: var(--space-4); }
+  .rag__pill--red { background: var(--status-bad); }
+  .rag__pill--amber { background: var(--status-warn); }
+  .rag__pill--green { background: var(--status-good); }
+  .rag__finding { font-size: 1.1rem; margin-top: var(--space-2); }
+  .rag__points { margin-top: var(--space-4); padding-left: 1.2rem; color: var(--muted); display: grid; gap: var(--space-2); font-size: 0.98rem; }
+
+  .bars { list-style: none; padding: 0; display: grid; gap: var(--space-4); }
+  .bars__row { display: grid; grid-template-columns: minmax(8rem, 14rem) 1fr auto; gap: var(--space-4); align-items: center; }
+  .bars__row--you .bars__name { font-weight: 700; }
+  .bars__row--you .bars__fill { background: var(--accent); }
+  .bars__name em { font-style: normal; color: var(--muted); font-weight: 500; }
+  .bars__track { display: block; height: 1.4rem; background: #fff; border: 1px solid var(--hairline); border-radius: 999px; overflow: hidden; }
+  .bars__fill { display: block; height: 100%; background: var(--muted); border-radius: 999px; }
+  .bars__num { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink); font-weight: 600; }
+  .bars__note { margin-top: var(--space-6); color: var(--muted); max-width: 60ch; }
+  @media (max-width: 40rem) {
+    .bars__row { grid-template-columns: 1fr auto; }
+    .bars__track { grid-column: 1 / -1; }
+  }
+
+  .money__tile { text-align: center; }
+  .money__tile strong { display: block; font-family: var(--font-heading); font-size: 2.4rem; line-height: 1.1; color: var(--brand-dark); font-variant-numeric: tabular-nums; }
+  .money__tile span { color: var(--muted); }
+  .money__sum { margin-top: var(--space-8); font-size: 1.25rem; max-width: 60ch; }
+  .money__sum strong { color: var(--brand-dark); }
+  .money__note { margin-top: var(--space-4); color: var(--muted); max-width: 60ch; }
+
+  .fixes { list-style: none; padding: 0; display: grid; gap: var(--space-4); counter-reset: fix; }
+  .fixes__item { display: grid; grid-template-columns: auto 1fr; gap: var(--space-6); align-items: start; }
+  .fixes__n { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--accent); color: var(--accent-ink, var(--ink)); font-family: var(--font-heading); font-weight: 700; font-size: 1.2rem; }
+  .fixes__why { margin-top: var(--space-2); color: var(--muted); }
+  .fixes__what { margin-top: var(--space-3); }
+
+  .lh-next { background: var(--ink); color: #fff; }
+  .lh-next__in { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: var(--space-12); align-items: center; }
+  .lh-next :global(h2) { color: #fff; margin-top: var(--space-3); }
+  .lh-next .eyebrow { color: var(--accent-on-dark); }
+  .lh-next__lede { color: #fff; opacity: 0.85; margin-top: var(--space-4); }
+  .lh-next__actions { display: grid; gap: var(--space-4); justify-items: start; }
+  .lh-next__actions .btn--ghost { color: #fff; border-color: #fff; }
+  .lh-next__actions .btn--ghost:hover { color: var(--accent-on-dark); border-color: var(--accent-on-dark); }
+  .lh-next__mail { color: #fff; opacity: 0.8; }
+  @media (max-width: 52rem) { .lh-next__in { grid-template-columns: 1fr; } }
+
+  .lh-sources { color: var(--muted); font-size: 0.875rem; }
+
+  @media print {
+    :global(.hdr), :global(.ftr), :global(.sticky), :global(.skip-link), .lh-next__actions .btn--ghost { display: none !important; }
+    .lh-hero, .lh-next { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section { padding-block: var(--space-6); break-inside: avoid; }
+    .card { box-shadow: none; }
+  }
+</style>

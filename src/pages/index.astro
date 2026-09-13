@@ -27,7 +27,9 @@ const services = (await getCollection('services'))
   .sort((a, b) => a.data.order - b.data.order);
 const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
 
-const title = `${site.business.name} | Windows & Doors in ${site.contact.address.locality}`;
+// `business.homeTitle` overrides the default, which reads badly when the
+// business name already contains "Windows & Doors".
+const title = site.business.homeTitle ?? `${site.business.name} | Windows & Doors in ${site.contact.address.locality}`;
 const description = site.business.description.slice(0, 160);
 const homeFaqs = site.business.homeFaqs ?? site.business.about?.faqs ?? [];
 const schemas = services.map((s) =>

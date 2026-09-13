@@ -1,0 +1,109 @@
+{
+  "fetchedAt": "2026-09-13T14:27:03.050Z",
+  "slug": "prospect-riverside-windows-and-doors",
+  "aliasUrl": "https://riverside-windows-and-doors--glazeos-demos.netlify.app",
+  "close": {
+    "leadId": "lead_WamwFlEnNKdnrjoQ5iItkTTyUItUdsHwCO1vJUV6bsI",
+    "url": "https://app.close.com/lead/lead_WamwFlEnNKdnrjoQ5iItkTTyUItUdsHwCO1vJUV6bsI/",
+    "name": "Riverside Windows & Doors",
+    "demoUrl": null
+  },
+  "business": {
+    "name": "Riverside Windows & Doors",
+    "legalName": "Riverside Windows & Doors",
+    "owner": "Dave Riley",
+    "mobile": "07700 900321",
+    "email": "dave@riversidewindows.example",
+    "postcode": "CM2 6XX",
+    "town": "Chelmsford",
+    "website": "https://glazeos-village-glazing.netlify.app",
+    "websiteStatus": null,
+    "products": [
+      "uPVC windows",
+      "composite doors",
+      "bi-fold doors",
+      "conservatories"
+    ],
+    "mostWanted": "Wants more bi-fold jobs",
+    "towns": [
+      "Chelmsford",
+      "Braintree",
+      "Witham",
+      "Maldon"
+    ],
+    "keywords": [
+      "upvc windows chelmsford",
+      "composite doors chelmsford",
+      "bifold doors chelmsford",
+      "double glazing chelmsford",
+      "double glazing braintree"
+    ],
+    "customerWords": "new windows chelmsford",
+    "startedTrading": "2011",
+    "guarantee": "10 years, insurance-backed",
+    "accreditations": [
+      "FENSA",
+      "GGF"
+    ],
+    "otherClaims": "Site says \"over 20 years experience\"",
+    "cps": "FENSA"
+  },
+  "reviews": {
+    "googleCount": 14,
+    "googleRating": 4.9,
+    "jobsLastYear": 160,
+    "elsewhere": "Checkatrade 38 at 9.7",
+    "howTheyAsk": "Sometimes texts a link, not consistent",
+    "gmbLink": "https://maps.app.goo.gl/example",
+    "gmbStatus": null
+  },
+  "rivals": [
+    {
+      "name": "Chelmsford Windows Ltd",
+      "count": 212,
+      "rating": 4.3
+    }
+  ],
+  "social": {
+    "facebook": "https://facebook.com/riversidewindows",
+    "instagram": null
+  },
+  "money": {
+    "avgJob": 5200,
+    "enquiriesMonth": 18,
+    "jobsMonth": 7,
+    "workComesFrom": [
+      "referrals",
+      "Checkatrade / directories"
+    ]
+  },
+  "testEnquiryOk": "Yes",
+  "callNotes": "Dave does the surveys himself, one fitting team of 3. Hates the Anglian-style hard sell and says customers tell him the same. Facebook page last posted Christmas. Wants Chelmsford and Braintree first.",
+  "callStatus": "Ready for audit",
+  "callDate": "2026-09-13T14:22:47.606000+00:00",
+  "website": {
+    "url": "https://glazeos-village-glazing.netlify.app",
+    "finalUrl": "https://glazeos-village-glazing.netlify.app/",
+    "status": 200,
+    "https": true,
+    "title": "Village Glazing Repairs | Windows &amp; Doors in Wallasey",
+    "metaDescription": "Window and door repairs across Wallasey and the Wirral: locks, hinges, handles, multipoint mechanisms, misted double glazed units and lead lights. 21 years expe",
+    "viewportMeta": true,
+    "tapToCall": true,
+    "hasForm": true,
+    "accreditationsMentioned": [],
+    "reviewsMentioned": true,
+    "wordCount": 664,
+    "imageCount": 7,
+    "builder": null,
+    "lighthouse": {
+      "performance": 98,
+      "seo": 100,
+      "accessibility": 96,
+      "lcp": "1.3 s",
+      "cls": "0",
+      "tbt": "10 ms",
+      "pageWeightKb": 131
+    }
+  }
+}

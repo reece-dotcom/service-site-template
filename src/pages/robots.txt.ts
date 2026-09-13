@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { site } from '../lib/client.mjs';
+import { isDemo } from '../lib/demo.mjs';
 
 /**
  * Two different kinds of AI crawler, deliberately treated differently:
@@ -27,11 +28,13 @@ const TRAINING_BOTS = [
 const ANSWER_BOTS = ['OAI-SearchBot', 'ChatGPT-User', 'Claude-SearchBot', 'PerplexityBot'];
 
 export const GET: APIRoute = () => {
+  // A prospect demo is closed to every crawler. The per-bot blocks below stay
+  // so the QA checks (and the file's shape) are the same as a live site.
+  const general = isDemo()
+    ? ['User-agent: *', 'Disallow: /', 'Disallow: /lp/']
+    : ['User-agent: *', 'Allow: /', 'Disallow: /thank-you/', 'Disallow: /lp/'];
   const body = [
-    'User-agent: *',
-    'Allow: /',
-    'Disallow: /thank-you/',
-    'Disallow: /lp/',
+    ...general,
     '',
     '# Answer engines: allowed — these send referral traffic.',
     ...ANSWER_BOTS.flatMap((bot) => [`User-agent: ${bot}`, 'Allow: /', '']),

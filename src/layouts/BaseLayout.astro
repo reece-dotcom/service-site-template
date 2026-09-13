@@ -8,6 +8,8 @@ import { alternateLocales, defaultLocale, hreflangSet, normalisePath } from '../
 import SiteHeader from '../components/SiteHeader.astro';
 import StickyCta from '../components/StickyCta.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import DemoBar from '../components/DemoBar.astro';
+import { isDemo } from '../lib/demo.mjs';
 
 const {
   title,
@@ -51,7 +53,8 @@ const alternates = siblings.length ? hreflangSet(enPathOfThisPage, siblings) : [
 // An unreviewed translation stays out of the index until a native speaker has
 // signed it off. See src/lib/i18n.mjs for why this is not optional.
 const localeNoindex = Boolean(thisLocale && !thisLocale.reviewed);
-const isNoindex = noindex || localeNoindex;
+// A prospect demo is never indexed — see src/lib/demo.mjs.
+const isNoindex = noindex || localeNoindex || isDemo();
 
 // The other-language link for the header switcher.
 const switcher = thisLocale
@@ -139,6 +142,7 @@ const ogImage = image ? new URL(image, site.url).href : undefined;
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
+    {isDemo() && <DemoBar />}
     <SiteHeader
       switcher={switcher}
       navOverride={localeNav}
