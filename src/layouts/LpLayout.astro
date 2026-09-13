@@ -15,7 +15,10 @@ import { assertSeo, canonical } from '../lib/seo.mjs';
 import { lpAnnounce, lpConfig } from '../lib/lp.mjs';
 
 const announce = lpAnnounce();
-const dark = lpConfig().heroLayout === 'centered';
+const lp = lpConfig();
+const dark = lp.heroLayout === 'centered';
+/* Opt-out, not opt-in: every client wants a tappable phone number on mobile. */
+const sticky = lp.stickyBar !== false;
 
 const { title, description } = Astro.props;
 
@@ -77,6 +80,14 @@ const dv = Object.entries(derivedVars(t)).map(([k, v]) => `${k}:${v};`).join('')
       </div>
     </header>
     <main><slot /></main>
+    {sticky && (
+      /* Sticky mobile action bar: most ad traffic here is a phone, and the
+         header CTA scrolls away. Hidden on desktop, where the header stays. */
+      <div class="lp-sticky">
+        <a class="lp-sticky__call" href={`tel:${site.contact.phoneHref}`}>Call {site.contact.phone}</a>
+        <a class="lp-sticky__quote" href="#quote">{lp.stickyCta ?? 'Get a fixed price'}</a>
+      </div>
+    )}
     <footer class="lp-foot">
       <div class="lp-wrap">
         <p>

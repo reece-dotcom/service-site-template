@@ -50,6 +50,11 @@ const steps = lp.steps ?? site.business.process ?? [];
 const faqs = lp.faqs ?? site.business.homeFaqs ?? site.business.about?.faqs ?? [];
 const centered = lp.heroLayout === 'centered';
 const heroImage = centered ? clientImage(lp.hero?.image) : null;
+/* Hero carousel: one photo per rotating word, resolved in the same order.
+   Falls back to the single hero.image when no slides are configured. */
+const heroSlides = centered
+  ? (lp.hero?.slides ?? []).map((slide) => ({ ...slide, src: clientImage(slide.image) }))
+  : [];
 const ownerPhoto = clientImage(lp.owner?.photo ?? site.business.about?.photo);
 
 const title = (lp.title ?? `${site.business.name} | Free quote`).slice(0, 60);
@@ -64,9 +69,23 @@ const description = (
     <!-- hero -->
     {centered ? (
       <section class="lp-hero lp-hero--center">
-        {heroImage && (
+        {heroSlides.length ? (
+          <div class={`lp-hero__slides lp-hero__slides--n${heroSlides.length}`}>
+            {heroSlides.map((slide, i) => (
+              <Image
+                class="lp-hero__bg"
+                src={slide.src}
+                alt={slide.alt}
+                widths={[900, 1600]}
+                sizes="100vw"
+                loading={i === 0 ? 'eager' : 'lazy'}
+                style={`animation-delay:${(i * 12) / heroSlides.length}s`}
+              />
+            ))}
+          </div>
+        ) : heroImage ? (
           <Image class="lp-hero__bg" src={heroImage} alt={hero.imageAlt ?? `${site.business.name} work in ${site.contact.address.locality}`} widths={[900, 1600]} sizes="100vw" loading="eager" />
-        )}
+        ) : null}
         <div class="lp-wrap lp-hero__center">
           <h1>
             {hero.headline}

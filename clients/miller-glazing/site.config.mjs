@@ -186,6 +186,15 @@ export default {
     hero: {
       image: 'job-6.webp',
       imageAlt: 'Top-hung sliding steel-look doors with bronze-tinted glass, fitted by Miller Glazing',
+      /* One photo per rotating word, in the same order, so the picture always
+         shows the job the headline is naming. All six are Liam and Kai's own
+         work; no stock. */
+      slides: [
+        { image: 'job-1.webp', alt: 'Single steel-look internal door with four horizontal panes, fitted off a hallway' },
+        { image: 'job-5.webp', alt: 'Four-leaf steel-look bifold doors between a living room and a kitchen' },
+        { image: 'job-6.webp', alt: 'Top-hung sliding steel-look doors with bronze-tinted glass' },
+        { image: 'job-3.webp', alt: 'Glazed steel-look display cabinet with a lit oak interior and matching doors along the hall' },
+      ],
       cta: 'Book a free survey',
       note: 'One fixed price in writing before anything is ordered. No salesman, no pressure.',
       eyebrow: 'Dagenham · east London · Essex',

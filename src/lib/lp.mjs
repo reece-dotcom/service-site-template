@@ -46,6 +46,35 @@ export function lpHero() {
   if (hero.rotate && hero.rotate.length < 2) {
     fail('lp.hero.rotate needs at least two words, or omit it');
   }
+  /**
+   * Optional hero carousel: one photo per rotating word, in the same order,
+   * so the picture always shows the thing the headline is naming. The CSS
+   * keyframes only exist for 2-5 slides, and a mismatched count would show a
+   * bifold photo above the word "sliders", so both are hard failures.
+   */
+  if (hero.slides) {
+    if (!hero.rotate) {
+      fail('lp.hero.slides needs lp.hero.rotate — each slide pairs with one word');
+    }
+    if (hero.slides.length !== hero.rotate.length) {
+      fail(
+        `lp.hero.slides has ${hero.slides.length} photo(s) but lp.hero.rotate has ` +
+          `${hero.rotate.length} word(s) — the carousel is synced to the words, ` +
+          'so the counts must match'
+      );
+    }
+    if (hero.slides.length > 5) {
+      fail('lp.hero.slides supports at most 5 photos');
+    }
+    hero.slides.forEach((slide, i) => {
+      if (!slide.image) fail(`lp.hero.slides[${i}].image is required`);
+      if (!slide.alt) {
+        fail(
+          `lp.hero.slides[${i}].alt is required — describe the work in the photo`
+        );
+      }
+    });
+  }
   return hero;
 }
 

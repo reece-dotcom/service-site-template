@@ -169,6 +169,43 @@
      headline keeps AA contrast on every crop. */
   opacity: 0.34;
 }
+/* Hero carousel — one photo per rotating word, same order, same 12s cycle,
+   so the picture always shows the thing the headline is naming. Pure CSS:
+   the wrapper carries the dimming, the slides only crossfade opacity 0->1.
+   Keyframes exist per slide count because CSS cannot parameterise them. */
+.lp-hero__slides {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: 0.34;
+}
+.lp-hero__slides .lp-hero__bg {
+  z-index: auto;
+  opacity: 0;
+  animation: lp-slide-n4 12s linear infinite;
+}
+.lp-hero__slides--n2 .lp-hero__bg { animation-name: lp-slide-n2; }
+.lp-hero__slides--n3 .lp-hero__bg { animation-name: lp-slide-n3; }
+.lp-hero__slides--n4 .lp-hero__bg { animation-name: lp-slide-n4; }
+.lp-hero__slides--n5 .lp-hero__bg { animation-name: lp-slide-n5; }
+@keyframes lp-slide-n2 {
+  0% { opacity: 0; } 5%, 50% { opacity: 1; } 55%, 100% { opacity: 0; }
+}
+@keyframes lp-slide-n3 {
+  0% { opacity: 0; } 5%, 33.3% { opacity: 1; } 38.3%, 100% { opacity: 0; }
+}
+@keyframes lp-slide-n4 {
+  0% { opacity: 0; } 5%, 25% { opacity: 1; } 30%, 100% { opacity: 0; }
+}
+@keyframes lp-slide-n5 {
+  0% { opacity: 0; } 5%, 20% { opacity: 1; } 25%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* No cycling: the first photo simply stays, matching the static first word. */
+  .lp-hero__slides .lp-hero__bg { animation: none; opacity: 0; }
+  .lp-hero__slides .lp-hero__bg:first-child { opacity: 1; }
+}
+
 .lp-hero--center::after {
   content: '';
   position: absolute;
@@ -573,4 +610,47 @@
   .lp-stat {
     grid-template-columns: 1fr;
   }
+}
+
+/* Sticky mobile action bar (from the artifact). Two thumb-sized targets, both
+   above the iOS home bar; desktop keeps the header CTA instead. */
+.lp-sticky {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line);
+}
+.lp-sticky a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  line-height: 1.2;
+}
+.lp-sticky__call {
+  background: var(--brand);
+  color: var(--accent-ink, #fff);
+}
+.lp-sticky__quote {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line-strong, var(--line));
+}
+/* The bar covers the last of the page, so give the footer room to clear it. */
+.lp .lp-foot { padding-bottom: 6rem; }
+@media (min-width: 52rem) {
+  .lp-sticky { display: none; }
+  .lp .lp-foot { padding-bottom: var(--space-8); }
 }
