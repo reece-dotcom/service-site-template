@@ -1,7 +1,9 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import { site } from './src/lib/client.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { site, CLIENT } from './src/lib/client.mjs';
 
 // Translated pages stay out of the sitemap until a native speaker has reviewed
 // them (see src/lib/i18n.mjs). Unreviewed machine translation that Google has
@@ -9,6 +11,27 @@ import { site } from './src/lib/client.mjs';
 const unreviewedPrefixes = (site.locales?.alternates ?? [])
   .filter((l) => !l.reviewed)
   .map((l) => `${l.prefix}/`);
+
+// Virtual module listing only the active client's images. A plain
+// import.meta.glob over clients/*/images/ (eager or lazy) makes Vite emit every
+// client's photos into every client's dist/ — 8 MB of strangers' images per build.
+const VIRTUAL_ID = 'virtual:client-images';
+const clientImagesPlugin = {
+  name: 'glazeos-client-images',
+  resolveId(id) {
+    return id === VIRTUAL_ID ? '\0' + VIRTUAL_ID : null;
+  },
+  load(id) {
+    if (id !== '\0' + VIRTUAL_ID) return null;
+    const dir = path.resolve('clients', CLIENT, 'images');
+    const files = fs.existsSync(dir)
+      ? fs.readdirSync(dir).filter((f) => /\.(webp|jpe?g|png|avif)$/i.test(f))
+      : [];
+    const imports = files.map((f, i) => `import i${i} from '/clients/${CLIENT}/images/${f}';`);
+    const entries = files.map((f, i) => `${JSON.stringify(f)}: i${i}`);
+    return `${imports.join('\n')}\nexport default { ${entries.join(', ')} };`;
+  },
+};
 
 // Multi-tenant: the active client comes from the CLIENT env var.
 // One Netlify site per client, all building from this one repo.
@@ -47,4 +70,5 @@ export default defineConfig({
   ],
   image: { service: { entrypoint: 'astro/assets/services/sharp' } },
   prefetch: false,
+  vite: { plugins: [clientImagesPlugin] },
 });
