@@ -98,6 +98,39 @@
   letter-spacing: -0.01em;
 }
 
+/* ---------- announcement strip ---------- */
+.lp-announce {
+  background: linear-gradient(90deg, var(--ink) 0%, var(--brand-dark, var(--ink)) 100%);
+  color: #fff;
+  text-align: center;
+}
+.lp-announce p {
+  margin: 0;
+  padding-block: 0.55rem;
+  font-weight: 650;
+  font-size: 0.98rem;
+}
+.lp-announce__basis {
+  padding-top: 0 !important;
+  padding-bottom: 0.55rem !important;
+  font-weight: 400 !important;
+  font-size: 0.78rem !important;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.lp-bar--dark {
+  background: rgba(17, 17, 17, 0.92);
+  border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+.lp-bar--dark .lp-bar__name { color: #fff; }
+.lp-bar--dark .btn--accent {
+  background: #fff;
+  color: var(--ink);
+  border-color: #fff;
+}
+
+.lp-sec--tight { padding-block: clamp(1.4rem, 2.6vw, 2.2rem); }
+
 /* ---------- hero ---------- */
 .lp-hero {
   padding-block: clamp(2.5rem, 6vw, 4.5rem);
@@ -113,6 +146,119 @@
   line-height: 1.02;
   letter-spacing: -0.03em;
   margin: 0;
+}
+
+/* ---------- centered dark hero (artifact format) ---------- */
+.lp-hero--center {
+  position: relative;
+  isolation: isolate;
+  background: var(--ink);
+  color: #fff;
+  text-align: center;
+  padding-block: clamp(3.5rem, 9vw, 7rem);
+  overflow: hidden;
+}
+.lp-hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  /* The photo is atmosphere, not information: pushed well back so the
+     headline keeps AA contrast on every crop. */
+  opacity: 0.34;
+}
+.lp-hero--center::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(120% 90% at 50% 40%, rgba(17, 17, 17, 0.55) 0%, rgba(17, 17, 17, 0.88) 70%);
+}
+.lp-hero__center {
+  display: grid;
+  justify-items: center;
+}
+.lp-hero--center h1 {
+  font-size: clamp(2.4rem, 6.4vw, 4.6rem);
+  max-width: 22ch;
+}
+.lp-lede--center {
+  max-width: 40ch;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: clamp(1.05rem, 2.1vw, 1.3rem);
+  text-align: center;
+}
+.lp-hero__actions--center {
+  justify-content: center;
+  margin-top: var(--space-7, 2rem);
+}
+.lp-hero--center .btn--accent {
+  background: #fff;
+  color: var(--ink);
+  border-color: #fff;
+}
+.lp-hero--center .btn--accent:hover {
+  background: rgba(255, 255, 255, 0.86);
+  border-color: rgba(255, 255, 255, 0.86);
+}
+.lp-hero__note {
+  margin: var(--space-5, 1.25rem) 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.93rem;
+  line-height: 1.6;
+}
+.lp-hero__note a {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Slide dots: decorative, they mirror the rotating word's 12s cycle. */
+.lp-dots {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: var(--space-6, 1.5rem) 0 0;
+}
+.lp-dots__d {
+  width: 1.6rem;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.28);
+  animation: lp-dot 12s linear infinite;
+}
+@keyframes lp-dot {
+  0%, 2% { background: rgba(255, 255, 255, 0.28); }
+  5%, 22% { background: #fff; }
+  27%, 100% { background: rgba(255, 255, 255, 0.28); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-dots { display: none; }
+}
+
+/* Rotating word in a pill, as the artifact draws it. */
+.lp-rot--pill {
+  /* The pill itself stays solid and only the word inside it crossfades — an
+     animated background flashes on every hand-over and reads as a bug. Width
+     is held by the invisible sizer span, so the pill never resizes either. */
+  color: var(--ink);
+  background: #fff;
+  border-radius: 0.55rem;
+  padding: 0 0.35em;
+}
+
+.lp-hero__points--row {
+  grid-auto-flow: row;
+  gap: var(--space-3);
+  margin: 0;
+}
+@media (min-width: 52rem) {
+  .lp-hero__points--row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 4vw, 3rem);
+  }
 }
 
 /* Rotating word: each span holds the row for its slot, then hands over.

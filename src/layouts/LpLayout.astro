@@ -12,6 +12,10 @@ import '../styles/lp.css';
 import { site } from '../lib/client.mjs';
 import { derivedVars } from '../lib/theme.mjs';
 import { assertSeo, canonical } from '../lib/seo.mjs';
+import { lpAnnounce, lpConfig } from '../lib/lp.mjs';
+
+const announce = lpAnnounce();
+const dark = lpConfig().heroLayout === 'centered';
 
 const { title, description } = Astro.props;
 
@@ -56,7 +60,15 @@ const dv = Object.entries(derivedVars(t)).map(([k, v]) => `${k}:${v};`).join('')
   </head>
   <body class="lp">
     <a class="skip-link" href="#quote">Skip to the quote form</a>
-    <header class="lp-bar">
+    {announce && (
+      <div class="lp-announce">
+        <div class="lp-wrap">
+          <p>{announce.text}</p>
+          {announce.basis && <p class="lp-announce__basis">{announce.basis}</p>}
+        </div>
+      </div>
+    )}
+    <header class={`lp-bar${dark ? ' lp-bar--dark' : ''}`}>
       <div class="lp-wrap lp-bar__inner">
         <span class="lp-bar__name">{site.business.name}</span>
         <a class="btn btn--accent lp-bar__cta" href={`tel:${site.contact.phoneHref}`}>

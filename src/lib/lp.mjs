@@ -96,6 +96,34 @@ export function lpJobs() {
 }
 
 /**
+ * Announcement strip above the header (the artifact's green bar).
+ *
+ * That strip is the most-read line on the page, and the artifact fills it with
+ * "The only [Town] installer offering a 15-year guarantee" — a superlative and
+ * a comparative claim in nine words. Under the CPRs the trader must be able to
+ * substantiate both, so a superlative here needs a `basis`, which is printed as
+ * the small print beneath it.
+ */
+const SUPERLATIVES = /\b(only|best|cheapest|number one|no\.?\s?1|leading|largest|fastest|most trusted)\b/i;
+
+export function lpAnnounce() {
+  const a = lpConfig().announce;
+  if (!a) return null;
+  const text = typeof a === 'string' ? a : a.text;
+  if (!text) fail('lp.announce needs `text`');
+  const basis = typeof a === 'string' ? null : a.basis;
+  if (SUPERLATIVES.test(text) && !basis) {
+    fail(
+      `lp.announce "${text}" makes a superlative or comparative claim. Supply ` +
+        '`basis` with the evidence (and be ready to show it), or reword it. ' +
+        'The CMA can fine the trader directly for an unsubstantiated "only ' +
+        'installer in town" line.'
+    );
+  }
+  return { text, basis };
+}
+
+/**
  * Consumer-credit block. Requires the FCA firm reference number of the
  * authorised lender or broker, plus the representative example — without
  * both, advertising finance is a regulated-activity breach.

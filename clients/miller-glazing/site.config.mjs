@@ -175,7 +175,19 @@ export default {
     title: 'Steel-Look Internal Doors, East London | Miller Glazing',
     description:
       'Steel-look internal glass doors, bifolds and sliders measured and fitted across east London and Essex by a family-run glazing company. Fixed price in writing.',
+    /**
+     * Centered dark hero, the artifact's format. `announce` is deliberately a
+     * checkable fact rather than the artifact's "only installer offering a
+     * 15-year guarantee" — he has no such guarantee, and a superlative there
+     * needs substantiation the client does not have.
+     */
+    heroLayout: 'centered',
+    announce: 'Steel-look internal doors, measured and fitted by the two brothers who own the company',
     hero: {
+      image: 'job-6.webp',
+      imageAlt: 'Top-hung sliding steel-look doors with bronze-tinted glass, fitted by Miller Glazing',
+      cta: 'Book a free survey',
+      note: 'One fixed price in writing before anything is ordered. No salesman, no pressure.',
       eyebrow: 'Dagenham · east London · Essex',
       headline: 'We fit',
       rotate: ['steel-look doors', 'internal bifolds', 'glass sliders', 'glazed screens'],

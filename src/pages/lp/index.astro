@@ -48,6 +48,8 @@ const jobTypes = enabled ? lpJobTypes() : [];
 const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
 const steps = lp.steps ?? site.business.process ?? [];
 const faqs = lp.faqs ?? site.business.homeFaqs ?? site.business.about?.faqs ?? [];
+const centered = lp.heroLayout === 'centered';
+const heroImage = centered ? clientImage(lp.hero?.image) : null;
 const ownerPhoto = clientImage(lp.owner?.photo ?? site.business.about?.photo);
 
 const title = (lp.title ?? `${site.business.name} | Free quote`).slice(0, 60);
@@ -60,21 +62,20 @@ const description = (
 {enabled ? (
   <LpLayout title={title} description={description}>
     <!-- hero -->
-    <section class="lp-hero">
-      <div class="lp-wrap lp-hero__grid">
-        <div>
-          <p class="lp-eyebrow">{hero.eyebrow ?? site.contact.address.locality}</p>
+    {centered ? (
+      <section class="lp-hero lp-hero--center">
+        {heroImage && (
+          <Image class="lp-hero__bg" src={heroImage} alt={hero.imageAlt ?? `${site.business.name} work in ${site.contact.address.locality}`} widths={[900, 1600]} sizes="100vw" loading="eager" />
+        )}
+        <div class="lp-wrap lp-hero__center">
           <h1>
             {hero.headline}
             {hero.rotate?.length ? (
               <>
                 {' '}
-                <span class="lp-rot">
+                <span class="lp-rot lp-rot--pill">
                   {hero.rotate.map((word, i) => (
-                    <span
-                      class="lp-rot__w"
-                      style={`animation-delay:${(i * 12) / hero.rotate.length}s`}
-                    >
+                    <span class="lp-rot__w" style={`animation-delay:${(i * 12) / hero.rotate.length}s`}>
                       {word}
                     </span>
                   ))}
@@ -86,22 +87,75 @@ const description = (
               </>
             ) : null}
           </h1>
-          {hero.sub && <p class="lp-lede">{hero.sub}</p>}
-          {hero.points?.length ? (
-            <ul class="lp-hero__points">
-              {hero.points.map((p) => <li>{p}</li>)}
+          {hero.sub && <p class="lp-lede lp-lede--center">{hero.sub}</p>}
+          <div class="lp-hero__actions lp-hero__actions--center">
+            <a class="btn btn--accent btn--lg" href="#quote">{hero.cta ?? 'Book a free survey'}</a>
+          </div>
+          <p class="lp-hero__note">
+            {hero.note}
+            {hero.note && <br />}
+            or call <a href={`tel:${site.contact.phoneHref}`}>{site.contact.phone}</a>
+            {hero.hours ? ` — ${hero.hours}` : ''}
+          </p>
+          {hero.rotate?.length ? (
+            <ul class="lp-dots" aria-hidden="true">
+              {hero.rotate.map((_, i) => (
+                <li class="lp-dots__d" style={`animation-delay:${(i * 12) / hero.rotate.length}s`}></li>
+              ))}
             </ul>
           ) : null}
-          <div class="lp-hero__actions">
-            <a class="btn btn--accent btn--lg" href={`tel:${site.contact.phoneHref}`}>
-              Call {site.contact.phone}
-            </a>
-            <a class="btn" href="#quote">Get a price</a>
-          </div>
         </div>
-        <QuoteForm heading={lp.formHeading ?? 'Tell us what the job is'} compact={true} id="quote-top" />
-      </div>
-    </section>
+      </section>
+    ) : (
+      <section class="lp-hero">
+        <div class="lp-wrap lp-hero__grid">
+          <div>
+            <p class="lp-eyebrow">{hero.eyebrow ?? site.contact.address.locality}</p>
+            <h1>
+              {hero.headline}
+              {hero.rotate?.length ? (
+                <>
+                  {' '}
+                  <span class="lp-rot">
+                    {hero.rotate.map((word, i) => (
+                      <span class="lp-rot__w" style={`animation-delay:${(i * 12) / hero.rotate.length}s`}>
+                        {word}
+                      </span>
+                    ))}
+                    <span class="lp-rot__w" style="visibility:hidden;animation:none;opacity:1">
+                      {hero.rotate.reduce((a, b) => (b.length > a.length ? b : a))}
+                    </span>
+                  </span>
+                </>
+              ) : null}
+            </h1>
+            {hero.sub && <p class="lp-lede">{hero.sub}</p>}
+            {hero.points?.length ? (
+              <ul class="lp-hero__points">
+                {hero.points.map((p) => <li>{p}</li>)}
+              </ul>
+            ) : null}
+            <div class="lp-hero__actions">
+              <a class="btn btn--accent btn--lg" href={`tel:${site.contact.phoneHref}`}>
+                Call {site.contact.phone}
+              </a>
+              <a class="btn" href="#quote">Get a price</a>
+            </div>
+          </div>
+          <QuoteForm heading={lp.formHeading ?? 'Tell us what the job is'} compact={true} id="quote-top" />
+        </div>
+      </section>
+    )}
+
+    {centered && hero.points?.length ? (
+      <section class="lp-sec lp-sec--tight lp-sec--alt">
+        <div class="lp-wrap">
+          <ul class="lp-hero__points lp-hero__points--row">
+            {hero.points.map((p) => <li>{p}</li>)}
+          </ul>
+        </div>
+      </section>
+    ) : null}
 
     <!-- job picker -->
     {jobTypes.length ? (
