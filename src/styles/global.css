@@ -2,7 +2,8 @@
  * Design tokens only. Components must never use arbitrary hex values.
  * The colour tokens are injected per client from clients/<slug>/site.config.mjs
  * theme block (see BaseLayout.astro). Type and shape follow the Glazing Master
- * Template: Mona Sans, pill buttons, 12/16/20px radii.
+ * Template with the Entrepreneurs Circle weight: Nunito (stand-in for Museo
+ * Sans Rounded), heavy headings, pill buttons, 12/16/20px radii.
  */
 :root {
   --space-1: 0.25rem;
@@ -70,12 +71,12 @@ h1, h2, h3, h4 {
   line-height: 1.1;
   letter-spacing: -0.025em;
   text-wrap: balance;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 h1 { font-size: clamp(2.1rem, 1.35rem + 3vw, 3.5rem); letter-spacing: -0.03em; }
 h2 { font-size: clamp(1.7rem, 1.2rem + 1.6vw, 2.4rem); }
-h3 { font-size: 1.2rem; letter-spacing: -0.015em; line-height: 1.25; }
+h3 { font-size: 1.2rem; letter-spacing: -0.015em; line-height: 1.25; font-weight: 700; }
 p { text-wrap: pretty; }
 
 a { color: var(--brand-dark); text-underline-offset: 3px; }
@@ -141,7 +142,7 @@ img { max-width: 100%; height: auto; display: block; }
   padding: 0.875rem 1.65rem;
   border-radius: var(--radius-pill);
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
   border: 0;
   transition: background-color 0.25s, transform 0.35s var(--ease-out), box-shadow 0.35s;
