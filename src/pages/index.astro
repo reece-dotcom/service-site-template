@@ -1,108 +1,14 @@
 ---
 /**
- * Home page — the Glazing Master Template, section for section:
- *   hero (nav inside, rotating word, photo carousel) → stats → trust logos →
- *   Google reviews → job panes → direct answer → proof stat → five steps →
- *   guarantee grid → recent jobs → comparison → owner → coverage → finance →
- *   FAQ → final CTA with the form.
- * Every section reads its data through src/lib/home.mjs and renders nothing
- * when the client has not given us that fact. The claim guards in lp.mjs
- * apply here too.
+ * HOME PAGE = the Glazing Master Template, verbatim. All assembly happens in
+ * src/lib/template-home.mjs; this page only renders the result.
  */
-import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SiteHeader from '../components/SiteHeader.astro';
-import CenteredHero from '../components/CenteredHero.astro';
-import StatsBox from '../components/StatsBox.astro';
-import TrustCard from '../components/TrustCard.astro';
-import ReviewsBand from '../components/ReviewsBand.astro';
-import JobPanes from '../components/JobPanes.astro';
-import AnswerBlock from '../components/AnswerBlock.astro';
-import ProofStat from '../components/ProofStat.astro';
-import ProcessSteps from '../components/ProcessSteps.astro';
-import GuaranteeGrid from '../components/GuaranteeGrid.astro';
-import Jobs from '../components/Jobs.astro';
-import ComparisonTable from '../components/ComparisonTable.astro';
-import OwnerBand from '../components/OwnerBand.astro';
-import Coverage from '../components/Coverage.astro';
-import FinancePanel from '../components/FinancePanel.astro';
-import FaqList from '../components/FaqList.astro';
-import FinalCta from '../components/FinalCta.astro';
-import { clientImage } from '../lib/images.mjs';
-import { site } from '../lib/client.mjs';
-import { canonical, serviceSchema, faqSchema } from '../lib/seo.mjs';
-import {
-  homeHero, homeAnnounce, homeStats, homeStat, homeJobs, homePromises, homeFinance, homePanes,
-} from '../lib/home.mjs';
-
-const services = (await getCollection('services'))
-  .filter((s) => !s.data.draft)
-  .sort((a, b) => a.data.order - b.data.order);
-
-// `business.homeTitle` overrides the default, which reads badly when the
-// business name already contains "Windows & Doors".
-const title = site.business.homeTitle ?? `${site.business.name} | Windows & Doors in ${site.contact.address.locality}`;
-const description = site.business.description.slice(0, 160);
-const homeFaqs = site.business.homeFaqs ?? site.business.about?.faqs ?? [];
-const schemas = services.map((s) =>
-  serviceSchema({ name: s.data.name, description: s.data.summary, url: canonical(`/services/${s.id}/`) })
-);
-if (homeFaqs.length) schemas.push(faqSchema(homeFaqs));
-
-const hero = homeHero();
-const heroImage = clientImage(site.home?.hero?.image ?? site.media?.hero);
-/* Carousel photos resolved in the same order as the rotating words. */
-const heroSlides = (site.home?.hero?.slides ?? []).map((slide) => ({ ...slide, src: clientImage(slide.image) }));
-const announce = homeAnnounce();
-const stats = await homeStats();
-const stat = homeStat();
-const jobs = homeJobs();
-const promises = homePromises();
-const finance = homeFinance();
-const panes = await homePanes();
+import '../styles/template.css';
+import { buildHome } from '../lib/template-home.mjs';
+const { html, title, description, schemas } = await buildHome();
 ---
 
-<BaseLayout title={title.slice(0, 60)} description={description} schemas={schemas} headerInHero={true}>
-  <CenteredHero hero={hero} slides={heroSlides} fallbackImage={heroImage} wrapClass="container">
-    <SiteHeader slot="nav" variant="hero" announce={announce} />
-    <Fragment slot="below">
-      <StatsBox stats={stats} />
-      <TrustCard />
-    </Fragment>
-  </CenteredHero>
-
-  <ReviewsBand />
-
-  <JobPanes panes={panes} />
-
-  {site.business.directAnswer && (
-    <section class="section section--tight">
-      <div class="container">
-        <AnswerBlock
-          question={site.business.directAnswerQuestion ?? `Who fits windows and doors in ${site.contact.address.locality}?`}
-          answer={site.business.directAnswer}
-        />
-      </div>
-    </section>
-  )}
-
-  <ProofStat stat={stat} />
-
-  <ProcessSteps />
-
-  <GuaranteeGrid promises={promises} />
-
-  <Jobs jobs={jobs} />
-
-  <ComparisonTable />
-
-  <OwnerBand />
-
-  <Coverage />
-
-  <FinancePanel finance={finance} />
-
-  <FaqList faqs={homeFaqs} />
-
-  <FinalCta panes={panes} />
+<BaseLayout title={title} description={description} schemas={schemas} chrome={false}>
+  <Fragment set:html={html} />
 </BaseLayout>

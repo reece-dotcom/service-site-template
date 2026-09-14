@@ -19,6 +19,8 @@ const {
   image,
   /** Home page renders SiteHeader itself, inside the hero. */
   headerInHero = false,
+  /** The template home page brings its own header, footer and sticky bar. */
+  chrome = true,
   /** Locale code of THIS page. English pages leave it unset. */
   locale,
 } = Astro.props;
@@ -150,7 +152,7 @@ const ogImage = image ? new URL(image, site.url).href : undefined;
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     {isDemo() && <DemoBar />}
-    {!headerInHero && (
+    {chrome && !headerInHero && (
       <SiteHeader
         switcher={switcher}
         navOverride={localeNav}
@@ -158,7 +160,7 @@ const ogImage = image ? new URL(image, site.url).href : undefined;
       />
     )}
     <main id="main"><slot /></main>
-    <SiteFooter />
-    <StickyCta />
+    {chrome && <SiteFooter />}
+    {chrome && <StickyCta />}
   </body>
 </html>
