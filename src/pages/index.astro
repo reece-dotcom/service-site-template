@@ -54,7 +54,7 @@ const heroImage = clientImage(site.home?.hero?.image ?? site.media?.hero);
 /* Carousel photos resolved in the same order as the rotating words. */
 const heroSlides = (site.home?.hero?.slides ?? []).map((slide) => ({ ...slide, src: clientImage(slide.image) }));
 const announce = homeAnnounce();
-const stats = homeStats();
+const stats = await homeStats();
 const stat = homeStat();
 const jobs = homeJobs();
 const promises = homePromises();

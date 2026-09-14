@@ -28,6 +28,7 @@ export default {
       { name: 'GGF member', blurb: 'A member of the Glass and Glazing Federation, the trade body for the industry, which sets the standards the work is done to.' },
     ],
     guarantee: {
+      years: 10,
       heading: 'Ten years, insurance-backed',
       body: 'The workmanship guarantee runs for ten years and is underwritten by an independent insurer, so the cover stands whatever happens to the business. The certificate comes with the paperwork.',
     },

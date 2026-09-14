@@ -42,14 +42,32 @@ export function homeHero() {
 
 export const homeAnnounce = () => validateAnnounce(homeConfig().announce, 'home.announce');
 
-/** Up to four figures in the glass panel under the hero. Real numbers only. */
-export function homeStats() {
-  const stats = homeConfig().stats ?? [];
-  if (stats.length > 4) throw new Error('[home] home.stats supports at most 4 figures');
-  for (const s of stats) {
-    if (!s.value || !s.label) throw new Error('[home] every home.stats entry needs `value` and `label`');
+/**
+ * Up to four figures in the glass panel under the hero. Explicit home.stats
+ * wins; otherwise the panel is built from facts already in the config — years
+ * trading, the Google rating, the guarantee, towns covered — and shows only
+ * the ones that exist. Never a made-up "2,800 windows fitted".
+ */
+export async function homeStats() {
+  const explicit = homeConfig().stats;
+  if (explicit?.length) {
+    if (explicit.length > 4) throw new Error('[home] home.stats supports at most 4 figures');
+    for (const s of explicit) {
+      if (!s.value || !s.label) throw new Error('[home] every home.stats entry needs `value` and `label`');
+    }
+    return explicit;
   }
-  return stats;
+  const out = [];
+  const b = site.business;
+  const years = b.yearFounded ? new Date().getFullYear() - b.yearFounded : null;
+  if (years !== null && years >= 1) out.push({ value: `${years}+ yrs`, label: b.yearsLabel ? `years ${b.yearsLabel}` : `fitting in ${site.contact.address.locality} and around` });
+  const agg = site.reviews?.aggregate;
+  if (agg) out.push({ value: `${agg.ratingValue}★`, label: `from ${agg.reviewCount} ${agg.source ?? 'Google'} reviews` });
+  const gy = b.guaranteeYears ?? b.guarantee?.years;
+  if (gy) out.push({ value: `${gy} yrs`, label: b.guarantee?.insuranceBacked === false ? 'workmanship guarantee' : 'insurance-backed guarantee' });
+  const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
+  if (areas.length >= 3) out.push({ value: String(areas.length), label: `towns covered across ${site.contact.address.region}` });
+  return out.slice(0, 4);
 }
 
 export const homeStat = () => validateStat(homeConfig().stat ?? lp().stat, 'home.stat');
