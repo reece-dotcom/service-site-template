@@ -1,6 +1,7 @@
 ---
 /**
- * Google reviews band. Only renders when reviews.featured is populated — and
+ * Google reviews grid (template: centred "4.9 out of 5 · 312 reviews" line,
+ * three quote cards). Only renders when reviews.featured is populated — and
  * only ever with reviews actually pulled from the client's Google Business
  * Profile. Never invent a rating: a fabricated 5.0 is the single fastest way
  * to lose trust with a prospect who knows their own review count.
@@ -8,39 +9,23 @@
 import { site } from '../lib/client.mjs';
 
 const agg = site.reviews?.aggregate ?? null;
-const featured = site.reviews?.featured ?? [];
-if (!featured.length) { /* renders nothing */ }
+const featured = (site.reviews?.featured ?? []).slice(0, 3);
 const profileUrl = site.reviews?.profileUrl ?? '';
 ---
 {featured.length > 0 && (
   <section class="rv">
     <div class="container">
-      <div class="rv__head">
-        <div class="rv__score">
-          <svg class="rv__g" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
-            <path fill="#4285F4" d="M23.5 12.3c0-.9-.1-1.5-.2-2.2H12v4h6.6c-.1 1.1-.9 2.8-2.5 3.9l-.1.2 3.6 2.8.3.1c2.3-2.1 3.6-5.2 3.6-8.8z"/>
-            <path fill="#34A853" d="M12 24c3.3 0 6-1.1 8-2.9l-3.8-3c-1 .7-2.4 1.2-4.2 1.2-3.2 0-5.9-2.1-6.9-5l-.2.1-3.7 2.9-.1.2C3.1 21.3 7.2 24 12 24z"/>
-            <path fill="#FBBC05" d="M5.1 14.3c-.3-.8-.4-1.6-.4-2.3s.1-1.6.4-2.3v-.3L1.3 6.5l-.1.1C.4 8.2 0 10 0 12s.4 3.8 1.2 5.4l3.9-3.1z"/>
-            <path fill="#EA4335" d="M12 4.7c2.3 0 3.8 1 4.7 1.8l3.4-3.3C18 1.2 15.3 0 12 0 7.2 0 3.1 2.7 1.2 6.6l3.9 3c1-2.9 3.7-4.9 6.9-4.9z"/>
-          </svg>
-          {agg && (
-            <>
-              <strong class="rv__num">{agg.ratingValue}</strong>
-              <span class="rv__stars" aria-hidden="true">★★★★★</span>
-              <span class="rv__count">{agg.reviewCount} Google reviews</span>
-            </>
-          )}
-        </div>
-        {profileUrl && (
-          <a class="rv__link" href={profileUrl} target="_blank" rel="noopener">Read them on Google</a>
-        )}
-      </div>
-      <ul class="rv__list">
+      <p class="rv__head">
+        <img src="/logos/google.png" alt="Google" />
+        {agg ? <><b>{agg.ratingValue}</b> out of 5 · {agg.reviewCount} {agg.source ?? 'Google'} reviews</> : <span>What customers say on Google</span>}
+        {profileUrl && <a class="rv__link" href={profileUrl} target="_blank" rel="noopener">Read them all</a>}
+      </p>
+      <ul class="rv__grid">
         {featured.map((r) => (
           <li class="rv__card">
-            <span class="rv__stars rv__stars--sm" aria-label={`${r.rating ?? 5} out of 5`}>★★★★★</span>
+            <p class="rv__stars" aria-label={`${r.rating ?? 5} out of 5`}>★★★★★</p>
             <blockquote>{r.body}</blockquote>
-            <p class="rv__who">{r.author}{r.when ? ` · ${r.when}` : ''}</p>
+            <cite>{r.author}, posted on {r.source ?? agg?.source ?? 'Google'}{r.when ? ` · ${r.when}` : ''}</cite>
           </li>
         ))}
       </ul>
@@ -48,16 +33,16 @@ const profileUrl = site.reviews?.profileUrl ?? '';
   </section>
 )}
 <style>
-  .rv { padding-block: var(--space-8); background: var(--surface); }
-  .rv__head { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; justify-content: space-between; margin-bottom: var(--space-6); }
-  .rv__score { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
-  .rv__num { font-size: 1.6rem; font-family: var(--font-heading); line-height: 1; }
-  .rv__stars { color: #f5a623; letter-spacing: 0.06em; font-size: 1.15rem; }
-  .rv__stars--sm { font-size: 0.95rem; }
-  .rv__count { color: var(--muted); font-size: 0.95rem; }
-  .rv__link { font-weight: 600; }
-  .rv__list { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-5); grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
-  .rv__card { background: #fff; border: 1px solid color-mix(in srgb, var(--muted) 20%, transparent); border-radius: var(--radius-lg); padding: var(--space-5); display: grid; gap: var(--space-3); align-content: start; }
-  .rv__card blockquote { margin: 0; font-size: 0.98rem; line-height: 1.55; }
-  .rv__who { margin: 0; color: var(--muted); font-size: 0.85rem; font-weight: 600; }
+  .rv { padding-block: clamp(2.75rem, 5vw, 4rem); }
+  .rv__head { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1.6rem; font-size: 0.95rem; color: var(--muted); flex-wrap: wrap; }
+  .rv__head img { height: 1.75rem; width: auto; }
+  .rv__head b { font-weight: 700; font-size: 1.25rem; color: var(--ink); }
+  .rv__link { font-weight: 600; margin-left: 0.5rem; }
+  .rv__grid { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+  .rv__card { border: 1px solid var(--hairline); background: #fff; border-radius: var(--radius-lg); padding: 1.4rem 1.5rem; transition: transform 0.4s var(--ease-out), box-shadow 0.4s; }
+  .rv__card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+  .rv__stars { color: var(--brand); letter-spacing: 2px; font-size: 0.85rem; line-height: 1; }
+  .rv__card blockquote { margin: 0.6rem 0 0.75rem; font-size: 0.98rem; line-height: 1.6; color: var(--ink); }
+  .rv__card cite { font-style: normal; font-size: 0.85rem; color: var(--muted); font-weight: 500; }
+  @media (max-width: 54rem) { .rv__grid { grid-template-columns: 1fr; } }
 </style>

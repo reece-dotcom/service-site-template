@@ -156,12 +156,10 @@ export default {
     // + glass-blue highlight). Do not invent colours when the client has a logo.
     brand: '#0b2d5c',
     brandDark: '#061d3d',
-    accent: '#2f7fe0',
+    accent: '#2468C4',
     accentInk: '#ffffff',
     ink: '#121a26',
     muted: '#5a6675',
     surface: '#f2f6fb',
-    fontHeading: "'Bricolage Grotesque', system-ui, sans-serif",
-    fontBody: "system-ui, -apple-system, 'Segoe UI', sans-serif",
   },
 };

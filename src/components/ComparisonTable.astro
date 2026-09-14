@@ -8,7 +8,8 @@
  *   heading?, them?: 'National chains', rows: [{ label, us, them }]
  * }
  * Every row must be a claim the client can defend — never tick a box for
- * something they do not actually do.
+ * something they do not actually do. Template style: ink header, brand "us"
+ * column with a tick, a cross where the other side's answer is a flat no.
  */
 import { site } from '../lib/client.mjs';
 
@@ -16,16 +17,14 @@ const c = site.business.comparison;
 const rows = c?.rows ?? [];
 const themLabel = c?.them ?? 'National chains';
 const usLabel = site.business.name;
+const isNo = (v) => /^(no|rare|rarely|not|never)\b/i.test(String(v ?? '').trim());
 ---
 {rows.length > 0 && (
   <section class="section">
     <div class="container">
       <div class="section-head">
-        <div>
-          <p class="eyebrow">Straight comparison</p>
-          <h2>{c.heading ?? `Why people pick us over the big firms`}</h2>
-        </div>
-        <p class="lede">No swipes at anyone by name — just how the two ways of buying actually differ.</p>
+        <p class="eyebrow">Straight comparison</p>
+        <h2>{c.heading ?? 'Why local homeowners choose us over the rest'}</h2>
       </div>
       <div class="cmp">
         <table>
@@ -40,8 +39,8 @@ const usLabel = site.business.name;
             {rows.map((r) => (
               <tr>
                 <th scope="row">{r.label}</th>
-                <td class="cmp__us">{r.us}</td>
-                <td class="cmp__them">{r.them}</td>
+                <td class="cmp__us"><span aria-hidden="true">✓&nbsp;</span>{r.us}</td>
+                <td class:list={['cmp__them', isNo(r.them) && 'cmp__no']}>{isNo(r.them) && <span aria-hidden="true">✗&nbsp;</span>}{r.them}</td>
               </tr>
             ))}
           </tbody>
@@ -52,13 +51,14 @@ const usLabel = site.business.name;
 )}
 
 <style>
-  .cmp { margin-top: var(--space-8); overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; background: #fff; font-size: 0.97rem; }
-  th, td { text-align: left; padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--hairline); }
-  thead th { font-family: var(--font-heading); font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-  tbody th { font-weight: 550; color: var(--ink); }
-  .cmp__us { background: color-mix(in srgb, var(--brand) 6%, #fff); font-weight: 650; color: var(--ink); }
-  thead .cmp__us { color: var(--brand); }
-  .cmp__them { color: var(--muted); }
+  .cmp { max-width: 56rem; overflow-x: auto; border: 1px solid var(--hairline); border-radius: var(--radius-lg); background: #fff; }
+  table { width: 100%; border-collapse: collapse; min-width: 35rem; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--hairline); }
+  thead th { font-family: var(--font-heading); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; background: var(--ink); color: #fff; border-bottom: 0; }
+  thead th.cmp__us { background: var(--brand); }
+  tbody th { font-weight: 500; color: var(--ink); }
+  td.cmp__us { background: var(--brand-tint); color: var(--brand-dark); font-weight: 600; }
+  .cmp__them { color: var(--ink); }
+  .cmp__no { color: var(--muted); }
   tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 </style>

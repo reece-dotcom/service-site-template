@@ -1,0 +1,26 @@
+---
+/**
+ * Final CTA: "Start with the job you've got." The four routes again, compact,
+ * beside the quote form. Owns the #quote anchor that every CTA points at.
+ */
+import QuoteForm from './QuoteForm.astro';
+import JobPanes from './JobPanes.astro';
+const { panes = [] } = Astro.props;
+---
+<section class="section section--surface" id="quote">
+  <div class="container final">
+    <div>
+      <p class="eyebrow">Get a fixed price</p>
+      <h2>Start with the job you've got.</h2>
+      <p class="lede final__lede">{panes.length ? 'Pick the job, or fill in the form and we will ring you back.' : 'Fill in the form and we will ring you back to arrange a survey.'}</p>
+      <JobPanes panes={panes} compact={true} />
+    </div>
+    <QuoteForm heading="Get a fixed price" id="quote-form" />
+  </div>
+</section>
+<style>
+  .final { display: grid; grid-template-columns: 1fr 25rem; gap: clamp(2rem, 4vw, 4rem); align-items: start; }
+  .final h2 { margin-top: 0.75rem; }
+  .final__lede { margin-top: 0.75rem; }
+  @media (max-width: 60rem) { .final { grid-template-columns: 1fr; } }
+</style>

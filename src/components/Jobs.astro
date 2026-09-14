@@ -1,0 +1,55 @@
+---
+/**
+ * "Recent jobs, and what the customer said afterwards." Photo, job line,
+ * and — only when a checkable review exists for that job — the quote with
+ * its platform. Data from home.mjs homeJobs(); a client with no reviews gets
+ * the photos and captions and an honest heading.
+ */
+import { Image } from 'astro:assets';
+import { clientImage } from '../lib/images.mjs';
+
+const { jobs = [] } = Astro.props;
+const shots = jobs.map((j) => ({ ...j, src: clientImage(j.image) })).filter((j) => j.src || j.quote);
+const anyQuote = shots.some((j) => j.quote);
+---
+{shots.length > 0 && (
+  <section class="section section--surface">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Recent work</p>
+        <h2>{anyQuote ? 'Recent jobs, and what the customer said afterwards.' : 'Recent work, and what it actually looks like.'}</h2>
+      </div>
+      <div class="jobs">
+        {shots.map((j) => (
+          <article class="job">
+            {j.src && <Image class="job__img" src={j.src} alt={j.alt ?? j.title} widths={[420, 760]} sizes="(max-width: 56rem) 92vw, 32vw" loading="lazy" />}
+            <div class="job__body">
+              {j.meta && <p class="job__meta">{j.meta}</p>}
+              {!j.meta && j.title && <p class="job__meta">{j.title}</p>}
+              {j.quote ? (
+                <>
+                  {j.rating && <p class="job__stars" aria-label={`Rated ${j.rating} out of 5`}>{'★'.repeat(Math.round(j.rating))}</p>}
+                  <blockquote>{j.quote}</blockquote>
+                  <cite>{j.author ? `${j.author}, ` : ''}{j.source} review</cite>
+                </>
+              ) : j.meta && j.title ? <p class="job__title">{j.title}</p> : null}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+<style>
+  .jobs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+  .job { background: #fff; border: 1px solid var(--hairline); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.4s var(--ease-out), box-shadow 0.4s; }
+  .job:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+  .job__img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+  .job__body { padding: 1.1rem 1.4rem 1.4rem; }
+  .job__meta { font-size: 0.8rem; font-weight: 600; color: var(--brand); line-height: 1.5; }
+  .job__title { margin-top: 0.4rem; font-weight: 500; }
+  .job__stars { color: var(--brand); letter-spacing: 2px; font-size: 0.85rem; line-height: 1; margin-top: 0.6rem; }
+  .job blockquote { margin: 0.6rem 0 0.75rem; font-size: 0.98rem; line-height: 1.6; color: var(--ink); }
+  .job cite { font-style: normal; font-size: 0.85rem; color: var(--muted); }
+  @media (max-width: 56rem) { .jobs { grid-template-columns: 1fr; } }
+</style>

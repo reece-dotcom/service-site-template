@@ -87,6 +87,15 @@ export default {
    *  the prospect sends some — one per rotating word, same order. */
   home: {
     heroLayout: 'centered',
+    /* No superlative: the guard would (rightly) refuse "the only installer…". */
+    announce: 'Surveyed by the owner, fitted by our own team, priced in writing before anything is ordered',
+    /* Only figures Dave gave us on the call. */
+    stats: [
+      { value: '15+', label: 'years fitting in Chelmsford and mid Essex' },
+      { value: '4.9★', label: 'from 14 Google reviews' },
+      { value: '10 yrs', label: 'insurance-backed guarantee' },
+      { value: '1 team', label: 'our own fitters, never subcontracted' },
+    ],
     hero: {
       headline: 'In Chelmsford we fit',
       rotate: ['uPVC windows', 'composite doors', 'bi-fold doors', 'conservatories'],
@@ -131,7 +140,5 @@ export default {
     ink: '#172026',
     muted: '#5A6A73',
     surface: '#F3F6F7',
-    fontHeading: "'Bricolage Grotesque', system-ui, sans-serif",
-    fontBody: "system-ui, -apple-system, 'Segoe UI', sans-serif",
   },
 };

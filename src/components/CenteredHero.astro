@@ -7,6 +7,10 @@
  * (config `home.hero`). Sharing the markup is deliberate — the fragile part is
  * the pairing of photo N with word N, and that logic should exist once.
  *
+ * Slots: `nav` (the site header, rendered inside the hero over the photo, as
+ * the template does) and `below` (the stats panel and trust card, which sit
+ * on the photo at the foot of the hero).
+ *
  * Styling lives in styles/lp.css under the `.lp-hero--center` class names; the
  * caller is responsible for importing it. No client-side JS: the rotation and
  * the crossfade are CSS animations on a shared 12s cycle, so the first photo
@@ -33,9 +37,11 @@ const rotate = hero.rotate ?? [];
 const widest = rotate.length
   ? rotate.reduce((a, b) => (b.length > a.length ? b : a))
   : '';
+const hasNav = Astro.slots.has('nav');
+const hasBelow = Astro.slots.has('below');
 ---
 
-<section class="lp-hero lp-hero--center">
+<section class:list={['lp-hero', 'lp-hero--center', hasNav && 'lp-hero--nav']}>
   {slides.length ? (
     <div class={`lp-hero__slides lp-hero__slides--n${slides.length}`}>
       {slides.map((slide, i) => (
@@ -60,6 +66,7 @@ const widest = rotate.length
       loading="eager"
     />
   ) : null}
+  {hasNav && <div class="lp-hero__nav"><slot name="nav" /></div>}
   <div class={`${wrapClass} lp-hero__center`}>
     <h1>
       {hero.headline}
@@ -81,7 +88,7 @@ const widest = rotate.length
     </h1>
     {hero.sub && <p class="lp-lede lp-lede--center">{hero.sub}</p>}
     <div class="lp-hero__actions lp-hero__actions--center">
-      <a class="btn btn--accent btn--lg" href={ctaHref}>{hero.cta ?? 'Book a free survey'}</a>
+      <a class="btn btn--primary btn--lg" href={ctaHref}>{hero.cta ?? 'Book a free survey'}</a>
     </div>
     <p class="lp-hero__note">
       {hero.note}
@@ -97,4 +104,14 @@ const widest = rotate.length
       </ul>
     ) : null}
   </div>
+  {hasBelow && <div class="lp-hero__below"><slot name="below" /></div>}
 </section>
+<style>
+  /* Header inside the hero: the section's top padding moves to the content so
+     the nav row sits flush at the top over the photo. */
+  .lp-hero--nav { padding-top: 0; }
+  .lp-hero__nav { position: relative; z-index: 3; }
+  .lp-hero--nav .lp-hero__center { padding-top: clamp(2.75rem, 6vw, 5rem); }
+  .lp-hero__below { position: relative; z-index: 2; margin-top: clamp(2rem, 4vw, 3rem); }
+  .lp-hero--center .lp-hero__center :global(.lp-rot--pill) { background: var(--brand-on-dark); color: var(--brand-on-dark-ink); }
+</style>

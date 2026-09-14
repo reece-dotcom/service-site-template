@@ -78,17 +78,21 @@ const action = useGhl ? site.forms.ghlEndpoint : '/thank-you/';
   </form>
 </div>
 <style>
-  .qf { color: var(--ink); background: #fff; border-radius: var(--radius-lg); padding: var(--space-6); border: 1px solid color-mix(in srgb, var(--muted) 20%, transparent); box-shadow: 0 18px 40px -28px rgba(0,0,0,0.45); }
+  .qf { color: var(--ink); background: #fff; border-radius: var(--radius-panel); padding: clamp(1.4rem, 2.4vw, 1.75rem); border: 1px solid var(--hairline); box-shadow: var(--shadow); }
   .qf__h { color: var(--ink); font-size: 1.25rem; }
   .qf__sub { font-size: 0.9rem; margin-top: var(--space-2); }
   .form { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
   .form__row { display: grid; gap: var(--space-4); grid-template-columns: 1fr 1fr; }
-  .field { color: var(--ink); display: grid; gap: var(--space-2); font-weight: 600; font-size: 0.9rem; }
+  .field { color: var(--ink); display: grid; gap: 0.4rem; font-weight: 600; font-size: 0.86rem; }
   .field input, .field textarea, .field select {
-    font: inherit; font-weight: 400; padding: 0.65rem 0.8rem; border-radius: var(--radius);
-    border: 1.5px solid color-mix(in srgb, var(--muted) 42%, transparent); background: #fff; width: 100%;
+    font: inherit; font-weight: 400; font-size: 1rem; padding: 0.65rem 0.875rem; border-radius: var(--radius-sm);
+    border: 1px solid var(--hairline-2); background: var(--surface); width: 100%; color: var(--ink);
   }
-  .form__btn { justify-content: center; width: 100%; }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none; border-color: var(--brand); background: #fff;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 12%, transparent);
+  }
+  .form__btn { width: 100%; }
   .form__note { font-size: 0.8rem; }
   @media (max-width: 40rem) { .form__row { grid-template-columns: 1fr; } }
 </style>

@@ -95,15 +95,20 @@ export function validateCenteredHero(hero, key = 'hero') {
  * the compliance fix and the more persuasive version.
  */
 export function lpStat() {
-  const stat = lpConfig().stat;
+  return validateStat(lpConfig().stat, 'lp.stat');
+}
+export function validateStat(stat, key = 'stat') {
   if (!stat) return null;
-  if (!stat.value || !stat.label) fail('lp.stat needs both `value` and `label`');
+  if (!stat.value || !stat.label) fail(`${key} needs both \`value\` and \`label\``);
   if (!stat.basis) {
     fail(
-      'lp.stat.basis is required — state what the figure is measured from ' +
+      `${key}.basis is required — state what the figure is measured from ` +
         '(e.g. "112 installations completed in 2026"). An unsubstantiated ' +
         'statistic is a misleading commercial practice under the CPRs.'
     );
+  }
+  for (const b of stat.bars ?? []) {
+    if (!b.label || typeof b.pct !== 'number') fail(`${key}.bars entries need \`label\` and a numeric \`pct\``);
   }
   return stat;
 }
@@ -116,18 +121,20 @@ export function lpStat() {
  * the single most common fabrication in this trade, and we do not ship them.
  */
 export function lpJobs() {
-  const jobs = lpConfig().jobs ?? [];
+  return validateJobs(lpConfig().jobs ?? [], 'lp.jobs');
+}
+export function validateJobs(jobs, key = 'jobs') {
   for (const job of jobs) {
-    if (!job.title) fail('every lp.jobs entry needs a `title`');
+    if (!job.title) fail(`every ${key} entry needs a \`title\``);
     if (job.quote && !job.source) {
       fail(
-        `lp.jobs "${job.title}" has a customer quote with no \`source\` — ` +
+        `${key} "${job.title}" has a customer quote with no \`source\` — ` +
           'name the platform it is published on (Google, Checkatrade, Which? ' +
           'Trusted Trader). Never ship a testimonial that cannot be checked.'
       );
     }
     if (job.rating && !job.source) {
-      fail(`lp.jobs "${job.title}" has a rating with no \`source\``);
+      fail(`${key} "${job.title}" has a rating with no \`source\``);
     }
   }
   return jobs;
@@ -145,14 +152,16 @@ export function lpJobs() {
 const SUPERLATIVES = /\b(only|best|cheapest|number one|no\.?\s?1|leading|largest|fastest|most trusted)\b/i;
 
 export function lpAnnounce() {
-  const a = lpConfig().announce;
+  return validateAnnounce(lpConfig().announce, 'lp.announce');
+}
+export function validateAnnounce(a, key = 'announce') {
   if (!a) return null;
   const text = typeof a === 'string' ? a : a.text;
-  if (!text) fail('lp.announce needs `text`');
+  if (!text) fail(`${key} needs \`text\``);
   const basis = typeof a === 'string' ? null : a.basis;
   if (SUPERLATIVES.test(text) && !basis) {
     fail(
-      `lp.announce "${text}" makes a superlative or comparative claim. Supply ` +
+      `${key} "${text}" makes a superlative or comparative claim. Supply ` +
         '`basis` with the evidence (and be ready to show it), or reword it. ' +
         'The CMA can fine the trader directly for an unsubstantiated "only ' +
         'installer in town" line.'
@@ -167,17 +176,19 @@ export function lpAnnounce() {
  * both, advertising finance is a regulated-activity breach.
  */
 export function lpFinance() {
-  const fin = lpConfig().finance;
+  return validateFinance(lpConfig().finance, 'lp.finance');
+}
+export function validateFinance(fin, key = 'finance') {
   if (!fin) return null;
   if (!fin.fcaFirmRef) {
     fail(
-      'lp.finance.fcaFirmRef is required — advertising consumer credit is a ' +
+      `${key}.fcaFirmRef is required — advertising consumer credit is a ` +
         'regulated activity. Supply the FCA firm reference number of the ' +
         'authorised broker or lender, or remove the finance block.'
     );
   }
   if (!fin.representativeExample) {
-    fail('lp.finance.representativeExample is required alongside any APR claim');
+    fail(`${key}.representativeExample is required alongside any APR claim`);
   }
   return fin;
 }
@@ -187,9 +198,11 @@ export function lpFinance() {
  * Free-form, but each point needs a body: a bare adjective promises nothing.
  */
 export function lpPromises() {
-  const promises = lpConfig().promises ?? [];
+  return validatePromises(lpConfig().promises ?? [], 'lp.promises');
+}
+export function validatePromises(promises, key = 'promises') {
   for (const p of promises) {
-    if (!p.title || !p.body) fail('every lp.promises entry needs `title` and `body`');
+    if (!p.title || !p.body) fail(`every ${key} entry needs \`title\` and \`body\``);
   }
   return promises;
 }

@@ -1,68 +1,83 @@
 ---
+/**
+ * Footer in the template's style: brand block with a small-caps subline,
+ * two link columns with ruled uppercase headings, and a legal row carrying the
+ * registered name and any accreditation numbers we can point at.
+ */
 import { site } from '../lib/client.mjs';
-import { accreditationNames } from '../lib/business.mjs';
+import { accreditationList } from '../lib/business.mjs';
 import { getCollection } from 'astro:content';
 const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
 const services = (await getCollection('services')).filter((s) => !s.data.draft)
   .sort((a, b) => a.data.order - b.data.order);
 const a = site.contact.address;
 const year = new Date().getFullYear();
-// Social profiles the client has confirmed exist. Rendered as real links so
-// visitors (and Google) can see the business is active somewhere off-site;
-// the same list feeds sameAs in the schema.
 const socialLabels = { facebook: 'Facebook', instagram: 'Instagram', x: 'X', linkedin: 'LinkedIn', youtube: 'YouTube' };
 const socials = Object.entries(site.social ?? {})
   .filter(([, url]) => Boolean(url))
   .map(([key, url]) => ({ url, label: socialLabels[key] ?? key }));
+const fmtHours = (h) => {
+  const d = h.days.map((x) => x.slice(0, 3));
+  const span = d.length > 2 ? `${d[0]}–${d[d.length - 1]}` : d.join(' & ');
+  return `${span} ${h.opens}–${h.closes}`;
+};
+const legal = [
+  `© ${year} ${site.business.legalName ?? site.business.name}`,
+  ...accreditationList().filter((x) => x.id).map((x) => `${x.name.replace(/ (registered|member|approved)$/i, '')} ${x.id}`),
+];
+const subline = site.business.footerSubline ?? `${site.copy?.footerTrade ?? 'Windows & doors'} · ${a.locality}`;
 ---
 <footer class="ftr">
-  <div class="container grid grid--3">
+  <div class="container ftr__grid">
     <div>
-      <h2 class="ftr__h">{site.business.name}</h2>
-      <p class="ftr__p">{site.business.tagline}</p>
-      <address class="ftr__p ftr__addr">
-        {a.street}<br />{a.locality}<br />{a.region} {a.postcode}
-      </address>
-      <p class="ftr__p">
-        <a href={`tel:${site.contact.phoneHref}`}>{site.contact.phone}</a><br />
+      <a class="ftr__logo" href="/">{site.business.name}<span>{subline}</span></a>
+      <address class="ftr__addr">
+        {a.street && <>{a.street}<br /></>}{a.locality}{a.postcode ? ` ${a.postcode}` : ''}<br />
+        <a class="ftr__phone" href={`tel:${site.contact.phoneHref}`}>{site.contact.phone}</a><br />
         <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
-      </p>
+      </address>
+      {site.hours?.length > 0 && <p class="ftr__hours">{site.hours.map(fmtHours).join(' · ')}</p>}
       {socials.length > 0 && (
-        <p class="ftr__p ftr__social">
-          {socials.map((s2) => (
-            <a href={s2.url} rel="me noopener" target="_blank">{s2.label}</a>
-          ))}
+        <p class="ftr__social">
+          {socials.map((s2) => <a href={s2.url} rel="me noopener" target="_blank">{s2.label}</a>)}
         </p>
       )}
     </div>
     <div>
-      <h2 class="ftr__h">Services</h2>
-      <ul class="ftr__list">
+      <h4>{site.copy?.servicesHeading ?? 'What we fit'}</h4>
+      <ul>
         {services.map((s) => <li><a href={`/services/${s.id}/`}>{s.data.name}</a></li>)}
       </ul>
     </div>
     <div>
-      <h2 class="ftr__h">Areas we cover</h2>
-      <ul class="ftr__list">
-        {areas.map((x) => <li><a href={`/areas/${x.id}/`}>{x.data.name}</a></li>)}
+      <h4>Useful</h4>
+      <ul>
+        <li><a href="/areas/">Areas we cover</a></li>
+        {areas.slice(0, 4).map((x) => <li><a href={`/areas/${x.id}/`}>{x.data.name}</a></li>)}
         <li><a href="/about/">About us</a></li>
         <li><a href="/blog/">Advice &amp; guides</a></li>
         <li><a href="/contact/">Get a quote</a></li>
       </ul>
     </div>
   </div>
-  <div class="container ftr__base">
-    <p>&copy; {year} {site.business.legalName}. {accreditationNames().join(' · ')}</p>
+  <div class="container ftr__legal">
+    <p>{legal.join(' · ')}</p>
   </div>
 </footer>
 <style>
-  .ftr { background: var(--ink); color: #fff; padding-block: var(--space-16) var(--space-8); margin-top: var(--space-16); }
-  .ftr a { color: #fff; }
-  .ftr a:hover { color: var(--accent-on-dark); text-decoration-thickness: 2px; }
-  .ftr__h { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--space-4); color: var(--accent-on-dark); }
-  .ftr__p { opacity: 0.85; margin-bottom: var(--space-4); font-size: 0.98rem; }
-  .ftr__addr { font-style: normal; }
-  .ftr__list { list-style: none; padding: 0; display: grid; gap: var(--space-2); font-size: 0.98rem; }
-  .ftr__social { display: flex; gap: var(--space-4); }
-  .ftr__base { margin-top: var(--space-12); padding-top: var(--space-6); border-top: 1px solid rgb(255 255 255 / 18%); font-size: 0.875rem; opacity: 0.7; }
+  .ftr { background: var(--ink); color: rgb(255 255 255 / 66%); font-size: 0.92rem; margin-top: var(--space-16); }
+  .ftr a { color: inherit; text-decoration: none; transition: color 0.2s; }
+  .ftr a:hover { color: var(--brand-on-dark); }
+  .ftr__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: var(--space-8); padding-block: clamp(2.75rem, 5vw, 3.75rem) 2.25rem; }
+  .ftr__logo { font-family: var(--font-heading); font-weight: 700; font-size: 1.3rem; letter-spacing: -0.02em; color: #fff; display: inline-block; line-height: 1.2; }
+  .ftr__logo span { display: block; font-weight: 500; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(255 255 255 / 50%); margin-top: 0.3rem; }
+  .ftr__addr { font-style: normal; margin-top: 1.1rem; max-width: 38ch; line-height: 1.7; }
+  .ftr__phone { color: var(--brand-on-dark); font-weight: 600; }
+  .ftr__hours { margin-top: 0.75rem; font-size: 0.88rem; }
+  .ftr__social { margin-top: 0.75rem; display: flex; gap: var(--space-4); }
+  .ftr h4 { color: #fff; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.9rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgb(255 255 255 / 12%); }
+  .ftr ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+  .ftr__legal { border-top: 1px solid rgb(255 255 255 / 10%); font-size: 0.85rem; padding-block: 1.4rem; }
+  @media (max-width: 48rem) { .ftr__grid { grid-template-columns: 1fr; } }
+  @media print { .ftr { display: none; } }
 </style>

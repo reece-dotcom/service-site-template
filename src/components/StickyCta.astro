@@ -1,26 +1,33 @@
 ---
 /**
- * Mobile-only sticky call / quote bar. Most glazing leads come from a phone
- * held one-handed; keep the number permanently thumb-reachable.
+ * Mobile-only sticky call / quote bar, template style: two floating pills
+ * above the iOS home bar. Most glazing leads come from a phone held one-handed;
+ * keep the number permanently thumb-reachable.
  */
 import { site } from '../lib/client.mjs';
+/* The form lives on the home page (#quote); inner pages send people there via /contact/. */
+const quoteHref = Astro.url.pathname === '/' ? '#quote' : '/contact/#quote';
 ---
 <div class="sticky" aria-label="Contact shortcuts">
   <a class="sticky__call" href={`tel:${site.contact.phoneHref}`}>Call {site.contact.phone}</a>
-  <a class="sticky__quote" href="/contact/">Free quote</a>
+  <a class="sticky__quote" href={quoteHref}>Get a fixed price</a>
 </div>
 <style>
   .sticky { display: none; }
 
-  @media (max-width: 46rem) {
+  @media (max-width: 60rem) {
     .sticky {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
-      position: fixed; inset-inline: 0; bottom: 0; z-index: 40;
-      box-shadow: 0 -8px 24px -18px rgba(0,0,0,0.6);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+      position: fixed; left: 0.6rem; right: 0.6rem; bottom: calc(0.6rem + env(safe-area-inset-bottom)); z-index: 40;
     }
-    .sticky a { text-align: center; padding: 0.95rem 0.5rem; font-weight: 650; text-decoration: none; font-size: 0.98rem; }
-    .sticky__call { background: var(--accent); color: var(--accent-ink, var(--ink)); }
-    .sticky__quote { background: var(--brand-dark); color: #fff; }
-    :global(body) { padding-bottom: 3.4rem; }
+    .sticky a {
+      text-align: center; padding: 0.8rem 0.5rem; font-weight: 600; text-decoration: none; font-size: 0.95rem;
+      border-radius: var(--radius-pill); box-shadow: 0 10px 30px rgb(0 0 0 / 22%);
+      font-family: var(--font-heading);
+    }
+    .sticky__call { background: var(--ink); color: #fff; }
+    .sticky__quote { background: var(--brand); color: #fff; }
+    :global(body) { padding-bottom: 4.6rem; }
   }
+  @media print { .sticky { display: none; } }
 </style>

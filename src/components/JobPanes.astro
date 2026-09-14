@@ -1,0 +1,56 @@
+---
+/**
+ * "Tell us what the job is and we'll price that job." Four self-select routes.
+ * Data from src/lib/home.mjs homePanes(): explicit home.panes, else one pane
+ * per service. `compact` is the small version used beside the final form.
+ */
+const { panes = [], compact = false, heading = "Tell us what the job is and we'll price that job.", lede = 'Pick the one that matches what you are actually replacing. Each one is priced differently, so each one gets its own survey.' } = Astro.props;
+---
+{panes.length > 0 && (compact ? (
+  <div class="panes panes--compact">
+    {panes.map((p) => (
+      <a class="pane" href={p.href}>
+        <h3>{p.title}</h3>
+        <span class="pane__go">{p.cta ?? 'Get a price'}</span>
+      </a>
+    ))}
+  </div>
+) : (
+  <section class="section section--surface">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Start here</p>
+        <h2>{heading}</h2>
+        <p class="lede">{lede}</p>
+      </div>
+      <div class="panes">
+        {panes.map((p) => (
+          <a class="pane" href={p.href}>
+            {p.kicker && <p class="pane__kicker">{p.kicker}</p>}
+            <h3>{p.title}</h3>
+            {p.body && <p class="pane__body">{p.body}</p>}
+            <span class="pane__go">{p.cta ?? 'Get a price'}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+))}
+<style>
+  .panes { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .pane { background: #fff; border: 1px solid var(--hairline); border-radius: var(--radius-lg); padding: clamp(1.25rem, 2.2vw, 1.6rem); text-decoration: none; color: var(--ink); display: flex; flex-direction: column; transition: transform 0.4s var(--ease-out), box-shadow 0.4s, border-color 0.3s; }
+  .pane:hover, .pane:focus-visible { border-color: var(--brand); transform: translateY(-3px); box-shadow: var(--shadow-lift); color: var(--ink); }
+  .pane__kicker { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brand); margin-bottom: 0.5rem; }
+  .pane h3 { font-size: clamp(1.15rem, 1.8vw, 1.3rem); }
+  .pane__body { font-size: 0.95rem; color: var(--muted); margin: 0.5rem 0 1.1rem; max-width: 44ch; line-height: 1.6; }
+  .pane__go { margin-top: auto; display: inline-flex; align-items: center; gap: 0.6rem; font-weight: 600; font-size: 0.95rem; color: var(--ink); }
+  .pane__go::after {
+    content: '→'; width: 1.9rem; height: 1.9rem; border-radius: 50%; flex: none; display: grid; place-items: center;
+    background: var(--brand-tint); color: var(--brand); font-size: 1rem; transition: background-color 0.3s, transform 0.3s;
+  }
+  .pane:hover .pane__go::after { background: color-mix(in srgb, var(--brand) 18%, #fff); transform: translateX(4px); }
+  .panes--compact { gap: 0.75rem; margin-top: 1.5rem; }
+  .panes--compact .pane { padding: 1.1rem 1.25rem; }
+  .panes--compact .pane h3 { font-size: 1rem; margin-bottom: 0.6rem; }
+  @media (max-width: 45rem) { .panes { grid-template-columns: 1fr; } }
+</style>

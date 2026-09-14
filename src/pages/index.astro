@@ -1,31 +1,43 @@
 ---
+/**
+ * Home page — the Glazing Master Template, section for section:
+ *   hero (nav inside, rotating word, photo carousel) → stats → trust logos →
+ *   Google reviews → job panes → direct answer → proof stat → five steps →
+ *   guarantee grid → recent jobs → comparison → owner → coverage → finance →
+ *   FAQ → final CTA with the form.
+ * Every section reads its data through src/lib/home.mjs and renders nothing
+ * when the client has not given us that fact. The claim guards in lp.mjs
+ * apply here too.
+ */
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import CtaBand from '../components/CtaBand.astro';
-import TrustStrip from '../components/TrustStrip.astro';
-import AnswerBlock from '../components/AnswerBlock.astro';
-import ReviewsBand from '../components/ReviewsBand.astro';
-import QuoteForm from '../components/QuoteForm.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 import CenteredHero from '../components/CenteredHero.astro';
-import Gallery from '../components/Gallery.astro';
+import StatsBox from '../components/StatsBox.astro';
+import TrustCard from '../components/TrustCard.astro';
+import ReviewsBand from '../components/ReviewsBand.astro';
+import JobPanes from '../components/JobPanes.astro';
+import AnswerBlock from '../components/AnswerBlock.astro';
+import ProofStat from '../components/ProofStat.astro';
 import ProcessSteps from '../components/ProcessSteps.astro';
-import MapBand from '../components/MapBand.astro';
-import ProblemOutcome from '../components/ProblemOutcome.astro';
+import GuaranteeGrid from '../components/GuaranteeGrid.astro';
+import Jobs from '../components/Jobs.astro';
 import ComparisonTable from '../components/ComparisonTable.astro';
-import AssuranceBand from '../components/AssuranceBand.astro';
-import OfferBand from '../components/OfferBand.astro';
+import OwnerBand from '../components/OwnerBand.astro';
+import Coverage from '../components/Coverage.astro';
+import FinancePanel from '../components/FinancePanel.astro';
 import FaqList from '../components/FaqList.astro';
-import { Image } from 'astro:assets';
+import FinalCta from '../components/FinalCta.astro';
 import { clientImage } from '../lib/images.mjs';
 import { site } from '../lib/client.mjs';
-import { accreditationNames, activeOffer } from '../lib/business.mjs';
 import { canonical, serviceSchema, faqSchema } from '../lib/seo.mjs';
-import { homeCentered, homeHero } from '../lib/home.mjs';
+import {
+  homeHero, homeAnnounce, homeStats, homeStat, homeJobs, homePromises, homeFinance, homePanes,
+} from '../lib/home.mjs';
 
 const services = (await getCollection('services'))
   .filter((s) => !s.data.draft)
   .sort((a, b) => a.data.order - b.data.order);
-const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
 
 // `business.homeTitle` overrides the default, which reads badly when the
 // business name already contains "Windows & Doors".
@@ -33,191 +45,64 @@ const title = site.business.homeTitle ?? `${site.business.name} | Windows & Door
 const description = site.business.description.slice(0, 160);
 const homeFaqs = site.business.homeFaqs ?? site.business.about?.faqs ?? [];
 const schemas = services.map((s) =>
-  serviceSchema({
-    name: s.data.name,
-    description: s.data.summary,
-    url: canonical(`/services/${s.id}/`),
-  })
+  serviceSchema({ name: s.data.name, description: s.data.summary, url: canonical(`/services/${s.id}/`) })
 );
 if (homeFaqs.length) schemas.push(faqSchema(homeFaqs));
 
-/**
- * Hero selling points. Set `business.usps` per client to override — the
- * defaults assume a replacement installer with accreditations, which is wrong
- * for repair-only businesses and produces broken copy when accreditations is
- * empty.
- */
-const centered = homeCentered();
 const hero = homeHero();
-const heroImage = clientImage(centered ? (site.home.hero.image ?? site.media?.hero) : site.media?.hero);
+const heroImage = clientImage(site.home?.hero?.image ?? site.media?.hero);
 /* Carousel photos resolved in the same order as the rotating words. */
-const heroSlides = centered
-  ? (site.home.hero.slides ?? []).map((slide) => ({ ...slide, src: clientImage(slide.image) }))
-  : [];
-const heroPoints = site.business.usps?.length
-  ? site.business.usps
-  : [
-      'Fixed written quotes after a proper survey — no pressure selling',
-      'Fitted by our own installers, never subcontracted',
-      ...(accreditationNames()[0]
-        ? [`${accreditationNames()[0]} with insurance-backed guarantees`]
-        : []),
-      `Local team covering ${areas.map((a) => a.data.name).slice(0, 3).join(', ')} and nearby`,
-    ];
+const heroSlides = (site.home?.hero?.slides ?? []).map((slide) => ({ ...slide, src: clientImage(slide.image) }));
+const announce = homeAnnounce();
+const stats = homeStats();
+const stat = homeStat();
+const jobs = homeJobs();
+const promises = homePromises();
+const finance = homeFinance();
+const panes = await homePanes();
 ---
 
-<BaseLayout title={title.slice(0, 60)} description={description} schemas={schemas}>
-  {centered ? (
-    <>
-      <CenteredHero
-        hero={hero}
-        slides={heroSlides}
-        fallbackImage={heroImage}
-        wrapClass="container"
-      />
-      {/* The centered hero has no room for the form, so it sits immediately
-          below and owns the #quote target the hero CTA points at. */}
-      <section class="section section--tight" id="quote">
-        <div class="container container--narrow">
-          <QuoteForm heading="Get a free quote" />
-        </div>
-      </section>
-    </>
-  ) : (
-  <section class:list={['hero', heroImage && 'hero--image']}>
-    {heroImage && (
-      <Image class="hero__bg" src={heroImage} alt={site.media?.heroAlt ?? `${site.business.name} — ${site.business.tagline}`} widths={[900, 1600]} sizes="100vw" loading="eager" fetchpriority="high" />
-    )}
-    <div class="container hero__inner">
-      <div class="hero__copy">
-        <p class="eyebrow">{site.contact.address.region}</p>
-        <h1>{site.business.tagline}</h1>
-        <p class="lede hero__lede">{site.business.description}</p>
-        <ul class="checklist hero__points">
-          {heroPoints.map((point) => <li>{point}</li>)}
-        </ul>
-        <div class="hero__actions">
-          <a class="btn btn--accent btn--lg" href={`tel:${site.contact.phoneHref}`}>
-            Call {site.contact.phone}
-          </a>
-          {site.reviews?.aggregate && (
-            <p class="hero__proof">
-              <span class="hero__stars" aria-hidden="true">★★★★★</span>
-              <strong>{site.reviews.aggregate.ratingValue}</strong>
-              from {site.reviews.aggregate.reviewCount} Google reviews
-            </p>
-          )}
-        </div>
-      </div>
-      <QuoteForm heading="Get a free quote" compact={true} />
-    </div>
-  </section>
-  )}
+<BaseLayout title={title.slice(0, 60)} description={description} schemas={schemas} headerInHero={true}>
+  <CenteredHero hero={hero} slides={heroSlides} fallbackImage={heroImage} wrapClass="container">
+    <SiteHeader slot="nav" variant="hero" announce={announce} />
+    <Fragment slot="below">
+      <StatsBox stats={stats} />
+      <TrustCard />
+    </Fragment>
+  </CenteredHero>
 
-  <TrustStrip />
+  <ReviewsBand />
+
+  <JobPanes panes={panes} />
+
   {site.business.directAnswer && (
     <section class="section section--tight">
       <div class="container">
         <AnswerBlock
-          question={site.business.directAnswerQuestion ??
-            `Who repairs windows and doors in ${site.contact.address.locality}?`}
+          question={site.business.directAnswerQuestion ?? `Who fits windows and doors in ${site.contact.address.locality}?`}
           answer={site.business.directAnswer}
         />
       </div>
     </section>
   )}
-  <ReviewsBand />
 
-  <ProblemOutcome />
-
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">What we do</p>
-          <h2>Our services</h2>
-        </div>
-        <p class="lede">Every job priced in writing before we start. If it can be repaired rather than replaced, we will tell you.</p>
-      </div>
-      <div class="grid grid--3 svc">
-        {services.map((s) => (
-          <a class="card card--link svc__card" href={`/services/${s.id}/`}>
-            {clientImage(s.data.image) && (
-              <span class="svc__media">
-                <Image src={clientImage(s.data.image)} alt={s.data.name} widths={[400, 720]} sizes="(max-width: 48rem) 92vw, 30vw" loading="lazy" />
-              </span>
-            )}
-            <h3>{s.data.name}</h3>
-            <p class="muted">{s.data.summary}</p>
-            <span class="svc__more">Read more &rarr;</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--surface">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Where we work</p>
-          <h2>Areas we cover</h2>
-        </div>
-        <p class="lede">
-          Based in {site.contact.address.locality}, working across {site.contact.address.region}.
-        </p>
-      </div>
-      <ul class="chips">
-        {areas.map((a) => (
-          <li><a class="chip" href={`/areas/${a.id}/`}>{a.data.name}</a></li>
-        ))}
-      </ul>
-    </div>
-  </section>
-
-  <Gallery items={site.media?.gallery ?? []} />
-
-  <AssuranceBand />
-
-  <ComparisonTable />
+  <ProofStat stat={stat} />
 
   <ProcessSteps />
 
-  <OfferBand />
+  <GuaranteeGrid promises={promises} />
+
+  <Jobs jobs={jobs} />
+
+  <ComparisonTable />
+
+  <OwnerBand />
+
+  <Coverage />
+
+  <FinancePanel finance={finance} />
 
   <FaqList faqs={homeFaqs} />
 
-  <MapBand />
-
-  <CtaBand />
+  <FinalCta panes={panes} />
 </BaseLayout>
-
-<style>
-  .hero { padding-block: clamp(var(--space-12), 6vw, var(--space-24)); position: relative; isolation: isolate; }
-  .hero--image { color: #fff; }
-  .hero__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
-  .hero--image::after {
-    content: ''; position: absolute; inset: 0; z-index: -1;
-    background: linear-gradient(100deg, color-mix(in srgb, var(--brand-dark) 92%, transparent) 0%, color-mix(in srgb, var(--brand-dark) 78%, transparent) 46%, color-mix(in srgb, var(--brand-dark) 42%, transparent) 100%);
-  }
-  .hero--image :global(h1), .hero--image .hero__lede, .hero--image .eyebrow { color: #fff; }
-  .hero--image .hero__points li { color: #fff; }
-  .hero__inner { display: grid; gap: var(--space-12); grid-template-columns: 1.05fr 0.95fr; align-items: center; }
-  .hero__lede { margin-top: var(--space-6); max-width: 34rem; }
-  .hero__actions { display: flex; gap: var(--space-4); margin-top: var(--space-8); flex-wrap: wrap; }
-  .hero__points { margin-top: var(--space-8); }
-  .hero:not(.hero--image) .hero__points { background: var(--surface); padding: var(--space-6); border-radius: var(--radius-lg); }
-  .hero__proof { display: flex; align-items: center; gap: 0.45rem; font-size: 0.95rem; }
-  .hero__stars { color: #f5a623; letter-spacing: 0.05em; }
-  .hero--image .hero__proof { color: #fff; }
-  .svc__card { display: flex; flex-direction: column; text-decoration: none; color: var(--ink); overflow: hidden; }
-  .svc__card h3 { color: var(--ink); }
-  .svc__card:hover h3 { color: var(--brand-dark); }
-  .svc__media { display: block; margin: calc(var(--space-6) * -1) calc(var(--space-6) * -1) var(--space-6); overflow: hidden; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
-  .svc__media :global(img) { width: 100%; height: 12.5rem; object-fit: cover; display: block; transition: transform 0.5s ease; }
-  .svc__card:hover .svc__media :global(img) { transform: scale(1.045); }
-  .svc__more { margin-top: auto; padding-top: var(--space-4); font-weight: 650; font-size: 0.95rem; text-decoration: none; color: var(--brand); }
-  .svc h3 a { text-decoration: none; color: var(--ink); }
-  .svc h3 a:hover { color: var(--brand); }
-  @media (max-width: 52rem) { .hero__inner { grid-template-columns: 1fr; } }
-</style>

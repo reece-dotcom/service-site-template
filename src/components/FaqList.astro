@@ -1,16 +1,20 @@
 ---
 // Headings are overridable so translated pages are not stuck with English
-// furniture around Welsh content.
-const { faqs, eyebrow = 'Common questions', heading = 'Answered honestly' } = Astro.props;
+// furniture around Welsh content. Template style: bordered expanders with a
+// round +/− marker; the first one opens by default so the block reads as
+// answers, not a list of closed doors.
+const { faqs, eyebrow = 'Common questions', heading = 'The questions we get asked every week.', openFirst = true } = Astro.props;
 ---
 {faqs?.length ? (
-  <section class="section section--surface">
+  <section class="section">
     <div class="container">
-      <p class="eyebrow">{eyebrow}</p>
-      <h2>{heading}</h2>
+      <div class="section-head">
+        <p class="eyebrow">{eyebrow}</p>
+        <h2>{heading}</h2>
+      </div>
       <div class="faq">
-        {faqs.map((f) => (
-          <details class="faq__item">
+        {faqs.map((f, i) => (
+          <details class="faq__item" open={openFirst && i === 0 ? true : undefined}>
             <summary>{f.question}</summary>
             <p>{f.answer}</p>
           </details>
@@ -20,9 +24,16 @@ const { faqs, eyebrow = 'Common questions', heading = 'Answered honestly' } = As
   </section>
 ) : null}
 <style>
-  .faq { margin-top: var(--space-8); max-width: 60rem; }
-  .faq__item { background: #fff; border-radius: var(--radius); padding: var(--space-4) var(--space-6); border: 1px solid color-mix(in srgb, var(--muted) 20%, transparent); }
-  .faq__item + .faq__item { margin-top: var(--space-3); }
-  .faq__item summary { font-weight: 650; cursor: pointer; font-family: var(--font-heading); font-size: 1.05rem; }
-  .faq__item p { margin-top: var(--space-3); color: var(--muted); }
+  .faq { max-width: 48rem; display: grid; gap: 0.6rem; }
+  .faq__item { background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--hairline); transition: border-color 0.3s; }
+  .faq__item[open] { border-color: var(--brand); }
+  .faq__item summary { cursor: pointer; list-style: none; padding: 1rem 4rem 1rem 1.4rem; position: relative; font-weight: 600; font-family: var(--font-heading); font-size: 1rem; line-height: 1.45; }
+  .faq__item summary::-webkit-details-marker { display: none; }
+  .faq__item summary::after {
+    content: '+'; position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%);
+    width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--brand-tint); color: var(--brand);
+    display: grid; place-items: center; font-size: 1.2rem; font-weight: 500; line-height: 1;
+  }
+  .faq__item[open] summary::after { content: '−'; background: var(--brand); color: #fff; }
+  .faq__item p { margin: 0; padding: 0 1.4rem 1.1rem; color: var(--muted); max-width: 70ch; font-size: 0.97rem; }
 </style>

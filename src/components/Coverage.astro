@@ -1,0 +1,83 @@
+---
+/**
+ * "Where we work." Text beside the Google map, then the area chips split into
+ * the base town (its postcode districts, from that area page's `postcodes`)
+ * and the nearby towns. One section replaces the old chip row + map band.
+ * Map uses the keyless embed; prefer the Place ID once the Google Business
+ * Profile exists so the pin is the business, not the town centre.
+ */
+import { getCollection } from 'astro:content';
+import { site } from '../lib/client.mjs';
+import { copy } from '../lib/copy.mjs';
+
+const areas = (await getCollection('areas')).filter((a) => !a.data.draft);
+const locality = site.contact.address.locality;
+const home = areas.find((a) => a.data.name.toLowerCase() === String(locality).toLowerCase());
+const nearby = areas.filter((a) => a !== home);
+
+const q = site.contact.googlePlaceId ? `place_id:${site.contact.googlePlaceId}` : site.contact.mapEmbedQuery;
+const z = site.contact.mapZoom ?? 12;
+const src = q ? `https://www.google.com/maps?q=${encodeURIComponent(q)}&z=${z}&output=embed` : null;
+const mapsLink = site.contact.googlePlaceId
+  ? `https://www.google.com/maps/place/?q=place_id:${site.contact.googlePlaceId}`
+  : q ? `https://www.google.com/maps/search/${encodeURIComponent(q)}` : null;
+const radius = site.contact.serviceRadiusKm;
+const lede = site.home?.coverageText ?? (radius
+  ? `We stay within about ${Math.round(radius / 1.6)} miles of ${locality}, so a callback in year seven is a phone call, not a claim form.`
+  : `Based in ${locality}, working across ${site.contact.address.region}.`);
+---
+{areas.length > 0 && (
+  <section class="section section--surface">
+    <div class="container">
+      <div class="cov__top">
+        <div>
+          <p class="eyebrow">Where we work</p>
+          <h2>Where we work.</h2>
+          <p class="lede cov__lede">{lede}</p>
+          <p class="muted">Outside these areas? Ring anyway — if we can't do it, we'll tell you who can.</p>
+        </div>
+        {src && (
+          <div>
+            <iframe class="cov__map" src={src} title={`Map showing ${site.business.name} in ${locality}`} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            {mapsLink && <a class="cov__link" href={mapsLink} target="_blank" rel="noopener">View on Google Maps &rarr;</a>}
+          </div>
+        )}
+      </div>
+      <div class="cov__areas">
+        {home && (
+          <div>
+            <h3>{home.data.name}</h3>
+            <ul class="chips cov__chips">
+              {(home.data.postcodes.length ? home.data.postcodes : [home.data.name]).map((pc) => (
+                <li><a class="chip" href={`/areas/${home.id}/`}>{pc === home.data.name ? pc : `${pc} ${home.data.name}`}</a></li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {nearby.length > 0 && (
+          <div>
+            <h3>{home ? copy('nearbyHeading') : 'Areas we cover'}</h3>
+            <ul class="chips cov__chips">
+              {nearby.map((a) => (
+                <li><a class="chip" href={`/areas/${a.id}/`}>{a.data.postcodes[0] ? `${a.data.postcodes[0]} ` : ''}{a.data.name}</a></li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+)}
+<style>
+  .cov__top { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+  .cov__top h2 { margin-top: 0.75rem; }
+  .cov__lede { margin-top: 1rem; }
+  .cov__lede + .muted { margin-top: 0.75rem; font-size: 0.97rem; }
+  .cov__map { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: var(--radius-lg); background: var(--brand-tint); }
+  .cov__link { display: inline-flex; margin-top: 1rem; font-weight: 600; text-decoration: none; }
+  .cov__link:hover { text-decoration: underline; }
+  .cov__areas { margin-top: clamp(1.75rem, 3.5vw, 2.5rem); display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.75rem, 5vw, 4rem); }
+  .cov__areas h3 { font-size: 1.03rem; }
+  .cov__chips { margin-top: 0.9rem; }
+  @media (max-width: 52rem) { .cov__top, .cov__areas { grid-template-columns: 1fr; } }
+</style>

@@ -27,6 +27,7 @@ assertSeo(title, description, Astro.url.pathname);
 const url = canonical(Astro.url.pathname);
 const t = site.theme;
 const dv = Object.entries(derivedVars(t)).map(([k, v]) => `${k}:${v};`).join('');
+const FONT = "'Mona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 ---
 
 <!doctype html>
@@ -46,12 +47,15 @@ const dv = Object.entries(derivedVars(t)).map(([k, v]) => `${k}:${v};`).join('')
     <meta property="og:locale" content="en_GB" />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mona+Sans:wght@400;500;600;700&display=swap" />
     <meta name="theme-color" content={t.brand} />
 
     <style is:inline set:html={`:root{
       --brand:${t.brand};--brand-dark:${t.brandDark};--accent:${t.accent};--accent-ink:${t.accentInk ?? t.ink};${dv}
       --ink:${t.ink};--muted:${t.muted};--surface:${t.surface};
-      --font-heading:${t.fontHeading};--font-body:${t.fontBody};}`}></style>
+      --font-heading:${t.fontHeading ?? FONT};--font-body:${t.fontBody ?? FONT};}`}></style>
 
     {site.analytics.plausibleDomain && (
       <script

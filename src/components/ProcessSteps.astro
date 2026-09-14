@@ -1,31 +1,37 @@
 ---
 /**
- * "How it works" strip. Steps come from business.process in site.config.mjs;
- * the fallback suits any trade that surveys before quoting.
+ * "The five things that happen, in order." Numbered circles joined by a line,
+ * template style. Steps come from business.process; the default is the
+ * template's five for a replacement installer, with the FENSA line only when
+ * the client actually holds a competent-person registration.
  */
 import { site } from '../lib/client.mjs';
+import { accreditationNames } from '../lib/business.mjs';
 
+const scheme = accreditationNames().find((n) => /fensa|certass|assure/i.test(n));
+const registration = scheme ? `${scheme.split(' ')[0]}` : null;
 const steps = site.business.process?.length
   ? site.business.process
   : [
-      { title: 'Call or message', body: 'Tell us what the problem is. Most jobs we can price sensibly over the phone.' },
-      { title: 'We look at it properly', body: 'We check the whole thing, not just the bit that failed, so it does not come back.' },
-      { title: 'Fixed price in writing', body: 'You get a price that does not move, and a date. No sales visit, no discount theatre.' },
+      { title: 'Survey', body: 'Every opening measured properly, plus a look at lintels, sills and anything the last fitter got wrong.' },
+      { title: 'Fixed price', body: 'In writing, itemised per opening. No pressure discount attached to it.' },
+      { title: 'Manufacture', body: 'Made to your measurements. Frame colour and glass spec confirmed in writing before anything is cut.' },
+      { title: 'Fit day', body: 'Dust sheets down, old units out, new ones in, everything sealed and the waste taken away. The house is watertight every night.' },
+      { title: 'Sign-off', body: registration ? `We walk the job with you, adjust anything stiff, then register it with ${registration}. Your certificate follows in the post.` : 'We walk the job with you, adjust anything stiff, and hand over the guarantee paperwork.' },
     ];
+const heading = site.business.processHeading ?? `The ${['one', 'two', 'three', 'four', 'five', 'six'][steps.length - 1] ?? steps.length} things that happen, in order.`;
 ---
 <section class="section section--surface">
   <div class="container">
     <div class="section-head">
-      <div>
-        <p class="eyebrow">How it works</p>
-        <h2>Three steps, no sales visit</h2>
-      </div>
-      <p class="lede">Nobody sits in your front room for two hours. You get a price, a date, and the work done.</p>
+      <p class="eyebrow">How it works</p>
+      <h2>{heading}</h2>
+      <p class="lede">Nobody phones you afterwards to renegotiate. The number on the quote is the number on the invoice.</p>
     </div>
-    <ol class="steps">
+    <ol class:list={['steps', `steps--n${steps.length}`]}>
       {steps.map((s, i) => (
-        <li class="steps__item">
-          <span class="steps__num">{String(i + 1).padStart(2, '0')}</span>
+        <li class="step">
+          <span class="step__n" aria-hidden="true">{i + 1}</span>
           <h3>{s.title}</h3>
           <p>{s.body}</p>
         </li>
@@ -34,9 +40,18 @@ const steps = site.business.process?.length
   </div>
 </section>
 <style>
-  .steps { list-style: none; padding: 0; display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
-  .steps__item { background: #fff; border-radius: var(--radius-lg); padding: var(--space-6); border: 1px solid var(--hairline); border-top: 3px solid var(--brand); position: relative; }
-  .steps__num { font-family: var(--font-heading); font-weight: 700; color: var(--brand); font-size: 2.4rem; opacity: 0.9; line-height: 1; letter-spacing: -0.03em; display: block; }
-  .steps__item h3 { margin-top: var(--space-3); font-size: 1.15rem; }
-  .steps__item p { margin-top: var(--space-2); color: var(--muted); font-size: 0.95rem; }
+  .steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: clamp(1.1rem, 2vw, 1.6rem); }
+  .steps--n3 { grid-template-columns: repeat(3, 1fr); }
+  .steps--n4 { grid-template-columns: repeat(4, 1fr); }
+  .step { position: relative; }
+  .step__n { font-family: var(--font-heading); font-weight: 600; font-size: 0.9rem; width: 2.4rem; height: 2.4rem; border-radius: 50%; display: grid; place-items: center; background: var(--brand); color: #fff; margin-bottom: 1rem; position: relative; z-index: 1; box-shadow: 0 0 0 6px var(--surface); }
+  .step:not(:last-child)::before { content: ''; position: absolute; top: 1.2rem; left: 2.4rem; right: calc(-1 * clamp(1.1rem, 2vw, 1.6rem)); height: 2px; background: var(--hairline-2); }
+  .step h3 { font-size: 1.05rem; margin-bottom: 0.4rem; }
+  .step p { font-size: 0.92rem; color: var(--muted); line-height: 1.6; }
+  @media (max-width: 56rem) {
+    .steps, .steps--n3, .steps--n4 { grid-template-columns: 1fr; gap: 1.5rem; }
+    .step { padding-left: 3.5rem; }
+    .step__n { position: absolute; left: 0; top: -0.25rem; margin: 0; }
+    .step:not(:last-child)::before { top: 2.4rem; bottom: -1.75rem; left: 1.15rem; right: auto; width: 2px; height: auto; }
+  }
 </style>

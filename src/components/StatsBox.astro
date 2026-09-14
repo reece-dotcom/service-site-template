@@ -1,0 +1,33 @@
+---
+/**
+ * The glass stats panel at the foot of the hero (template: 2,800 windows ·
+ * 17 yrs · 4.6 wks · 10 yrs). Config: home.stats = [{ value, label }], max 4,
+ * and only figures the client has actually given us — an invented "2,800
+ * windows fitted" is exactly the claim the CMA fines for.
+ */
+const { stats = [] } = Astro.props;
+---
+{stats.length > 0 && (
+  <div class="stats">
+    <ul class:list={['stats__list', `stats__list--n${stats.length}`]}>
+      {stats.map((s) => (
+        <li><b>{s.value}</b><span>{s.label}</span></li>
+      ))}
+    </ul>
+  </div>
+)}
+<style>
+  .stats { position: relative; z-index: 2; width: min(62.5rem, 100% - 2.5rem); margin-inline: auto; background: rgb(255 255 255 / 8%); border: 1px solid rgb(255 255 255 / 16%); border-radius: var(--radius-panel); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .stats__list { display: grid; grid-template-columns: repeat(4, 1fr); list-style: none; margin: 0; padding: 0; }
+  .stats__list--n2 { grid-template-columns: repeat(2, 1fr); }
+  .stats__list--n3 { grid-template-columns: repeat(3, 1fr); }
+  .stats__list li { padding: 1rem 1.4rem; border-left: 1px solid rgb(255 255 255 / 14%); }
+  .stats__list li:first-child { border-left: 0; }
+  .stats__list b { display: block; font-family: var(--font-heading); font-weight: 600; font-size: clamp(1.5rem, 2.6vw, 1.9rem); letter-spacing: -0.03em; line-height: 1; color: #fff; }
+  .stats__list span { display: block; font-size: 0.85rem; line-height: 1.4; margin-top: 0.4rem; color: rgb(255 255 255 / 72%); }
+  @media (max-width: 48rem) {
+    .stats__list { grid-template-columns: 1fr 1fr; }
+    .stats__list li:nth-child(3) { border-left: 0; }
+    .stats__list li:nth-child(n + 3) { border-top: 1px solid rgb(255 255 255 / 14%); }
+  }
+</style>

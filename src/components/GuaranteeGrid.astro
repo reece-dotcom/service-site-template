@@ -1,0 +1,90 @@
+---
+/**
+ * "Our N-point guarantee." Promise cards with an icon each, plus the wide
+ * tinted "Covered" card built from business.guarantee.
+ *
+ * Promises come from home.promises / business.promises / lp.promises (see
+ * home.mjs). The template's Trustworthy ("every fitter is DBS-checked") and
+ * Professional ("manufacturer-trained on every system") are claims we can
+ * only make per client, so the default set is the four that are true of any
+ * firm that runs its jobs properly. Icons are matched on the title.
+ */
+import { site } from '../lib/client.mjs';
+
+const { promises = [] } = Astro.props;
+const guarantee = site.business.guarantee;
+
+const DEFAULTS = [
+  { title: 'Reliable', body: 'A confirmed fitting date the week before, a call the morning we set off, and a realistic finish time. No open-ended "sometime that week".' },
+  { title: 'Clean', body: 'Dust sheets down before the first frame comes out. Old units, offcuts and packaging leave with us the same day, and we hoover through before we go.' },
+  { title: 'Courteous', body: 'Respectful to you, your property, your family and your neighbours. Every opening is secured while we are on site and nothing is left unsealed overnight.' },
+  { title: 'Honest', body: 'If we find rotten timber, a failed lintel or damaged reveals once the old frame is out, we stop, show you, and price it before carrying on. Otherwise the quoted price is the price you pay.' },
+];
+const items = promises.length ? promises : DEFAULTS;
+
+const ICONS = {
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+  broom: '<path d="M4 20h16"/><path d="M7 20v-5h10v5"/><path d="M9 15V4h6v11"/>',
+  hand: '<path d="M4 13h4l3 3h4"/><path d="M20 11V6a2 2 0 0 0-4 0"/><path d="M16 10V4a2 2 0 0 0-4 0v6"/><path d="M12 10V5a2 2 0 0 0-4 0v8"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+  chat: '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8"/><path d="M8 12h5"/>',
+  tools: '<path d="M3 20l7-7"/><path d="M14 4l6 6-3 3-6-6z"/><path d="M11 7L8 4H4v4l3 3"/>',
+  badge: '<circle cx="12" cy="9" r="5"/><path d="M9 13l-2 8 5-3 5 3-2-8"/>',
+  tick: '<path d="M5 12l4 4L19 7"/>',
+};
+const iconFor = (title = '') => {
+  const t = title.toLowerCase();
+  if (/reliab|time|punctual|date/.test(t)) return ICONS.clock;
+  if (/clean|tidy|mess/.test(t)) return ICONS.broom;
+  if (/courte|respect|polite|friendly/.test(t)) return ICONS.hand;
+  if (/trust|insur|check|vetted|safe/.test(t)) return ICONS.shield;
+  if (/honest|straight|price|clear/.test(t)) return ICONS.chat;
+  if (/profession|skill|trained|fitter|measure/.test(t)) return ICONS.tools;
+  if (/cover|guarantee|warrant/.test(t)) return ICONS.badge;
+  return ICONS.tick;
+};
+const count = items.length + (guarantee ? 1 : 0);
+const words = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+---
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">What you get, every job</p>
+      <h2>{site.business.promisesHeading ?? `Our ${words[count - 1] ?? count}-point guarantee`}</h2>
+      <p class="lede">The same promises on every job, from a single sash to a full house.</p>
+    </div>
+    <div class="gg">
+      {items.map((p) => (
+        <article class="gg__card">
+          <div class="gg__head">
+            <svg class="gg__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={iconFor(p.title)} />
+            <h3>{p.title}</h3>
+          </div>
+          <p>{p.body}</p>
+        </article>
+      ))}
+      {guarantee && (
+        <article class="gg__card gg__card--wide">
+          <div class="gg__head">
+            <svg class="gg__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS.badge} />
+            <h3>{guarantee.heading ?? 'Covered'}</h3>
+          </div>
+          <p>{guarantee.body}</p>
+        </article>
+      )}
+    </div>
+  </div>
+</section>
+<style>
+  .gg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .gg__card { background: #fff; border: 1px solid var(--hairline); border-radius: var(--radius-lg); padding: 1.25rem 1.4rem; display: flex; flex-direction: column; gap: 0.5rem; transition: transform 0.4s var(--ease-out), box-shadow 0.4s; }
+  .gg__card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+  .gg__card--wide { grid-column: span 2; background: var(--brand-tint); border-color: transparent; }
+  .gg__head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem; }
+  .gg__icon { width: 2.25rem; height: 2.25rem; flex: none; color: var(--brand); background: var(--brand-tint); border-radius: 50%; padding: 0.5rem; }
+  .gg__card--wide .gg__icon { background: var(--brand); color: #fff; }
+  .gg__card h3 { font-size: 1.03rem; }
+  .gg__card p { font-size: 0.92rem; line-height: 1.6; color: var(--muted); max-width: 46ch; }
+  @media (max-width: 62rem) { .gg { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 36rem) { .gg { grid-template-columns: 1fr; } .gg__card--wide { grid-column: span 1; } }
+</style>

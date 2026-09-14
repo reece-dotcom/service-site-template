@@ -257,7 +257,5 @@ export default {
     ink: '#16202b',
     muted: '#5b6b7c',
     surface: '#f5f7fa',
-    fontHeading: "'Bricolage Grotesque', system-ui, sans-serif",
-    fontBody: "system-ui, -apple-system, 'Segoe UI', sans-serif",
   },
 };

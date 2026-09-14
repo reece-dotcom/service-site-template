@@ -36,7 +36,10 @@ export function contrast(a, b) {
 export function derivedVars(t) {
   const onDark = contrast(t.accent, t.ink) >= 3 ? t.accent : '#FFFFFF';
   const brandOnDark = contrast(t.brand, t.ink) >= 3 ? t.brand : '#FFFFFF';
-  return { '--accent-on-dark': onDark, '--brand-on-dark': brandOnDark };
+  // Text colour for a brand-filled pill on a dark ground: white on a real
+  // brand colour, ink when the "brand" had to fall back to white.
+  const brandOnDarkInk = brandOnDark === '#FFFFFF' ? t.ink : '#FFFFFF';
+  return { '--accent-on-dark': onDark, '--brand-on-dark': brandOnDark, '--brand-on-dark-ink': brandOnDarkInk };
 }
 
 /** Problems a human would spot on hover / in the footer. Used by scripts/qa.mjs. */

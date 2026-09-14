@@ -1,0 +1,48 @@
+---
+/**
+ * Owner band on the home page: dark gradient, portrait, and the "who turns
+ * up at your door" story. Renders only when business.owner.name is set —
+ * never invent a person. Copy comes from about.story (first two paragraphs)
+ * or home.ownerText; heading from home.ownerHeading.
+ */
+import { Image } from 'astro:assets';
+import { site } from '../lib/client.mjs';
+import { clientImage } from '../lib/images.mjs';
+
+const owner = site.business.owner;
+const about = site.business.about ?? {};
+const home = site.home ?? {};
+const first = owner?.name?.split(' ')[0];
+const photo = clientImage(home.ownerPhoto ?? about.photo);
+const paras = home.ownerText ?? (about.story ?? []).slice(0, 2);
+const heading = home.ownerHeading ?? `You'll deal with ${first} from the first call to the last fitting day.`;
+---
+{owner?.name && paras.length > 0 && (
+  <section class="section owner">
+    <div class="container owner__grid">
+      {photo ? (
+        <Image class="owner__photo" src={photo} alt={`${owner.name}, ${owner.role ?? 'owner'} of ${site.business.name}`} widths={[400, 800]} sizes="(max-width: 52rem) 70vw, 16rem" loading="lazy" />
+      ) : (
+        <div class="owner__mark" aria-hidden="true">{first?.[0]}</div>
+      )}
+      <div>
+        <p class="eyebrow owner__eyebrow">Who turns up</p>
+        <h2>{heading}</h2>
+        {paras.map((p) => <p class="owner__p">{p}</p>)}
+        <p class="owner__sig">{owner.name}{owner.role ? `, ${owner.role.toLowerCase()}` : ''}</p>
+      </div>
+    </div>
+  </section>
+)}
+<style>
+  .owner { background: var(--gradient); color: #fff; }
+  .owner__grid { display: grid; grid-template-columns: 16rem 1fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+  .owner :global(h2) { color: #fff; margin-top: 0.75rem; }
+  .owner__eyebrow { color: var(--brand-on-dark); }
+  .owner__eyebrow::before { background: var(--brand-on-dark); }
+  .owner__photo { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius-panel); border: 1px solid rgb(255 255 255 / 14%); }
+  .owner__mark { aspect-ratio: 4 / 5; border-radius: var(--radius-panel); background: rgb(255 255 255 / 7%); border: 1px solid rgb(255 255 255 / 14%); display: grid; place-items: center; font-family: var(--font-heading); font-weight: 600; font-size: 5rem; color: rgb(255 255 255 / 55%); }
+  .owner__p { margin-top: 1rem; color: rgb(255 255 255 / 80%); font-size: 1.05rem; max-width: 60ch; }
+  .owner__sig { font-weight: 600; color: var(--brand-on-dark); margin-top: 1.1rem; }
+  @media (max-width: 52rem) { .owner__grid { grid-template-columns: 1fr; } .owner__photo, .owner__mark { max-width: 17rem; } }
+</style>

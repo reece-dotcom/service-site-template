@@ -1,0 +1,45 @@
+---
+/**
+ * The big proof number with its basis and an optional bar chart (template:
+ * "91% fitted within six weeks"). Config home.stat = { value, label, basis,
+ * bars?: [{ label, pct }] }. `basis` is mandatory — see validateStat().
+ */
+const { stat } = Astro.props;
+const max = Math.max(1, ...(stat?.bars ?? []).map((b) => b.pct));
+---
+{stat && (
+  <section class="section">
+    <div class:list={['container', 'proof', stat.bars?.length && 'proof--chart']}>
+      <div>
+        <p class="proof__big">{stat.value}</p>
+        <h2 class="proof__label">{stat.label}</h2>
+        <p class="proof__src">Source: {stat.basis}</p>
+      </div>
+      {stat.bars?.length > 0 && (
+        <div class="chart" role="img" aria-label={stat.bars.map((b) => `${b.label}: ${b.pct}%`).join(', ')}>
+          {stat.bars.map((b) => (
+            <div class="chart__row">
+              <span>{b.label}</span>
+              <span class="chart__track"><span class:list={['chart__bar', b.late && 'chart__bar--late']} style={`width:${Math.round((b.pct / max) * 100)}%`}></span></span>
+              <span class="chart__pct">{b.pct}%</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+)}
+<style>
+  .proof { display: grid; gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+  .proof--chart { grid-template-columns: 0.9fr 1.1fr; }
+  .proof__big { font-family: var(--font-heading); font-weight: 600; font-size: clamp(4rem, 8vw, 6.5rem); letter-spacing: -0.05em; line-height: 0.9; color: var(--brand); }
+  .proof__label { font-size: clamp(1.3rem, 2.2vw, 1.6rem); margin-top: 0.9rem; }
+  .proof__src { font-size: 0.82rem; color: var(--muted); font-style: italic; max-width: 46ch; margin-top: 1rem; line-height: 1.6; }
+  .chart { display: grid; gap: 0.7rem; background: #fff; border: 1px solid var(--hairline); border-radius: var(--radius-panel); padding: clamp(1.25rem, 2.4vw, 1.75rem); }
+  .chart__row { display: grid; grid-template-columns: 5.5rem 1fr 2.75rem; align-items: center; gap: 0.75rem; font-size: 0.88rem; color: var(--ink); }
+  .chart__track { display: block; }
+  .chart__bar { display: block; height: 0.75rem; background: var(--brand); border-radius: var(--radius-pill); }
+  .chart__bar--late { background: transparent; border: 1.5px dashed var(--brand); }
+  .chart__pct { text-align: right; font-weight: 600; }
+  @media (max-width: 52rem) { .proof--chart { grid-template-columns: 1fr; } }
+</style>

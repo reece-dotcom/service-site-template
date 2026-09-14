@@ -1,0 +1,30 @@
+---
+/**
+ * Finance panel ("Spread it over two years at 0%"). Opt-in and guarded: the
+ * client must supply the FCA firm reference and a representative example
+ * (validateFinance in lp.mjs) or the build fails. Config home.finance =
+ * { heading, body, cta?, href?, fcaFirmRef, representativeExample }.
+ */
+const { finance } = Astro.props;
+---
+{finance && (
+  <section class="section section--tight">
+    <div class="container">
+      <div class="fin">
+        <div>
+          <h2>{finance.heading ?? 'Spread the cost'}</h2>
+          <p class="fin__p">{finance.body}</p>
+          <p class="fin__small">{finance.representativeExample} FCA firm reference {finance.fcaFirmRef}.</p>
+        </div>
+        <a class="btn btn--light" href={finance.href ?? '/contact/'}>{finance.cta ?? 'See the finance options'}</a>
+      </div>
+    </div>
+  </section>
+)}
+<style>
+  .fin { background: var(--gradient); color: #fff; border-radius: var(--radius-panel); display: grid; grid-template-columns: 1fr auto; gap: 1.75rem; align-items: center; padding: clamp(1.5rem, 3.2vw, 2.5rem); }
+  .fin :global(h2) { color: #fff; font-size: clamp(1.4rem, 2.5vw, 1.9rem); }
+  .fin__p { color: rgb(255 255 255 / 80%); max-width: 60ch; margin-top: 0.6rem; font-size: 0.97rem; }
+  .fin__small { color: rgb(255 255 255 / 62%); max-width: 60ch; margin-top: 0.6rem; font-size: 0.8rem; }
+  @media (max-width: 48rem) { .fin { grid-template-columns: 1fr; } }
+</style>
